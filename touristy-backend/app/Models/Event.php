@@ -29,4 +29,9 @@ class Event extends Model
     {
         return $this->belongsTo(Location::class);
     }
+
+    public function interested_users()
+    {
+        return $this->belongsToMany(User::class, 'interested_events', 'event_id', 'user_id');
+    }
 }
