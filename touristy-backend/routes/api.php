@@ -20,9 +20,9 @@ Route::group(['prefix' => 'v0.1'], function () {
     Route::group(['middleware' => ['jwt.verify']], function () {
         Route::group(['prefix' => 'users'], function () {
             Route::get('/', [UserController::class, 'index']);
-            Route::get('/{id?}', [UserController::class, 'show']);
+            Route::get('/user/{id?}', [UserController::class, 'show']);
             Route::put('/{id?}', [UserController::class, 'update']);
-            Route::delete('/{id?}', [UserController::class, 'delete']);
+            Route::delete('/{id?}', [UserController::class, 'deleteAccount']);
         });
     });
 });
