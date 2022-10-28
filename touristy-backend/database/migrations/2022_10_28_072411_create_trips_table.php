@@ -19,8 +19,8 @@ class CreateTripsTable extends Migration
             $table->integer('location_id');
             $table->string('title');
             $table->text('description');
-            $table->date('arrival_date');
-            $table->date('departure_date');
+            $table->datetime('arrival_date');
+            $table->datetime('departure_date');
             $table->tinyinteger('is_past')->default(0);
             $table->timestamps();
         });
