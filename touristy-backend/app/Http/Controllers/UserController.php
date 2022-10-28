@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Traits\MediaTrait;
 use App\Traits\ResponseJson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
-    use ResponseJson;
+    use ResponseJson, MediaTrait;
     public function index()
     {
         $users = User::all();
@@ -32,7 +33,6 @@ class UserController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
-
         //Validate data
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string',
