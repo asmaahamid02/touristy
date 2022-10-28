@@ -122,4 +122,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsToMany(User::class, 'followships', 'followed_user_id', 'user_id')->withTimestamps();
     }
+
+    public function blocked_users()
+    {
+        return $this->belongsToMany(User::class, 'blockships', 'user_id', 'blocked_user_id')->withTimestamps();
+    }
+
+    public function blocked_by()
+    {
+        return $this->belongsToMany(User::class, 'blockships', 'blocked_user_id', 'user_id')->withTimestamps();
+    }
 }

@@ -23,29 +23,30 @@ class UserController extends Controller
 
     public function show($id = null)
     {
-        if ($id == null) {
-            $user = Auth::user();
-        } else {
-            $user = User::where('id', $id)->where('is_deleted', 0)->first();
 
-            if (!$user) {
-                return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
-            }
+        if ($id == null)
+            $id = Auth::id();
+
+
+        $user = User::where('id', $id)->where('is_deleted', 0)->first();
+
+        if (!$user) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
         }
+
 
         return $this->jsonResponse($user, 'data', Response::HTTP_OK, 'User');
     }
 
     public function update(Request $request, $id = null)
     {
-        if ($id == null) {
-            $user = Auth::user();
-        } else {
-            $user = User::where('id', $id)->where('is_deleted', 0)->first();
+        if ($id == null)
+            $id = Auth::id();
 
-            if ($user == null) {
-                return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
-            }
+        $user = User::where('id', $id)->where('is_deleted', 0)->first();
+
+        if ($user == null) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
         //Validate data
@@ -91,23 +92,26 @@ class UserController extends Controller
 
     public function deleteAccount($id = null)
     {
-        if ($id == null) {
-            $user = Auth::user();
-        } else {
-            $user = User::where('id', $id)->where('is_deleted', 0)->first();
+        if ($id == null)
+            $id = Auth::id();
 
-            if ($user == null) {
-                return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
-            }
+        $user = User::where('id', $id)->where('is_deleted', 0)->first();
 
-            if ($user->user_type->type == 'admin') {
-                return $this->jsonResponse('', 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'Admin cannot be deleted');
-            }
+        if ($user == null) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+        }
+
+        if ($user->user_type->type == 'admin') {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'Admin cannot be deleted');
         }
 
         $user->is_deleted = 1;
         $user->email = $user->email . '_deleted';
         $user->save();
+
+        if ($id == null) {
+            Auth::logout();
+        }
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Account deleted successfully');
     }
