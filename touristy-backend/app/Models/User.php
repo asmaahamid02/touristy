@@ -46,7 +46,7 @@ class User extends Authenticatable
         return $this->hasMany(Group::class);
     }
 
-    public function trips()
+    public function created_trips()
     {
         return $this->hasMany(Trip::class);
     }
@@ -56,7 +56,7 @@ class User extends Authenticatable
         return $this->belongsToMany(Group::class);
     }
 
-    public function events()
+    public function created_events()
     {
         return $this->hasMany(Event::class);
     }
