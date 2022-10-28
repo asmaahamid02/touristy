@@ -108,4 +108,10 @@ class AuthController extends Controller
         //Token created, return with success response and jwt token
         return $this->jsonResponse(['token' => $token], 'data', Response::HTTP_OK, 'Login successful');
     }
+
+    public function me()
+    {
+        $user = auth()->user();
+        return $this->jsonResponse($user, 'data', Response::HTTP_OK, 'User data');
+    }
 }
