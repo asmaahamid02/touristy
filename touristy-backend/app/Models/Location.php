@@ -15,4 +15,9 @@ class Location extends Model
         'city',
         'country',
     ];
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }
