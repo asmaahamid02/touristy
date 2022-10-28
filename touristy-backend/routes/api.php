@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -13,6 +14,12 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/me', [AuthController::class, 'me']);
             Route::get('/refresh', [AuthController::class, 'refresh']);
             Route::get('/logout', [AuthController::class, 'logout']);
+        });
+    });
+
+    Route::group(['middleware' => ['jwt.verify']], function () {
+        Route::group(['prefix' => 'users'], function () {
+            Route::get('/', [UserController::class, 'index']);
         });
     });
 });
