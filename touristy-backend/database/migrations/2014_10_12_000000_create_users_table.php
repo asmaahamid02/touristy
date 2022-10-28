@@ -24,6 +24,7 @@ class CreateUsersTable extends Migration
             $table->string('gender');
             $table->string('profile_picture')->nullable();
             $table->string('cover_picture')->nullable();
+            $table->string('bio', 150)->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
