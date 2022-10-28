@@ -12,4 +12,9 @@ class Nationality extends Model
     protected $fillable = [
         'nationality',
     ];
+
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
 }
