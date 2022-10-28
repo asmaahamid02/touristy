@@ -75,6 +75,37 @@ class AuthController extends Controller
 
         //User created, return success response
 
-        return $this->jsonResponse($user, 'data', Response::HTTP_CREATED, 'User created successfully');
+        return $this->login($request);
+        // return $this->jsonResponse($user, 'data', Response::HTTP_CREATED, 'User created successfully');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        //valid credential
+        $validator = Validator::make($credentials, [
+            'email' => 'required|email',
+            'password' => 'required|string|min:6|max:50'
+        ]);
+
+        //Send failed response if request is not valid
+        if ($validator->fails()) {
+            return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error');
+        }
+
+        //Request is validated
+        //Crean token
+        try {
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return $this->jsonResponse('', 'data', Response::HTTP_BAD_REQUEST, 'Invalid email or password');
+            }
+        } catch (JWTException $e) {
+            return $credentials;
+            return $this->jsonResponse('', 'data', Response::HTTP_INTERNAL_SERVER_ERROR, 'Could not create token');
+        }
+
+        //Token created, return with success response and jwt token
+        return $this->jsonResponse(['token' => $token], 'data', Response::HTTP_OK, 'Login successful');
     }
 }
