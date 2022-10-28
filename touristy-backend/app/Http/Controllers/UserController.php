@@ -21,14 +21,19 @@ class UserController extends Controller
         return $this->jsonResponse($users, 'data', Response::HTTP_OK, 'Users');
     }
 
-    public function show($id)
+    public function show($id = null)
     {
-        $user = User::find($id)->first();
-        if ($user) {
-            return $this->jsonResponse($user, 'data', Response::HTTP_OK, 'User');
+        if ($id == null) {
+            $user = Auth::user();
         } else {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            $user = User::where('id', $id)->where('is_deleted', 0)->first();
+
+            if (!$user) {
+                return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            }
         }
+
+        return $this->jsonResponse($user, 'data', Response::HTTP_OK, 'User');
     }
 
     public function update(Request $request, $id = null)
@@ -36,7 +41,7 @@ class UserController extends Controller
         if ($id == null) {
             $user = Auth::user();
         } else {
-            $user = User::find($id)->first();
+            $user = User::where('id', $id)->where('is_deleted', 0)->first();
 
             if ($user == null) {
                 return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
@@ -89,7 +94,7 @@ class UserController extends Controller
         if ($id == null) {
             $user = Auth::user();
         } else {
-            $user = User::find($id)->first();
+            $user = User::where('id', $id)->where('is_deleted', 0)->first();
 
             if ($user == null) {
                 return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
