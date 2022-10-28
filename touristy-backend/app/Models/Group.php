@@ -15,4 +15,10 @@ class Group extends Model
         'image',
         'creator_id',
     ];
+
+    // Relationships
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'creator_id');
+    }
 }
