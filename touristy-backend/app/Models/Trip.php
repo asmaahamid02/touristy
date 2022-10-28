@@ -18,4 +18,10 @@ class Trip extends Model
         'departure_date',
         'is_past',
     ];
+
+    // Relationships
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
