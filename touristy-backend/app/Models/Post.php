@@ -27,4 +27,9 @@ class Post extends Model
     {
         return $this->belongsTo(Location::class);
     }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class)->withTimestamps();
+    }
 }
