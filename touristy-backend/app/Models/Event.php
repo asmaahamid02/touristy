@@ -34,4 +34,9 @@ class Event extends Model
     {
         return $this->belongsToMany(User::class, 'interested_events', 'event_id', 'user_id');
     }
+
+    public function joined_users()
+    {
+        return $this->belongsToMany(User::class, 'joined_events', 'event_id', 'user_id');
+    }
 }
