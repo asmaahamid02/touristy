@@ -25,4 +25,9 @@ class Location extends Model
     {
         return $this->hasMany(Trip::class);
     }
+
+    public function events()
+    {
+        return $this->hasMany(Event::class);
+    }
 }
