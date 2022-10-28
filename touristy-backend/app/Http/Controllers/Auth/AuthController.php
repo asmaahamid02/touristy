@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserType;
+use App\Traits\MediaTrait;
 use App\Traits\ResponseJson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +15,7 @@ use JWTAuth;
 
 class AuthController extends Controller
 {
-    use ResponseJson;
+    use ResponseJson, MediaTrait;
     public function register(Request $request)
     {
         //Validate data
@@ -53,28 +54,13 @@ class AuthController extends Controller
 
 
         if ($request->has('profile_picture')) {
-            $base64Image = $request->profile_picture;
-
-            //split the base64URL from the image data
-            @list($type, $fileData) = explode(';', $base64Image);
-            //get the file extension
-            @list(, $extension) = explode('/', $type);
-            //get the file data
-            @list(, $fileData) = explode(',', $fileData);
-            //specify the full image name
-            $imageName = rand(100000, 999999) . time() . '.' . $extension;
-            //save the image to the specified path
-
-            $path = 'profiles/' . time() . '/' . $imageName;
-            Storage::put($path, base64_decode($fileData));
-
+            $path = $this->saveBase64Image($request->profile_picture, 'profile_pictures');
             $user->profile_picture = $path;
         }
 
         $user->save();
 
         //User created, return success response
-
         return $this->login($request);
         // return $this->jsonResponse($user, 'data', Response::HTTP_CREATED, 'User created successfully');
     }
