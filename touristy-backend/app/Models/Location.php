@@ -20,4 +20,9 @@ class Location extends Model
     {
         return $this->hasMany(Post::class);
     }
+
+    public function trips()
+    {
+        return $this->hasMany(Trip::class);
+    }
 }
