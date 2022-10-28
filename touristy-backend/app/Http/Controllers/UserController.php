@@ -16,7 +16,7 @@ class UserController extends Controller
     use ResponseJson, MediaTrait;
     public function index()
     {
-        $users = User::all();
+        $users = User::where('is_deleted', 0)->get();
         return $this->jsonResponse($users, 'data', Response::HTTP_OK, 'Users');
     }
 
