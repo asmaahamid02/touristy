@@ -18,4 +18,10 @@ class Event extends Model
         'location_id',
         'user_id',
     ];
+
+    // Relationships
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
