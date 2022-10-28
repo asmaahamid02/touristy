@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
@@ -30,14 +31,19 @@ class UserController extends Controller
         }
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id = null)
     {
-        $user = Auth::user();
+        if ($id == null) {
+            $user = Auth::user();
+        } else {
+            $user = User::find($id)->first();
+        }
+
         //Validate data
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string',
             'last_name' => 'required|string',
-            'gender' => 'required|string',
+            'gender' => 'required|string|in:male,female,other',
             'date_of_birth' => 'required|date',
             'profile_picture' => 'nullable|base64image',
             'cover_picture' => 'nullable|base64image',
@@ -72,10 +78,5 @@ class UserController extends Controller
         $user->save();
 
         return $this->jsonResponse($user, 'data', Response::HTTP_OK, 'Profile updated successfully');
-    }
-
-    public function delete($id)
-    {
-        //
     }
 }
