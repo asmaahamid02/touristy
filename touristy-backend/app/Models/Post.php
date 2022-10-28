@@ -47,4 +47,9 @@ class Post extends Model
     {
         return $this->belongsToMany(User::class, 'likes', 'post_id', 'user_id');
     }
+
+    public function media()
+    {
+        return $this->hasMany(PostMedia::class);
+    }
 }
