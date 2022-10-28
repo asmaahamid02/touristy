@@ -37,6 +37,10 @@ class UserController extends Controller
             $user = Auth::user();
         } else {
             $user = User::find($id)->first();
+
+            if ($user == null) {
+                return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            }
         }
 
         //Validate data
@@ -78,5 +82,28 @@ class UserController extends Controller
         $user->save();
 
         return $this->jsonResponse($user, 'data', Response::HTTP_OK, 'Profile updated successfully');
+    }
+
+    public function deleteAccount($id = null)
+    {
+        if ($id == null) {
+            $user = Auth::user();
+        } else {
+            $user = User::find($id)->first();
+
+            if ($user == null) {
+                return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            }
+
+            if ($user->user_type->type == 'admin') {
+                return $this->jsonResponse('', 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'Admin cannot be deleted');
+            }
+        }
+
+        $user->is_deleted = 1;
+        $user->email = $user->email . '_deleted';
+        $user->save();
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Account deleted successfully');
     }
 }
