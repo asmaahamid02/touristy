@@ -32,4 +32,9 @@ class Post extends Model
     {
         return $this->belongsToMany(Tag::class)->withTimestamps();
     }
+
+    public function mentioned_users()
+    {
+        return $this->belongsToMany(User::class, 'posts_mentions', 'post_id', 'user_id');
+    }
 }
