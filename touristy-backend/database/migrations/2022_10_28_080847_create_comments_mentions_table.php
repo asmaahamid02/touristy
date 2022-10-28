@@ -17,7 +17,6 @@ class CreateCommentsMentionsTable extends Migration
             $table->id();
             $table->integer('comment_id');
             $table->integer('user_id');
-            $table->integer('mentioned_user_id');
             $table->timestamps();
         });
     }
