@@ -16,4 +16,10 @@ class Post extends Model
         'image',
         'publicity',
     ];
+
+    // Relationships
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
