@@ -80,4 +80,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Comment::class);
     }
+
+    public function mentioned_in_comments()
+    {
+        return $this->belongsToMany(Comment::class, 'comments_mentions', 'user_id', 'comment_id');
+    }
 }
