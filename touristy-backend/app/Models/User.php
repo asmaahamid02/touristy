@@ -30,4 +30,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Nationality::class);
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }
