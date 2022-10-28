@@ -120,4 +120,11 @@ class AuthController extends Controller
         $token = auth()->refresh();
         return $this->jsonResponse(['token' => $token], 'data', Response::HTTP_OK, 'Token refreshed successfully');
     }
+
+    public function logout()
+    {
+        auth()->logout();
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'User logged out successfully');
+    }
 }
