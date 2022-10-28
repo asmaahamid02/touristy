@@ -12,6 +12,7 @@ Route::group(['prefix' => 'v0.1'], function () {
         Route::group(['middleware' => ['jwt.verify']], function () {
             Route::get('/me', [AuthController::class, 'me']);
             Route::get('/refresh', [AuthController::class, 'refresh']);
+            Route::get('/logout', [AuthController::class, 'logout']);
         });
     });
 });
