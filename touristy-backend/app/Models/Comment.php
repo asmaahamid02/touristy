@@ -35,4 +35,9 @@ class Comment extends Model
     {
         return $this->hasMany(Comment::class);
     }
+
+    public function mentioned_users()
+    {
+        return $this->belongsToMany(User::class, 'comments_mentions', 'comment_id', 'user_id');
+    }
 }
