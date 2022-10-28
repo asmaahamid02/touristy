@@ -18,8 +18,8 @@ class CreatePostsTable extends Migration
             $table->integer('user_id');
             $table->integer('location_id');
             $table->text('content');
-            $table->string('image')->nullable();
             $table->enum('publicity', ['public', 'followers'])->default('public');
+            $table->tinyInteger('is_deleted')->default(0);
             $table->timestamps();
         });
     }
