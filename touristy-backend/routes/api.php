@@ -61,6 +61,7 @@ Route::group(['prefix' => 'v0.1'], function () {
         //events
         Route::group(['prefix' => 'events'], function () {
             Route::get('/', [EventController::class, 'index']);
+            Route::post('/', [EventController::class, 'create']);
         });
     });
 });
