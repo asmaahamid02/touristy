@@ -52,6 +52,7 @@ Route::group(['prefix' => 'v0.1'], function () {
         //comments
         Route::group(['prefix' => 'comments'], function () {
             Route::post('/', [CommentController::class, 'create']);
+            Route::put('/{id}', [CommentController::class, 'update']);
         });
     });
 });
