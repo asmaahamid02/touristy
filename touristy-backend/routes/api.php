@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\TripController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,11 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::post('/', [PostController::class, 'create']);
             Route::put('/{id}', [PostController::class, 'update']);
             Route::delete('/{id}', [PostController::class, 'delete']);
+        });
+
+        //trips
+        Route::group(['prefix' => 'trips'], function () {
+            Route::get('/', [TripController::class, 'index']);
         });
     });
 });
