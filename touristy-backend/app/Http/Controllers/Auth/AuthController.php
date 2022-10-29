@@ -51,14 +51,13 @@ class AuthController extends Controller
         $user->password = bcrypt($request->password);
         $user->gender = $request->gender;
         $user->date_of_birth = $request->date_of_birth;
-
+        $user->save();
 
         if ($request->has('profile_picture')) {
-            $path = $this->saveBase64Image($request->profile_picture, 'profile_pictures');
+            $path = $this->saveBase64Image($request->profile_picture, 'profile_pictures/' . $user->id);
             $user->profile_picture = $path;
+            $user->save();
         }
-
-        $user->save();
 
         //User created, return success response
         return $this->login($request);
