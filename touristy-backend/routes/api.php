@@ -54,6 +54,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::post('/', [CommentController::class, 'create']);
             Route::put('/{id}', [CommentController::class, 'update']);
             Route::delete('/{id}', [CommentController::class, 'delete']);
+            Route::get('/post/{id}', [CommentController::class, 'getCommentsByPost']);
         });
     });
 });
