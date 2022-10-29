@@ -77,7 +77,65 @@ class EventController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $event = Event::find($id)->with('user')->with('location')->first();
+
+        if (!$event) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Event not found');
+        }
+
+        if ($event->user_id != Auth::id()) {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'string',
+            'description' => 'string',
+            'start_date' => 'date|after_or_equal:now',
+            'end_date' => 'date|after_or_equal:start_date',
+            'image' => 'base64image',
+            'longitude' => 'numeric',
+            'latitude' => 'numeric',
+            'city' => 'string',
+            'country' => 'string',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_BAD_REQUEST, 'Validation error');
+        }
+
+        if ($request->has('name')) {
+            $event->name = $request->name;
+        }
+
+        if ($request->has('description')) {
+            $event->description = $request->description;
+        }
+
+        if ($request->has('start_date')) {
+            $event->start_date = $request->start_date;
+        }
+
+        if ($request->has('end_date')) {
+            $event->end_date = $request->end_date;
+        }
+
+        if ($request->has('image')) {
+            // Delete old image
+            if ($event->image) {
+                $this->deleteMedia($event->image);
+            }
+
+            $event->image = $this->saveBase64Image($request->image, 'events' . DIRECTORY_SEPARATOR . Auth::id());
+        }
+
+        if ($request->has('longitude') && $request->has('latitude') && $request->has('city') && $request->has('country')) {
+            $location_id = $this->saveLocation($request->latitude, $request->longitude, $request->city, $request->country);
+            $event->location_id = $location_id;
+        }
+
+        $event->save();
+
+        return $this->jsonResponse($event, 'data', Response::HTTP_OK, 'Event updated');
     }
 
     public function delete($id)
