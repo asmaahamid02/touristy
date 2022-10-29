@@ -66,6 +66,18 @@ class CommentController extends Controller
 
     public function delete($id)
     {
-        //
+        $comment = Comment::find($id)->first();
+
+        if (!$comment) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Comment not found');
+        }
+
+        if ($comment->user_id != Auth::id()) {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+        }
+
+        $comment->delete();
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Comment deleted');
     }
 }
