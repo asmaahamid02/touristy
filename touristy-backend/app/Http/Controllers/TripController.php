@@ -111,6 +111,14 @@ class TripController extends Controller
 
     public function destroy($id)
     {
-        //
+        $trip = Trip::where('id', $id)->first();
+
+        if (!$trip) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Trip not found');
+        }
+
+        $trip->delete();
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Trip deleted');
     }
 }
