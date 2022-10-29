@@ -180,4 +180,25 @@ class EventController extends Controller
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Event added to your interested events');
     }
+
+    public function joinEvent($id)
+    {
+        $user_id = Auth::id();
+
+        $event = Event::where('id', $id)->where('user_id', '!=', $user_id)->first();
+
+        if (!$event) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Event not found');
+        }
+
+        if ($event->joined_users()->where('user_id', $user_id)->first()) {
+            $event->joined_users()->detach($user_id);
+
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Event removed from joined events');
+        }
+
+        $event->joined_users()->attach($user_id);
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Event added to your joined events');
+    }
 }
