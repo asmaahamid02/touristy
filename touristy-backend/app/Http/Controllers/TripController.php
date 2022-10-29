@@ -29,9 +29,9 @@ class TripController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string',
             'description' => 'required|string',
-            'arrival_date' => 'required_without:is_past|date',
-            'departure_date' => 'required_without:is_past|date',
-            'is_past' => 'required_without_all:arrival_date,departure_date|date',
+            'arrival_date' => 'required_without:is_past|date|after_or_equal:' . date('Y-m-d'),
+            'departure_date' => 'required_without:is_past|date|after:arrival_date',
+            'is_past' => 'required_without_all:arrival_date,departure_date|date|before:' . date('Y-m-d'),
             'longitude' => 'required|numeric',
             'latitude' => 'required|numeric',
             'city' => 'required|string',
@@ -85,9 +85,9 @@ class TripController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string',
             'description' => 'required|string',
-            'arrival_date' => 'required_without:is_past|date',
-            'departure_date' => 'required_without:is_past|date',
-            'is_past' => 'required_without_all:arrival_date,departure_date|date',
+            'arrival_date' => 'required_without:is_past|date|after_or_equal:' . date('Y-m-d'),
+            'departure_date' => 'required_without:is_past|date|after:arrival_date',
+            'is_past' => 'required_without_all:arrival_date,departure_date|date|before:' . date('Y-m-d'),
         ]);
 
         if ($validator->fails()) {
