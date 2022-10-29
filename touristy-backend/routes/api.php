@@ -33,6 +33,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/{id}', [PostController::class, 'show']);
             Route::post('/', [PostController::class, 'create']);
             Route::put('/{id}', [PostController::class, 'update']);
+            Route::delete('/{id}', [PostController::class, 'delete']);
         });
     });
 });
