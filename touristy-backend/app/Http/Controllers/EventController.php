@@ -159,4 +159,25 @@ class EventController extends Controller
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Event deleted');
     }
+
+    public function interestInEvent($id)
+    {
+        $user_id = Auth::id();
+
+        $event = Event::where('id', $id)->where('user_id', '!=', $user_id)->first();
+
+        if (!$event) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Event not found');
+        }
+
+        if ($event->interested_users()->where('user_id', $user_id)->first()) {
+            $event->interested_users()->detach($user_id);
+
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Event removed from interested events');
+        }
+
+        $event->interested_users()->attach($user_id);
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Event added to your interested events');
+    }
 }
