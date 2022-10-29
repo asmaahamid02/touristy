@@ -140,6 +140,23 @@ class EventController extends Controller
 
     public function delete($id)
     {
-        //
+        $event = Event::find($id)->first();
+
+        if (!$event) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Event not found');
+        }
+
+        if ($event->user_id != Auth::id()) {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+        }
+
+        // Delete old image
+        if ($event->image) {
+            $this->deleteMedia($event->image);
+        }
+
+        $event->delete();
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Event deleted');
     }
 }
