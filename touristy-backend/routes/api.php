@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\UserController;
@@ -46,6 +47,11 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::delete('/{id}', [TripController::class, 'delete']);
             Route::get('/user/{id}', [TripController::class, 'getTripsByUser']);
             Route::get('/location/{id}', [TripController::class, 'getTripsByLocation']);
+        });
+
+        //comments
+        Route::group(['prefix' => 'comments'], function () {
+            Route::post('/', [CommentController::class, 'create']);
         });
     });
 });
