@@ -17,13 +17,13 @@ class PostController extends Controller
     use ResponseJson, MediaTrait;
     public function index()
     {
-        $posts  = Post::where('is_deleted', 0)->get();
+        $posts  = Post::where('is_deleted', 0)->orderBy('created_at', 'desc')->get();
 
         if ($posts->count() == 0) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'No posts found');
         }
 
-        return $this->jsonResponse($posts, 'data', Response::HTTP_OK, 'Posts');
+        return $this->jsonResponse($posts->load(['tags', 'media']), 'data', Response::HTTP_OK, 'Posts');
     }
 
     public function create(Request $request)
@@ -131,14 +131,15 @@ class PostController extends Controller
         }
     }
 
-    public function store(Request $request)
-    {
-        //
-    }
-
     public function show($id)
     {
-        //
+        $post = Post::where('id', $id)->where('is_deleted', 0)->first();
+
+        if (!$post) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Post not found');
+        }
+
+        return $this->jsonResponse($post->load(['tags', 'media']), 'data', Response::HTTP_OK, 'Post');
     }
 
     public function edit($id)
