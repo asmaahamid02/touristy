@@ -80,4 +80,15 @@ class CommentController extends Controller
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Comment deleted');
     }
+
+    public function getCommentsByPost($post_id)
+    {
+        $comments = Comment::where('post_id', $post_id)->with('user')->with('replies')->get();
+
+        if ($comments->count() == 0) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Comments not found');
+        }
+
+        return $this->jsonResponse($comments, 'data', Response::HTTP_OK, 'Comments');
+    }
 }
