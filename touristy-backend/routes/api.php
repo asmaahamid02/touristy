@@ -40,6 +40,7 @@ Route::group(['prefix' => 'v0.1'], function () {
         //trips
         Route::group(['prefix' => 'trips'], function () {
             Route::get('/', [TripController::class, 'index']);
+            Route::post('/', [TripController::class, 'create']);
         });
     });
 });
