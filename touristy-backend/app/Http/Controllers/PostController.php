@@ -108,22 +108,9 @@ class PostController extends Controller
 
             //save media
             if ($request->has('media')) {
-                foreach ($request->media as $mediaFile) {
-                    $mime = $this->getMimeType($mediaFile);
-
-                    if ($mime == 'image') {
-                        $post->media()->create([
-                            'media_type' => 'image',
-                            'media_path' => $this->uploadMedia($mediaFile, 'posts/images/' . $user_id . '/' . $post->id),
-                        ]);
-                    } else {
-                        $post->media()->create([
-                            'media_type' => 'video',
-                            'media_path' => $this->uploadMedia($mediaFile, 'posts/videos/' . $user_id . '/' . $post->id),
-                        ]);
-                    }
-                }
+                $this->saveMedia($request->media, $post);
             }
+
             return $this->jsonResponse($post->load(['tags', 'media']), 'data', Response::HTTP_CREATED, 'Post created');
         } catch (Exception $error) {
 
@@ -240,21 +227,7 @@ class PostController extends Controller
 
             //save media
             if ($request->has('media')) {
-                foreach ($request->media as $mediaFile) {
-                    $mime = $this->getMimeType($mediaFile);
-
-                    if ($mime == 'image') {
-                        $post->media()->create([
-                            'media_type' => 'image',
-                            'media_path' => $this->uploadMedia($mediaFile, 'posts/images/' . $post->user_id . '/' . $post->id),
-                        ]);
-                    } else {
-                        $post->media()->create([
-                            'media_type' => 'video',
-                            'media_path' => $this->uploadMedia($mediaFile, 'posts/videos/' . $post->user_id . '/' . $post->id),
-                        ]);
-                    }
-                }
+                $this->saveMedia($request->media, $post);
             }
 
             return $this->jsonResponse($post->load(['tags', 'media']), 'data', Response::HTTP_OK, 'Post updated');
@@ -277,5 +250,24 @@ class PostController extends Controller
         finfo_close($finfo);
 
         return $mime;
+    }
+
+    public function saveMedia($media, $post)
+    {
+        foreach ($media as $mediaFile) {
+            $mime = $this->getMimeType($mediaFile);
+
+            if ($mime == 'image') {
+                $post->media()->create([
+                    'media_type' => 'image',
+                    'media_path' => $this->uploadMedia($mediaFile, 'posts/images/' . $post->user_id . '/' . $post->id),
+                ]);
+            } else {
+                $post->media()->create([
+                    'media_type' => 'video',
+                    'media_path' => $this->uploadMedia($mediaFile, 'posts/videos/' . $post->user_id . '/' . $post->id),
+                ]);
+            }
+        }
     }
 }
