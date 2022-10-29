@@ -66,7 +66,13 @@ class EventController extends Controller
 
     public function show($id)
     {
-        //
+        $event = Event::find($id)->with('user')->with('location')->first();
+
+        if (!$event) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Event not found');
+        }
+
+        return $this->jsonResponse($event, 'data', Response::HTTP_OK, 'Event');
     }
 
     public function update(Request $request, $id)
