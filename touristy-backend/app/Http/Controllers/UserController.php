@@ -76,12 +76,12 @@ class UserController extends Controller
         }
 
         if ($request->has('profile_picture')) {
-            $path = $this->saveBase64Image($request->profile_picture, 'profile_pictures');
+            $path = $this->saveBase64Image($request->profile_picture, 'profile_pictures' . $user->id);
             $user->profile_picture = $path;
         }
 
         if ($request->has('cover_picture')) {
-            $path = $this->saveBase64Image($request->cover_picture, 'cover_pictures');
+            $path = $this->saveBase64Image($request->cover_picture, 'cover_pictures' . $user->id);
             $user->cover_picture = $path;
         }
 
