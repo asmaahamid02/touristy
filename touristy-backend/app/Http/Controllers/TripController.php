@@ -132,4 +132,15 @@ class TripController extends Controller
 
         return $this->jsonResponse($trips, 'data', Response::HTTP_OK, 'Trips');
     }
+
+    public function getTripsByLocation($id)
+    {
+        $trips = Trip::where('location_id', $id)->orderBy('created_at', 'desc')->with('user')->with('location')->get();
+
+        if ($trips->count() == 0) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Trips not found');
+        }
+
+        return $this->jsonResponse($trips, 'data', Response::HTTP_OK, 'Trips');
+    }
 }
