@@ -239,7 +239,27 @@ class PostController extends Controller
 
     public function delete($id)
     {
-        //
+        try {
+            //get post
+            $post = Post::where('id', $id)->where('is_deleted', 0)->first();
+
+            if (!$post) {
+                return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Post not found');
+            }
+
+            //check if user is owner of post
+            if ($post->user_id != Auth::id()) {
+                return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+            }
+
+            $post->is_deleted = 1;
+            $post->save();
+            $post->media()->delete();
+
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Post deleted');
+        } catch (Exception $error) {
+            return $this->jsonResponse($error->getMessage(), 'data', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
+        }
     }
 
     public function getMimeType($file)
