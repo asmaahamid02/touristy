@@ -35,4 +35,9 @@ trait MediaTrait
 
         return $path;
     }
+
+    public function deleteMedia($path)
+    {
+        Storage::delete($path);
+    }
 }
