@@ -63,6 +63,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/', [EventController::class, 'index']);
             Route::get('/{id}', [EventController::class, 'show']);
             Route::post('/', [EventController::class, 'create']);
+            Route::put('/{id}', [EventController::class, 'update']);
         });
     });
 });
