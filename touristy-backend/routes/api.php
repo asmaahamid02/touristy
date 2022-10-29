@@ -30,6 +30,7 @@ Route::group(['prefix' => 'v0.1'], function () {
         //posts
         Route::group(['prefix' => 'posts'], function () {
             Route::get('/', [PostController::class, 'index']);
+            Route::get('/{id}', [PostController::class, 'show']);
             Route::post('/', [PostController::class, 'create']);
         });
     });
