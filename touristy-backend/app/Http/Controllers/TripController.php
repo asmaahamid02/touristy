@@ -76,7 +76,37 @@ class TripController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $trip = Trip::where('id', $id)->first();
+
+        if (!$trip) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Trip not found');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'arrival_date' => 'required_without:is_past|date',
+            'departure_date' => 'required_without:is_past|date',
+            'is_past' => 'required_without_all:arrival_date,departure_date|date',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_BAD_REQUEST, 'Validation error');
+        }
+
+        $trip->title = $request->title;
+        $trip->description = $request->description;
+
+        if ($request->has('is_past')) {
+            $trip->is_past = $request->is_past;
+        } else {
+            $trip->arrival_date = $request->arrival_date;
+            $trip->departure_date = $request->departure_date;
+        }
+
+        $trip->save();
+
+        return $this->jsonResponse($trip->load(['location']), 'data', Response::HTTP_OK, 'Trip updated');
     }
 
     public function destroy($id)
