@@ -44,6 +44,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::post('/', [TripController::class, 'create']);
             Route::put('/{id}', [TripController::class, 'update']);
             Route::delete('/{id}', [TripController::class, 'delete']);
+            Route::get('/user/{id}', [TripController::class, 'getTripsByUser']);
         });
     });
 });
