@@ -26,4 +26,13 @@ trait MediaTrait
 
         return $path;
     }
+
+    public function uploadMedia($file, $folderName)
+    {
+        $fileName = uniqid() . time() . '.' . $file->getClientOriginalExtension();
+        $path = 'uploads/' . $folderName . '/' . time() . '/' . $fileName;
+        Storage::put($path, file_get_contents($file));
+
+        return $path;
+    }
 }
