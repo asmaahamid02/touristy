@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\UserController;
@@ -55,6 +56,11 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::put('/{id}', [CommentController::class, 'update']);
             Route::delete('/{id}', [CommentController::class, 'delete']);
             Route::get('/post/{id}', [CommentController::class, 'getCommentsByPost']);
+        });
+
+        //events
+        Route::group(['prefix' => 'events'], function () {
+            Route::get('/', [EventController::class, 'index']);
         });
     });
 });
