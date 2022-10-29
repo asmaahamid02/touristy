@@ -42,6 +42,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/', [TripController::class, 'index']);
             Route::get('/{id}', [TripController::class, 'show']);
             Route::post('/', [TripController::class, 'create']);
+            Route::put('/{id}', [TripController::class, 'update']);
         });
     });
 });
