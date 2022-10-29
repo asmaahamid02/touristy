@@ -37,6 +37,6 @@ class Event extends Model
 
     public function joined_users()
     {
-        return $this->belongsToMany(User::class, 'joined_events', 'event_id', 'user_id');
+        return $this->belongsToMany(User::class, 'joined_events', 'event_id', 'user_id')->withTimestamps();
     }
 }
