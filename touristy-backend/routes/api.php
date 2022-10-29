@@ -32,6 +32,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/', [PostController::class, 'index']);
             Route::get('/{id}', [PostController::class, 'show']);
             Route::post('/', [PostController::class, 'create']);
+            Route::put('/{id}', [PostController::class, 'update']);
         });
     });
 });
