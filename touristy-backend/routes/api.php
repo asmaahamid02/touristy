@@ -64,6 +64,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/{id}', [EventController::class, 'show']);
             Route::post('/', [EventController::class, 'create']);
             Route::put('/{id}', [EventController::class, 'update']);
+            Route::delete('/{id}', [EventController::class, 'delete']);
         });
     });
 });
