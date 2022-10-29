@@ -66,6 +66,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::put('/{id}', [EventController::class, 'update']);
             Route::delete('/{id}', [EventController::class, 'delete']);
             Route::get('/interest/{id}', [EventController::class, 'interestInEvent']);
+            Route::get('/join/{id}', [EventController::class, 'joinEvent']);
         });
     });
 });
