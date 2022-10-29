@@ -65,7 +65,13 @@ class TripController extends Controller
 
     public function show($id)
     {
-        //
+        $trip = Trip::where('id', $id)->with('user')->with('location')->first();
+
+        if (!$trip) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Trip not found');
+        }
+
+        return $this->jsonResponse($trip, 'data', Response::HTTP_OK, 'Trip');
     }
 
     public function update(Request $request, $id)
