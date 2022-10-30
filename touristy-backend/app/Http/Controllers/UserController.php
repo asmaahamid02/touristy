@@ -124,4 +124,27 @@ class UserController extends Controller
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Account deleted successfully');
     }
+
+    //follow user
+    public function follow($id)
+    {
+        $user = User::where('id', $id)->where('is_deleted', 0)->first();
+
+        if ($user == null) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+        }
+
+        if ($user->id == Auth::id()) {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'You cannot follow yourself');
+        }
+
+        if ($user->followers()->where('follower_user_id', Auth::id())->exists()) {
+            $user->followers()->detach(Auth::id());
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Unfollowed successfully');
+        }
+
+        $user->followers()->attach(Auth::id());
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'User followed successfully');
+    }
 }
