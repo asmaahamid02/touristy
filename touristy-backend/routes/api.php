@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\CommonController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -22,9 +24,6 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/logout', [AuthController::class, 'logout']);
         });
     });
-
-    //get file route
-    Route::get('/file/{path}', [Controller::class, 'getFile'])->where('path', '.*');
 
     Route::group(['middleware' => ['jwt.verify']], function () {
         //users
@@ -92,6 +91,19 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/{id}', [GroupController::class, 'show'])->where('id', '[0-9]+');
             Route::get('/join/{id}', [GroupController::class, 'joinGroup'])->where('id', '[0-9]+');
             Route::get('/{id}/members', [GroupController::class, 'getGroupMembers'])->where('id', '[0-9]+');
+        });
+
+        //common
+        Route::group(['prefix' => 'common'], function () {
+            //search
+            Route::get('/search/{search}', [CommonController::class, 'searchAll'])->where('search', '.*');
+            //get file route
+            Route::get('/file/{path}', [CommonController::class, 'getFile'])->where('path', '.*');
+        });
+
+        //tags
+        Route::group(['prefix' => 'tags'], function () {
+            Route::get('/{limit?}', [TagController::class, 'index'])->where('limit', '[0-9]+');
         });
     });
 });
