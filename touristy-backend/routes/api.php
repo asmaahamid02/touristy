@@ -80,6 +80,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/interested/{id?}', [EventController::class, 'getInterestedEvents'])->where('id', '[0-9]+');
             Route::get('/joined/{id?}', [EventController::class, 'getJoinedEvents'])->where('id', '[0-9]+');
             Route::get('/random', [EventController::class, 'getRandomEvents']);
+            Route::get('/user/{id?}', [EventController::class, 'getEventsByUser'])->where('id', '[0-9]+');
         });
 
         //groups
