@@ -217,4 +217,19 @@ class EventController extends Controller
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Event added to your joined events');
     }
+
+    public function getJoinedEvents($id = null)
+    {
+        $user_id = $id ? $id : Auth::id();
+
+        $events = Event::whereHas('joined_users', function ($query) use ($user_id) {
+            $query->where('user_id', $user_id);
+        })->with('user')->with('location')->get();
+
+        if ($events->count() == 0) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'No events found');
+        }
+
+        return $this->jsonResponse($events, 'data', Response::HTTP_OK, 'Events');
+    }
 }
