@@ -261,7 +261,7 @@ class UserController extends Controller
             ->whereNotIn('id', $user->followings()->pluck('followed_user_id')->toArray())
             ->whereNotIn('id', $user->blockers()->pluck('user_id')->toArray())
             ->whereNotIn('id', $user->blockings()->pluck('blocked_user_id')->toArray())
-            ->orderBy('created_at', 'DESC')
+            ->inRandomOrder()
             ->get();
 
         if ($unfollowedUsers->count() == 0) {
