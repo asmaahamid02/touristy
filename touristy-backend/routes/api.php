@@ -32,7 +32,8 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/user/{id?}', [UserController::class, 'show'])->where('id', '[0-9]+');
             Route::put('/{id?}', [UserController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id?}', [UserController::class, 'deleteAccount'])->where('id', '[0-9]+');
-            Route::get('/follow/{id}', [UserController::class, 'follow']);
+            Route::get('/follow/{id}', [UserController::class, 'follow'])->where('id', '[0-9]+');;
+            Route::get('/block/{id}', [UserController::class, 'block'])->where('id', '[0-9]+');;
         });
 
         //posts
