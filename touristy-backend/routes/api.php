@@ -90,6 +90,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             });
             Route::get('/', [GroupController::class, 'index']);
             Route::get('/{id}', [GroupController::class, 'show'])->where('id', '[0-9]+');
+            Route::get('/join/{id}', [GroupController::class, 'joinGroup'])->where('id', '[0-9]+');
         });
     });
 });
