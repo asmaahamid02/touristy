@@ -45,7 +45,7 @@ class PostController extends Controller
                     //check if is it video
                     $is_video = Validator::make(
                         ['upload' => $value],
-                        ['upload' => 'mimetypes:video/avi,video/mpeg,video/quicktime']
+                        ['upload' => 'mimetypes:video/avi,video/mpeg,video/quicktime,video/mp4']
                     )->passes();
 
                     //return error if not image or video
@@ -57,7 +57,7 @@ class PostController extends Controller
                     if ($is_video) {
                         $validator = Validator::make(
                             ['video' => $value],
-                            ['video' => "max:102400|duration:0,60"]
+                            ['video' => "max:102400"]
                         );
                         if ($validator->fails()) {
                             $fail(":attribute must be 10 megabytes or less and 60 sec or less.");
@@ -148,7 +148,7 @@ class PostController extends Controller
                     //check if is it video
                     $is_video = Validator::make(
                         ['upload' => $value],
-                        ['upload' => 'mimetypes:video/avi,video/mpeg,video/quicktime']
+                        ['upload' => 'mimetypes:video/avi,video/mpeg,video/quicktime,video/mp4']
                     )->passes();
 
                     //return error if not image or video
@@ -160,7 +160,7 @@ class PostController extends Controller
                     if ($is_video) {
                         $validator = Validator::make(
                             ['video' => $value],
-                            ['video' => "max:102400|duration:0,60"]
+                            ['video' => "max:102400"]
                         );
                         if ($validator->fails()) {
                             $fail(":attribute must be 10 megabytes or less and 60 sec or less.");
