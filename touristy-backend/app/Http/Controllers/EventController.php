@@ -233,6 +233,18 @@ class EventController extends Controller
         return $this->jsonResponse($events, 'data', Response::HTTP_OK, 'Events');
     }
 
+    public function getEventsByUser($id = null)
+    {
+        $user_id = $id ? $id : Auth::id();
+        $events = Event::where('user_id', $user_id)->with('location')->get();
+
+        if ($events->count() == 0) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'No events found');
+        }
+
+        return $this->jsonResponse($events, 'data', Response::HTTP_OK, 'Events');
+    }
+
     //get random events
     public function getRandomEvents()
     {
