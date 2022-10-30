@@ -125,7 +125,7 @@ class UserController extends Controller
         return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Account deleted successfully');
     }
 
-    //follow user
+    //follow/unfollow user
     public function follow($id)
     {
         $user = User::where('id', $id)->where('is_deleted', 0)->first();
@@ -138,13 +138,22 @@ class UserController extends Controller
             return $this->jsonResponse('', 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'You cannot follow yourself');
         }
 
+        //check if user is blocked or blocked by me
+        if (
+            $user->blockings()->where('blocked_user_id', Auth::id())->exists() ||
+            $user->blockers()->where('user_id', Auth::id())->exists()
+        ) {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'You cannot follow this user');
+        }
+
+        //check if user is already followed, unfollow it
         if ($user->followers()->where('follower_user_id', Auth::id())->exists()) {
             $user->followers()->detach(Auth::id());
-            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Unfollowed successfully');
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, $user->first_name . ' ' . $user->last_name . ' unfollowed successfully');
         }
 
         $user->followers()->attach(Auth::id());
 
-        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'User followed successfully');
+        return $this->jsonResponse('', 'data', Response::HTTP_OK,  $user->first_name . ' ' . $user->last_name  . ' followed successfully');
     }
 }
