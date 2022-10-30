@@ -83,11 +83,13 @@ Route::group(['prefix' => 'v0.1'], function () {
 
         //groups
         Route::group(['prefix' => 'groups'], function () {
+            Route::group(['middleware' => 'role:admin'], function () {
+                Route::post('/', [GroupController::class, 'create']);
+                Route::put('/{id}', [GroupController::class, 'update'])->where('id', '[0-9]+');
+                Route::delete('/{id}', [GroupController::class, 'delete']);
+            });
             Route::get('/', [GroupController::class, 'index']);
             Route::get('/{id}', [GroupController::class, 'show'])->where('id', '[0-9]+');
-            Route::post('/', [GroupController::class, 'create']);
-            Route::put('/{id}', [GroupController::class, 'update'])->where('id', '[0-9]+');
-            Route::delete('/{id}', [GroupController::class, 'delete']);
         });
     });
 });
