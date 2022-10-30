@@ -33,7 +33,7 @@ class GroupController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return $this->jsonResponse($validator->errors(), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation error');
+            return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation error');
         }
 
         $group = new Group();
@@ -59,7 +59,43 @@ class GroupController extends Controller
 
     public function update(Request $request, $id)
     {
-        //
+        $group = Group::find($id)->first();
+
+        if (!$group) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Group not found');
+        }
+
+        if ($group->creator_id != Auth::id()) {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'string|unique:groups,name,' . $group->id,
+            'description' => 'string',
+            'image' => 'base64image',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation error');
+        }
+
+        if ($request->has('name') && $request->name != $group->name && $request->name != null) {
+            $group->name = $request->name;
+        }
+
+        if ($request->has('description') && $request->description != $group->description && $request->description != null) {
+            $group->description = $request->description;
+        }
+
+        if ($request->has('image') && $request->image != $group->image && $request->image != null) {
+            $this->deleteMedia($group->image);
+            $this->deleteEmptyFolders($group->image);
+            $group->image = $this->saveBase64Image($request->image, 'groups');
+        }
+
+        $group->save();
+
+        return $this->jsonResponse($group, 'data', Response::HTTP_OK, 'Group updated');
     }
 
     public function destroy($id)
