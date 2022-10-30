@@ -48,7 +48,7 @@ class GroupController extends Controller
 
     public function show($id)
     {
-        $group = Group::find($id)->first();
+        $group = Group::find($id);
 
         if (!$group) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Group not found');
@@ -59,7 +59,7 @@ class GroupController extends Controller
 
     public function update(Request $request, $id)
     {
-        $group = Group::find($id)->first();
+        $group = Group::find($id);
 
         if (!$group) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Group not found');
@@ -100,7 +100,7 @@ class GroupController extends Controller
 
     public function delete($id)
     {
-        $group = Group::find($id)->first();
+        $group = Group::find($id);
 
         if (!$group) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Group not found');
@@ -115,5 +115,27 @@ class GroupController extends Controller
         $group->delete();
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Group deleted');
+    }
+
+    public function joinGroup($id)
+    {
+        $group = Group::find($id);
+
+        if (!$group) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Group not found');
+        }
+
+        if ($group->creator_id == Auth::id()) {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+        }
+
+        if ($group->users->contains(Auth::id())) {
+            $group->users()->detach(Auth::id());
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'You left the group');
+        }
+
+        $group->users()->attach(Auth::id());
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Joined group');
     }
 }
