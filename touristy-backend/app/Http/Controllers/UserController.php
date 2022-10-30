@@ -227,4 +227,22 @@ class UserController extends Controller
 
         return $this->jsonResponse($followings, 'data', Response::HTTP_OK, 'Followings');
     }
+
+    //get blocked users
+    public function getBlockedUsers($id = null)
+    {
+        $user = $id ? User::where('id', $id)->where('is_deleted', 0)->first() : Auth::user();
+
+        if ($user == null) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+        }
+
+        $blockedUsers = $user->blockings()->orderBy('created_at', 'DESC')->get();
+
+        if ($blockedUsers->count() == 0) {
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No blocked users found');
+        }
+
+        return $this->jsonResponse($blockedUsers, 'data', Response::HTTP_OK, 'Blocked users');
+    }
 }
