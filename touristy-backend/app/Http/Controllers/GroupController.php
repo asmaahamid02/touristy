@@ -48,7 +48,13 @@ class GroupController extends Controller
 
     public function show($id)
     {
-        //
+        $group = Group::find($id)->first();
+
+        if (!$group) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Group not found');
+        }
+
+        return $this->jsonResponse($group, 'data', Response::HTTP_OK, 'Group');
     }
 
     public function update(Request $request, $id)
