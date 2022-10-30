@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\UserType;
 use App\Traits\MediaTrait;
 use App\Traits\ResponseJson;
 use Illuminate\Http\Request;
@@ -47,6 +48,10 @@ class UserController extends Controller
 
         if ($user == null) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+        }
+
+        if ($user->id != Auth::id() || $user->user_type->type != 'admin') {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
         }
 
         //Validate data
@@ -99,6 +104,10 @@ class UserController extends Controller
 
         if ($user == null) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+        }
+
+        if ($user->id != Auth::id() || $user->user_type->type != 'admin') {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
         }
 
         if ($user->user_type->type == 'admin') {
