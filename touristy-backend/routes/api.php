@@ -87,6 +87,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/{id}', [GroupController::class, 'show'])->where('id', '[0-9]+');
             Route::post('/', [GroupController::class, 'create']);
             Route::put('/{id}', [GroupController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [GroupController::class, 'delete']);
         });
     });
 });
