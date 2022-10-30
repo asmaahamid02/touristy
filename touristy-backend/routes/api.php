@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TripController;
@@ -20,6 +21,9 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/logout', [AuthController::class, 'logout']);
         });
     });
+
+    //get file route
+    Route::get('/file/{path}', [Controller::class, 'getFile'])->where('path', '.*');
 
     Route::group(['middleware' => ['jwt.verify']], function () {
         //users
