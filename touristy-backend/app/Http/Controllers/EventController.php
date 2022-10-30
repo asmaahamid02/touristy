@@ -232,4 +232,37 @@ class EventController extends Controller
 
         return $this->jsonResponse($events, 'data', Response::HTTP_OK, 'Events');
     }
+
+    //get random events
+    public function getRandomEvents()
+    {
+        $events = Event::where('user_id', '!=', Auth::id())->whereHas('user', function ($query) {
+            $query->where('id', '!=', Auth::id())
+                //remove blocked users
+                ->whereDoesntHave('blockings', function ($query) {
+                    $query->where('blocked_user_id', Auth::id());
+                })
+                //remove blocked by users
+                ->whereDoesntHave('blockers', function ($query) {
+                    $query->where('user_id', Auth::id());
+                });
+        })
+            //remove events that are already joined
+            ->whereDoesntHave('joined_users', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
+
+            //remove events that are already interested
+            ->whereDoesntHave('interested_users', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
+
+            ->with('user')->with('location')->inRandomOrder()->limit(10)->get();
+
+        if ($events->count() == 0) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'No events found');
+        }
+
+        return $this->jsonResponse($events, 'data', Response::HTTP_OK, 'Events');
+    }
 }
