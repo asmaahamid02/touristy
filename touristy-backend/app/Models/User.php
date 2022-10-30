@@ -70,7 +70,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function groups()
     {
-        return $this->belongsToMany(Group::class, 'users_groups', 'user_id', 'group_id');
+        return $this->belongsToMany(Group::class, 'users_groups', 'user_id', 'group_id')->withTimestamps();
     }
 
     public function created_events()
