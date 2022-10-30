@@ -17,7 +17,20 @@ class PostController extends Controller
     use ResponseJson, MediaTrait;
     public function index()
     {
-        $posts  = Post::where('is_deleted', 0)->orderBy('created_at', 'desc')->get();
+        $posts  = Post::where('is_deleted', 0)->whereHas('user', function ($query) {
+            $query->where('is_deleted', 0)
+                ->where('id', '!=', Auth::id())
+                //remove blocked users
+                ->whereDoesntHave('blockings', function ($query) {
+                    $query->where('blocked_user_id', Auth::id());
+                })
+                //remove blocked by users
+                ->whereDoesntHave('blockers', function ($query) {
+                    $query->where('user_id', Auth::id());
+                });
+        })
+            ->with('user')->with('tags')->with('comments')->with('likes')->with('media')
+            ->orderBy('created_at', 'desc')->get();
 
         if ($posts->count() == 0) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'No posts found');
@@ -111,7 +124,7 @@ class PostController extends Controller
                 $this->saveMedia($request->media, $post);
             }
 
-            return $this->jsonResponse($post->load(['tags', 'media']), 'data', Response::HTTP_CREATED, 'Post created');
+            return $this->jsonResponse($post->load(['tags', 'media', 'comments', 'likes']), 'data', Response::HTTP_CREATED, 'Post created');
         } catch (Exception $error) {
 
             return $this->jsonResponse($error->getMessage(), 'data', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
@@ -126,7 +139,7 @@ class PostController extends Controller
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Post not found');
         }
 
-        return $this->jsonResponse($post->load(['tags', 'media']), 'data', Response::HTTP_OK, 'Post');
+        return $this->jsonResponse($post->load(['tags', 'media', 'user', 'likes', 'comments']), 'data', Response::HTTP_OK, 'Post');
     }
 
     public function update(Request $request, $id)
@@ -230,7 +243,7 @@ class PostController extends Controller
                 $this->saveMedia($request->media, $post);
             }
 
-            return $this->jsonResponse($post->load(['tags', 'media']), 'data', Response::HTTP_OK, 'Post updated');
+            return $this->jsonResponse($post->load(['tags', 'media', 'likes', 'comments']), 'data', Response::HTTP_OK, 'Post updated');
         } catch (Exception $error) {
 
             return $this->jsonResponse($error->getMessage(), 'data', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
@@ -262,15 +275,7 @@ class PostController extends Controller
         }
     }
 
-    public function getMimeType($file)
-    {
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $file);
-        $mime = explode('/', $mime)[0];
-        finfo_close($finfo);
 
-        return $mime;
-    }
 
     public function saveMedia($media, $post)
     {
