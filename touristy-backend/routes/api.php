@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\TripController;
 use App\Http\Controllers\UserController;
@@ -78,6 +79,11 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/join/{id}', [EventController::class, 'joinEvent'])->where('id', '[0-9]+');;
             Route::get('/interested/{id?}', [EventController::class, 'getInterestedEvents'])->where('id', '[0-9]+');
             Route::get('/joined/{id?}', [EventController::class, 'getJoinedEvents'])->where('id', '[0-9]+');
+        });
+
+        //groups
+        Route::group(['prefix' => 'groups'], function () {
+            Route::get('/', [GroupController::class, 'index']);
         });
     });
 });
