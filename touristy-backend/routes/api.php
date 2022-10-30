@@ -33,7 +33,8 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::put('/{id?}', [UserController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id?}', [UserController::class, 'deleteAccount'])->where('id', '[0-9]+');
             Route::get('/follow/{id}', [UserController::class, 'follow'])->where('id', '[0-9]+');;
-            Route::get('/block/{id}', [UserController::class, 'block'])->where('id', '[0-9]+');;
+            Route::get('/block/{id}', [UserController::class, 'block'])->where('id', '[0-9]+');
+            Route::get('/followers/{id?}', [UserController::class, 'getFollowers'])->where('id', '[0-9]+');
         });
 
         //posts
