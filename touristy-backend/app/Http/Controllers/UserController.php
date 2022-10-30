@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\UserType;
 use App\Traits\MediaTrait;
+use App\Traits\NationalityTrait;
 use App\Traits\ResponseJson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
-    use ResponseJson, MediaTrait;
+    use ResponseJson, MediaTrait, NationalityTrait;
     public function index()
     {
         $users = User::where('is_deleted', 0)->get();
@@ -29,12 +30,11 @@ class UserController extends Controller
             $id = Auth::id();
 
 
-        $user = User::where('id', $id)->where('is_deleted', 0)->first();
+        $user = User::where('id', $id)->where('is_deleted', 0)->with(['nationality'])->first();
 
         if (!$user) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
         }
-
 
         return $this->jsonResponse($user, 'data', Response::HTTP_OK, 'User');
     }
@@ -50,7 +50,7 @@ class UserController extends Controller
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
-        if ($user->id != Auth::id() || $user->user_type->type != 'admin') {
+        if ($user->id != Auth::id() || ($user->id != Auth::id() && $user->user_type->type != 'admin')) {
             return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
         }
 
@@ -63,6 +63,7 @@ class UserController extends Controller
             'profile_picture' => 'nullable|base64image',
             'cover_picture' => 'nullable|base64image',
             'bio' => 'string|max:150',
+            'nationality' => 'string',
         ]);
 
         //Send failed response if request is not valid
@@ -80,6 +81,10 @@ class UserController extends Controller
             $user->bio = $request->bio;
         }
 
+        if ($request->has('nationality')) {
+            $user->nationality_id = $this->saveNationality($request->nationality);
+        }
+
         if ($request->has('profile_picture')) {
             $path = $this->saveBase64Image($request->profile_picture, 'profile_pictures' . $user->id);
             $user->profile_picture = $path;
@@ -92,6 +97,7 @@ class UserController extends Controller
 
         $user->save();
 
+        $user->nationality = $user->nationality;
         return $this->jsonResponse($user, 'data', Response::HTTP_OK, 'Profile updated successfully');
     }
 
@@ -106,7 +112,7 @@ class UserController extends Controller
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
-        if ($user->id != Auth::id() || $user->user_type->type != 'admin') {
+        if ($user->id != Auth::id() || ($user->id != Auth::id() && $user->user_type->type != 'admin')) {
             return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
         }
 
