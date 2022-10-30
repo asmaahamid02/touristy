@@ -56,4 +56,14 @@ trait MediaTrait
             }
         }
     }
+
+    public function getMimeType($file)
+    {
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $file);
+        $mime = explode('/', $mime)[0];
+        finfo_close($finfo);
+
+        return $mime;
+    }
 }
