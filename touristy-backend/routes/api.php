@@ -61,12 +61,13 @@ Route::group(['prefix' => 'v0.1'], function () {
         //events
         Route::group(['prefix' => 'events'], function () {
             Route::get('/', [EventController::class, 'index']);
-            Route::get('/{id}', [EventController::class, 'show']);
+            Route::get('/{id}', [EventController::class, 'show'])->where('id', '[0-9]+');
             Route::post('/', [EventController::class, 'create']);
-            Route::put('/{id}', [EventController::class, 'update']);
+            Route::put('/{id}', [EventController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [EventController::class, 'delete']);
-            Route::get('/interest/{id}', [EventController::class, 'interestInEvent']);
-            Route::get('/join/{id}', [EventController::class, 'joinEvent']);
+            Route::get('/interest/{id}', [EventController::class, 'interestInEvent'])->where('id', '[0-9]+');
+            Route::get('/join/{id}', [EventController::class, 'joinEvent'])->where('id', '[0-9]+');;
+            Route::get('/interested/{id?}', [EventController::class, 'getInterestedEvents'])->where('id', '[0-9]+');
         });
     });
 });
