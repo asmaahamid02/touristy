@@ -156,4 +156,39 @@ class UserController extends Controller
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK,  $user->first_name . ' ' . $user->last_name  . ' followed successfully');
     }
+
+    //block/unblock user
+    public function block($id)
+    {
+        $user = User::where('id', $id)->where('is_deleted', 0)->first();
+
+        if ($user == null) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+        }
+
+        if ($user->id == Auth::id()) {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'You cannot block yourself');
+        }
+
+        //check if user is already blocked, unblock it
+        if ($user->blockers()->where('user_id', Auth::id())->exists()) {
+            $user->blockers()->detach(Auth::id());
+            return $this->jsonResponse('', 'data', Response::HTTP_OK,  $user->first_name . ' ' . $user->last_name  . ' unblocked successfully');
+        }
+
+        //check if user is already followed, unfollow it
+        if ($user->followers()->where('follower_user_id', Auth::id())->exists()) {
+            $user->followers()->detach(Auth::id());
+        }
+
+        //check if user following me, unfollow me
+        if ($user->followings()->where('followed_user_id', Auth::id())->exists()) {
+            $user->followings()->detach(Auth::id());
+        }
+
+        //block user    
+        $user->blockers()->attach(Auth::id());
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK,  $user->first_name . ' ' . $user->last_name . ' blocked successfully');
+    }
 }
