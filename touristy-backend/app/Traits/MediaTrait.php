@@ -40,4 +40,20 @@ trait MediaTrait
     {
         Storage::delete($path);
     }
+
+    //delete empty folders
+    public function deleteEmptyFolders($path)
+    {
+        $path = explode('/', $path);
+        $path = array_slice($path, 0, count($path) - 1);
+        $path = implode('/', $path);
+
+        if (Storage::exists($path)) {
+            $files = Storage::allFiles($path);
+            if (count($files) == 0) {
+                Storage::deleteDirectory($path);
+                $this->deleteEmptyFolders($path);
+            }
+        }
+    }
 }
