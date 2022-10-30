@@ -84,6 +84,7 @@ Route::group(['prefix' => 'v0.1'], function () {
         //groups
         Route::group(['prefix' => 'groups'], function () {
             Route::get('/', [GroupController::class, 'index']);
+            Route::post('/', [GroupController::class, 'create']);
         });
     });
 });
