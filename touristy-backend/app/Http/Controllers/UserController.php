@@ -191,4 +191,22 @@ class UserController extends Controller
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK,  $user->first_name . ' ' . $user->last_name . ' blocked successfully');
     }
+
+    //get followers
+    public function getFollowers($id = null)
+    {
+        $user = $id ? User::where('id', $id)->where('is_deleted', 0)->first() : Auth::user();
+
+        if ($user == null) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+        }
+
+        $followers = $user->followers()->orderBy('created_at', 'DESC')->get();
+
+        if ($followers->count() == 0) {
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No followers found');
+        }
+
+        return $this->jsonResponse($followers, 'data', Response::HTTP_OK, 'Followers');
+    }
 }
