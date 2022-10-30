@@ -98,8 +98,22 @@ class GroupController extends Controller
         return $this->jsonResponse($group, 'data', Response::HTTP_OK, 'Group updated');
     }
 
-    public function destroy($id)
+    public function delete($id)
     {
-        //
+        $group = Group::find($id)->first();
+
+        if (!$group) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Group not found');
+        }
+
+        if ($group->creator_id != Auth::id()) {
+            return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+        }
+
+        $this->deleteMedia($group->image);
+        $this->deleteEmptyFolders($group->image);
+        $group->delete();
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Group deleted');
     }
 }
