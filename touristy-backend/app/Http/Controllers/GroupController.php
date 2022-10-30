@@ -138,4 +138,18 @@ class GroupController extends Controller
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Joined group');
     }
+
+    //get group members
+    public function getGroupMembers($id)
+    {
+        $group = Group::find($id);
+
+        if (!$group) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Group not found');
+        }
+
+        $members = $group->users->where('id', '!=', $group->creator_id)->where('is_deleted', 0);
+
+        return $this->jsonResponse($members, 'data', Response::HTTP_OK, 'Group members');
+    }
 }
