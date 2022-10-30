@@ -37,6 +37,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/followers/{id?}', [UserController::class, 'getFollowers'])->where('id', '[0-9]+');
             Route::get('/followings/{id?}', [UserController::class, 'getFollowings'])->where('id', '[0-9]+');
             Route::get('/blocked/{id?}', [UserController::class, 'getBlockedUsers'])->where('id', '[0-9]+');
+            Route::get('/unfollowed', [UserController::class, 'getUnfollowedUsers']);
         });
 
         //posts
