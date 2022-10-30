@@ -143,4 +143,29 @@ class TripController extends Controller
 
         return $this->jsonResponse($trips, 'data', Response::HTTP_OK, 'Trips');
     }
+
+    //get random trips
+    public function getRandomTrips()
+    {
+        $trips =  Trip::where('user_id', '!=', Auth::id())
+            //remove trips from blocked users
+            ->whereDoesntHave('user.blockings', function ($query) {
+                $query->where('blocked_user_id', Auth::id());
+            })
+            //remove trips from blocked by users
+            ->whereDoesntHave('user.blockers', function ($query) {
+                $query->where('user_id', Auth::id());
+            })
+            ->inRandomOrder()
+            ->with('user')
+            ->with('location')
+            ->limit(10)
+            ->get();
+
+        if ($trips->count() == 0) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Trips not found');
+        }
+
+        return $this->jsonResponse($trips, 'data', Response::HTTP_OK, 'Trips');
+    }
 }
