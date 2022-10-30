@@ -68,6 +68,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/interest/{id}', [EventController::class, 'interestInEvent'])->where('id', '[0-9]+');
             Route::get('/join/{id}', [EventController::class, 'joinEvent'])->where('id', '[0-9]+');;
             Route::get('/interested/{id?}', [EventController::class, 'getInterestedEvents'])->where('id', '[0-9]+');
+            Route::get('/joined/{id?}', [EventController::class, 'getJoinedEvents'])->where('id', '[0-9]+');
         });
     });
 });
