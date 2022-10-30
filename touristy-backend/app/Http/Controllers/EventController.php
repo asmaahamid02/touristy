@@ -140,7 +140,7 @@ class EventController extends Controller
 
     public function delete($id)
     {
-        $event = Event::find($id)->first();
+        $event = Event::find($id);
 
         if (!$event) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Event not found');

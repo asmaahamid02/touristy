@@ -48,7 +48,7 @@ class CommentController extends Controller
             return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_BAD_REQUEST, 'Validation error');
         }
 
-        $comment = Comment::find($id)->first();
+        $comment = Comment::find($id);
 
         if (!$comment) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Comment not found');
@@ -66,7 +66,7 @@ class CommentController extends Controller
 
     public function delete($id)
     {
-        $comment = Comment::find($id)->first();
+        $comment = Comment::find($id);
 
         if (!$comment) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Comment not found');
