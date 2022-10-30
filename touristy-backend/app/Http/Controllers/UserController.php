@@ -251,4 +251,23 @@ class UserController extends Controller
 
         return $this->jsonResponse($blockedUsers, 'data', Response::HTTP_OK, 'Blocked users');
     }
+
+    //get unfollowed users
+    public function getUnfollowedUsers()
+    {
+        $user = Auth::user();
+        $unfollowedUsers = User::where('id', '!=', $user->id)
+            ->where('is_deleted', 0)
+            ->whereNotIn('id', $user->followings()->pluck('followed_user_id')->toArray())
+            ->whereNotIn('id', $user->blockers()->pluck('user_id')->toArray())
+            ->whereNotIn('id', $user->blockings()->pluck('blocked_user_id')->toArray())
+            ->orderBy('created_at', 'DESC')
+            ->get();
+
+        if ($unfollowedUsers->count() == 0) {
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No unfollowed users found');
+        }
+
+        return $this->jsonResponse($unfollowedUsers->load(['nationality']), 'data', Response::HTTP_OK, 'Unfollowed users');
+    }
 }
