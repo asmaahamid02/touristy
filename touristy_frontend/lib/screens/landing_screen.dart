@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import '../screens/login_screen.dart';
 import 'package:video_player/video_player.dart';
+import '../widgets/logo.dart';
 
 class LandingScreen extends StatefulWidget {
   const LandingScreen({Key? key}) : super(key: key);
+
+  static const routeName = '/';
   @override
   State<LandingScreen> createState() => _LandingScreenState();
 }
@@ -47,10 +51,7 @@ class _LandingScreenState extends State<LandingScreen> {
               ),
             ),
           ),
-          Positioned(
-            top: 50,
-            child: Image.asset('assets/images/logo_vertical.png'),
-          ),
+          const Logo('assets/images/logo_vertical.png'),
           Padding(
             padding: const EdgeInsets.only(bottom: 50, left: 20, right: 20),
             child: Column(
@@ -63,7 +64,9 @@ class _LandingScreenState extends State<LandingScreen> {
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(LoginScreen.routeName);
+                  },
                   child: const Text('SIGNIN'),
                 ),
               ],
