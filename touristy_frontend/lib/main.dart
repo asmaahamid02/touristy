@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:touristy_frontend/screens/login_screen.dart';
 import './screens/landing_screen.dart';
+import './screens/login_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -41,12 +43,16 @@ class MyApp extends StatelessWidget {
         ),
         textTheme: const TextTheme(
           button: TextStyle(
-            fontSize: 18,
+            // fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
       ),
-      home: LandingScreen(),
+      // home: LandingScreen(),
+      routes: {
+        LandingScreen.routeName: (ctx) => LandingScreen(),
+        LoginScreen.routeName: (ctx) => LoginScreen(),
+      },
     );
   }
 }
