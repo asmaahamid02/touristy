@@ -24,16 +24,17 @@ class CommentController extends Controller
             return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_BAD_REQUEST, 'Validation error');
         }
 
-        $comment = new Comment();
-        $comment->user_id = Auth::id();
-        $comment->post_id = $request->post_id;
-        $comment->content = $request->content;
+        $commentData = array();
+        $commentData['user_id'] = Auth::id();
+        $commentData['post_id'] = $request->post_id;
+        $commentData['content'] = $request->content;
+
 
         if ($request->has('comment_id')) {
-            $comment->comment_id = $request->comment_id;
+            $commentData['comment_id'] = $request->comment_id;
         }
 
-        $comment->save();
+        $comment = Comment::create($commentData);
 
         return $this->jsonResponse($comment, 'data', Response::HTTP_CREATED, 'Comment created');
     }

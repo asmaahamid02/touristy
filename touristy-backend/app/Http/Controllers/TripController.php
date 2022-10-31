@@ -44,21 +44,21 @@ class TripController extends Controller
 
         $location_id = $this->saveLocation($request->latitude, $request->longitude, $request->city, $request->country);
 
-        $trip = new Trip();
+        $tripData = array();
 
-        $trip->user_id = Auth::id();
-        $trip->location_id = $location_id;
-        $trip->title = $request->title;
-        $trip->description = $request->description;
+        $tripData['user_id '] = Auth::id();
+        $tripData['location_id'] = $location_id;
+        $tripData['title'] = $request->title;
+        $tripData['description'] = $request->description;
 
         if ($request->has('is_past')) {
-            $trip->is_past = $request->is_past;
+            $tripData['is_past'] = $request->is_past;
         } else {
-            $trip->arrival_date = $request->arrival_date;
-            $trip->departure_date = $request->departure_date;
+            $tripData['arrival_date'] = $request->arrival_date;
+            $tripData['departure_date'] = $request->departure_date;
         }
 
-        $trip->save();
+        $trip = Trip::create($tripData);
 
         return $this->jsonResponse($trip->load(['location']), 'data', Response::HTTP_CREATED, 'Trip created');
     }

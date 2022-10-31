@@ -46,20 +46,20 @@ class EventController extends Controller
 
         $location_id = $this->saveLocation($request->latitude, $request->longitude, $request->city, $request->country);
 
-        $event = new Event();
+        $eventData = array();
 
-        $event->user_id = Auth::id();
-        $event->location_id = $location_id;
-        $event->name = $request->name;
-        $event->description = $request->description;
-        $event->start_date = $request->start_date;
-        $event->end_date = $request->end_date;
+        $eventData['user_id '] = Auth::id();
+        $eventData['location_id'] = $location_id;
+        $eventData['name'] = $request->name;
+        $eventData['description'] = $request->description;
+        $eventData['start_date'] = $request->start_date;
+        $eventData['end_date'] = $request->end_date;
 
         if ($request->has('image')) {
-            $event->image = $this->saveBase64Image($request->image, 'events' . DIRECTORY_SEPARATOR . Auth::id());
+            $eventData['image'] = $this->saveBase64Image($request->image, 'events' . DIRECTORY_SEPARATOR . Auth::id());
         }
 
-        $event->save();
+        $event = Event::create($eventData);
 
         return $this->jsonResponse($event, 'data', Response::HTTP_CREATED, 'Event created');
     }

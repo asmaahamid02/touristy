@@ -36,12 +36,14 @@ class GroupController extends Controller
             return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation error');
         }
 
-        $group = new Group();
-        $group->name = $request->name;
-        $group->description = $request->description;
-        $group->image = $this->saveBase64Image($request->image, 'groups');
-        $group->creator_id = Auth::id();
-        $group->save();
+        $groupData = array();
+
+        $groupData['name'] = $request->name;
+        $groupData['description'] = $request->description;
+        $groupData['image'] = $this->saveBase64Image($request->image, 'groupData[');
+        $groupData['creator_id'] = Auth::id();
+
+        $group = Group::create($groupData);
 
         return $this->jsonResponse($group, 'data', Response::HTTP_CREATED, 'Group created');
     }

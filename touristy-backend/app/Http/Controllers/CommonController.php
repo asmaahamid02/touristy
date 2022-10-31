@@ -74,7 +74,6 @@ class CommonController extends Controller
     public function searchAll($search)
     {
         //search in users
-        echo Auth::id();
         $users = $this->search('User', $search, ['first_name', 'last_name']);
         $users = $users ? $this->applyUserFilters($users)->orderBy('first_name')->orderBy('last_name')->get() : null;
 

@@ -99,17 +99,18 @@ class PostController extends Controller
 
         try {
             //create post
-            $post = new Post();
+            $postData = array();
             $user_id = Auth::id();
-            $post->user_id = $user_id;
+
+            $postData['user_id'] = $user_id;
 
             if ($request->has('content')) {
-                $post->content = $request->content;
+                $postData['content'] = $request->content;
             }
 
-            $post->publicity = $request->publicity;
+            $postData['publicity'] = $request->publicity;
 
-            $post->save();
+            $post = Post::create($postData);
 
             //save tags
             if ($request->has('tags')) {
