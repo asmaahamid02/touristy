@@ -5,16 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Tag extends Model
+class PostMedia extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'tag',
-    ];
+    protected $table = 'posts_media';
 
-    public function posts()
-    {
-        return $this->belongsToMany(Post::class, 'posts_tags', 'tag_id', 'post_id')->withTimestamps();
-    }
+    protected $fillable = [
+        'post_id',
+        'media_path',
+        'media_type',
+    ];
 }

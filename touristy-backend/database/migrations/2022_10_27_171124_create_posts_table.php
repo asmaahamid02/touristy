@@ -15,11 +15,11 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
-            $table->integer('location_id');
+            $table->integer('user_id')->unsigned();
+            $table->integer('location_id')->nullable()->unsigned();
             $table->text('content');
-            $table->string('image')->nullable();
             $table->enum('publicity', ['public', 'followers'])->default('public');
+            $table->tinyInteger('is_deleted')->default(0);
             $table->timestamps();
         });
     }

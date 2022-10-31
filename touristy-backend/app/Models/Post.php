@@ -30,7 +30,7 @@ class Post extends Model
 
     public function tags()
     {
-        return $this->belongsToMany(Tag::class)->withTimestamps();
+        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id')->withTimestamps();
     }
 
     public function mentioned_users()
@@ -46,5 +46,10 @@ class Post extends Model
     public function likes()
     {
         return $this->belongsToMany(User::class, 'likes', 'post_id', 'user_id');
+    }
+
+    public function media()
+    {
+        return $this->hasMany(PostMedia::class);
     }
 }

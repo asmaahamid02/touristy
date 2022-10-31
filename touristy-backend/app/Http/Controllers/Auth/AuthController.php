@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserType;
 use App\Traits\MediaTrait;
+use App\Traits\NationalityTrait;
 use App\Traits\ResponseJson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -15,7 +16,7 @@ use JWTAuth;
 
 class AuthController extends Controller
 {
-    use ResponseJson, MediaTrait;
+    use ResponseJson, MediaTrait, NationalityTrait;
     public function register(Request $request)
     {
         //Validate data
@@ -26,6 +27,7 @@ class AuthController extends Controller
             'password' => 'required|string|min:6|max:50',
             'gender' => 'required|string',
             'date_of_birth' => 'required|date',
+            'nationality' => 'string',
             'profile_picture' => 'nullable|base64image',
             'role' => 'required|string',
         ]);
@@ -52,13 +54,17 @@ class AuthController extends Controller
         $user->gender = $request->gender;
         $user->date_of_birth = $request->date_of_birth;
 
-
-        if ($request->has('profile_picture')) {
-            $path = $this->saveBase64Image($request->profile_picture, 'profile_pictures');
-            $user->profile_picture = $path;
+        if ($request->has('nationality')) {
+            $user->nationality_id = $this->saveNationality($request->nationality);
         }
 
         $user->save();
+
+        if ($request->has('profile_picture')) {
+            $path = $this->saveBase64Image($request->profile_picture, 'profile_pictures/' . $user->id);
+            $user->profile_picture = $path;
+            $user->save();
+        }
 
         //User created, return success response
         return $this->login($request);

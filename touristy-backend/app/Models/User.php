@@ -70,7 +70,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function groups()
     {
-        return $this->belongsToMany(Group::class, 'users_groups', 'user_id', 'group_id');
+        return $this->belongsToMany(Group::class, 'users_groups', 'user_id', 'group_id')->withTimestamps();
     }
 
     public function created_events()
@@ -113,22 +113,22 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Comment::class, 'likes', 'user_id', 'comment_id')->withTimestamps();
     }
 
-    public function following()
+    public function followings()
     {
-        return $this->belongsToMany(User::class, 'followships', 'user_id', 'followed_user_id')->withTimestamps();
+        return $this->belongsToMany(User::class, 'followships', 'follower_user_id', 'followed_user_id')->withTimestamps();
     }
 
     public function followers()
     {
-        return $this->belongsToMany(User::class, 'followships', 'followed_user_id', 'user_id')->withTimestamps();
+        return $this->belongsToMany(User::class, 'followships', 'followed_user_id', 'follower_user_id')->withTimestamps();
     }
 
-    public function blocked_users()
+    public function blockings()
     {
         return $this->belongsToMany(User::class, 'blockships', 'user_id', 'blocked_user_id')->withTimestamps();
     }
 
-    public function blocked_by()
+    public function blockers()
     {
         return $this->belongsToMany(User::class, 'blockships', 'blocked_user_id', 'user_id')->withTimestamps();
     }

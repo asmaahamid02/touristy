@@ -32,11 +32,11 @@ class Event extends Model
 
     public function interested_users()
     {
-        return $this->belongsToMany(User::class, 'interested_events', 'event_id', 'user_id');
+        return $this->belongsToMany(User::class, 'interested_events', 'event_id', 'user_id')->withTimestamps();
     }
 
     public function joined_users()
     {
-        return $this->belongsToMany(User::class, 'joined_events', 'event_id', 'user_id');
+        return $this->belongsToMany(User::class, 'joined_events', 'event_id', 'user_id')->withTimestamps();
     }
 }
