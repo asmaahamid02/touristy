@@ -9,18 +9,18 @@ trait LocationTrait
 
     public function saveLocation($latitude, $longitude, $city, $country)
     {
-        $location = Location::where('latitude', $latitude)->where('longitude', $longitude)->first();
+        // $location = Location::where('latitude', $latitude)->where('longitude', $longitude)->first();
 
-        if ($location) {
-            return $location->id;
-        }
+        // if ($location) {
+        //     return $location->id;
+        // }
 
-        $location = new Location();
-        $location->latitude = $latitude;
-        $location->longitude = $longitude;
-        $location->city = $city;
-        $location->country = $country;
-        $location->save();
+        $location =  Location::Create([
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'city' => $city,
+            'country' => $country
+        ]);
 
         return $location->id;
     }
