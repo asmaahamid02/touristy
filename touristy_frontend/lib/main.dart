@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:touristy_frontend/screens/login_screen.dart';
-import './screens/landing_screen.dart';
 import './screens/login_screen.dart';
+import './screens/signup_screen.dart';
+import './screens/landing_screen.dart';
+import 'package:flutter/services.dart';
 
 void main() {
-  runApp(const MyApp());
+  //portrait mode only
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -47,11 +53,24 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          iconTheme: IconThemeData(
+            color: Colors.black,
+          ),
+          titleTextStyle: TextStyle(
+            color: Colors.black,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       // home: LandingScreen(),
       routes: {
         LandingScreen.routeName: (ctx) => LandingScreen(),
         LoginScreen.routeName: (ctx) => LoginScreen(),
+        SignupScreen.routeName: (ctx) => SignupScreen(),
       },
     );
   }
