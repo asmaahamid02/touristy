@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:touristy_frontend/screens/signup_screen.dart';
 import '../screens/login_screen.dart';
 import 'package:video_player/video_player.dart';
 import '../widgets/logo.dart';
@@ -41,16 +42,7 @@ class _LandingScreenState extends State<LandingScreen> {
         fit: StackFit.expand,
         alignment: Alignment.center,
         children: [
-          SizedBox.expand(
-            child: FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                width: _videoPlayerController.value.size.width,
-                height: _videoPlayerController.value.size.height,
-                child: VideoPlayer(_videoPlayerController),
-              ),
-            ),
-          ),
+          _videoView(),
           const Logo('assets/images/logo_vertical.png'),
           Padding(
             padding: const EdgeInsets.only(bottom: 50, left: 20, right: 20),
@@ -59,7 +51,9 @@ class _LandingScreenState extends State<LandingScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(SignupScreen.routeName);
+                  },
                   child: const Text('SIGNUP'),
                 ),
                 const SizedBox(height: 20),
@@ -73,6 +67,19 @@ class _LandingScreenState extends State<LandingScreen> {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _videoView() {
+    return SizedBox.expand(
+      child: FittedBox(
+        fit: BoxFit.cover,
+        child: SizedBox(
+          width: _videoPlayerController.value.size.width,
+          height: _videoPlayerController.value.size.height,
+          child: VideoPlayer(_videoPlayerController),
+        ),
       ),
     );
   }
