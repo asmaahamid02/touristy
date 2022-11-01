@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:email_validator/email_validator.dart';
 
 import '../widgets/logo.dart';
 import '../screens/signup_pesronal_info.dart';
@@ -41,7 +40,8 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
     _form.currentState!.save();
-    Navigator.of(context).pushNamed(SignupPersonalInfo.routeName);
+    Navigator.of(context)
+        .pushNamed(SignupPersonalInfo.routeName, arguments: _user);
   }
 
   @override
