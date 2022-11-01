@@ -1,5 +1,6 @@
 import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../widgets/logo.dart';
 import '../widgets/country_list.dart';
 import '../widgets/radio_button.dart';
@@ -16,6 +17,23 @@ class SignupPersonalInfoState extends State<SignupPersonalInfo> {
   Map<String, Object> _user = {};
   CountryCode? countrySelected;
   Gender? _gender;
+  DateTime? _dateOfBirth;
+
+  void _presentDatePicker() {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    ).then((pickedDate) {
+      if (pickedDate == null) {
+        return;
+      }
+      setState(() {
+        _dateOfBirth = pickedDate;
+      });
+    });
+  }
 
   @override
   void initState() {
@@ -66,25 +84,25 @@ class SignupPersonalInfoState extends State<SignupPersonalInfo> {
                   children: [
                     Container(
                       alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.only(left: 10),
-                      child: Text(
+                      padding: const EdgeInsets.only(left: 10),
+                      child: const Text(
                         'Nationality',
                       ),
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     CountryList(
                         _selectedCountry, countrySelected!.code as String),
-                    SizedBox(height: 30),
+                    const SizedBox(height: 30),
                     Column(
                       children: [
                         Container(
                           alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.only(left: 10),
-                          child: Text(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: const Text(
                             'Gender',
                           ),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Row(
                           children: [
                             GenderRadioButton(
@@ -96,7 +114,7 @@ class SignupPersonalInfoState extends State<SignupPersonalInfo> {
                                     _gender = value;
                                   });
                                 }),
-                            SizedBox(
+                            const SizedBox(
                               width: 8.0,
                             ),
                             GenderRadioButton(
@@ -108,7 +126,7 @@ class SignupPersonalInfoState extends State<SignupPersonalInfo> {
                                     _gender = value;
                                   });
                                 }),
-                            SizedBox(
+                            const SizedBox(
                               width: 8.0,
                             ),
                             GenderRadioButton(
@@ -122,13 +140,36 @@ class SignupPersonalInfoState extends State<SignupPersonalInfo> {
                                 }),
                           ],
                         ),
-                        SizedBox(height: 30),
+                        const SizedBox(height: 30),
                         Container(
                           alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.only(left: 10),
-                          child: Text(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: const Text(
                             'Date of Birth',
                           ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.cake_outlined,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                                child: Text(_dateOfBirth == null
+                                    ? 'No Date Chosen!'
+                                    : DateFormat.yMMMd()
+                                        .format(_dateOfBirth!))),
+                            IconButton(
+                              onPressed: _presentDatePicker,
+                              icon: Icon(
+                                Icons.calendar_month_outlined,
+                                color: Theme.of(context).primaryColor,
+                                size: 20,
+                              ),
+                            ),
+                          ],
                         )
                       ],
                     ),
