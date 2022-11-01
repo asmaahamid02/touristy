@@ -15,3 +15,21 @@ class Logo extends StatelessWidget {
     );
   }
 }
+
+class LogoHorizontal extends StatelessWidget {
+  const LogoHorizontal(
+    this.path,
+    this.height, {
+    Key? key,
+  }) : super(key: key);
+
+  final String path;
+  final double height;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: height,
+      child: Image.asset(path),
+    );
+  }
+}
