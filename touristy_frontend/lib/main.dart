@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './screens/signup_pesronal_info.dart';
 import './screens/login_screen.dart';
 import './screens/signup_screen.dart';
 import './screens/landing_screen.dart';
@@ -55,6 +56,7 @@ class MyApp extends StatelessWidget {
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
+          centerTitle: true,
           elevation: 0,
           iconTheme: IconThemeData(
             color: Colors.black,
@@ -71,6 +73,7 @@ class MyApp extends StatelessWidget {
         LandingScreen.routeName: (ctx) => LandingScreen(),
         LoginScreen.routeName: (ctx) => LoginScreen(),
         SignupScreen.routeName: (ctx) => SignupScreen(),
+        SignupPersonalInfo.routeName: (ctx) => SignupPersonalInfo(),
       },
     );
   }
