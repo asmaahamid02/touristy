@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import './screens/signup_pesronal_info.dart';
+import 'package:flutter/services.dart';
+import './screens/signup_pesronal_info_screen.dart';
 import './screens/login_screen.dart';
 import './screens/signup_screen.dart';
 import './screens/landing_screen.dart';
-import 'package:flutter/services.dart';
 
 void main() {
   //portrait mode only
@@ -67,13 +67,23 @@ class MyApp extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        iconTheme: IconThemeData(
+          size: 24,
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: ButtonStyle(
+            foregroundColor: MaterialStateProperty.all<Color>(
+              Colors.black,
+            ),
+          ),
+        ),
       ),
       // home: LandingScreen(),
       routes: {
         LandingScreen.routeName: (ctx) => LandingScreen(),
         LoginScreen.routeName: (ctx) => LoginScreen(),
         SignupScreen.routeName: (ctx) => SignupScreen(),
-        SignupPersonalInfo.routeName: (ctx) => SignupPersonalInfo(),
+        SignupPersonalInfoScreen.routeName: (ctx) => SignupPersonalInfoScreen(),
       },
     );
   }
