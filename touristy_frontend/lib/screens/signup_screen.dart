@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/logo.dart';
-import '../screens/signup_pesronal_info.dart';
+import 'signup_pesronal_info_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -41,7 +41,7 @@ class _SignupScreenState extends State<SignupScreen> {
     }
     _form.currentState!.save();
     Navigator.of(context)
-        .pushNamed(SignupPersonalInfo.routeName, arguments: _user);
+        .pushNamed(SignupPersonalInfoScreen.routeName, arguments: _user);
   }
 
   @override
