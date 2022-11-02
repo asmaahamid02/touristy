@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import './screens/signup_profile_screen.dart';
 import './screens/signup_pesronal_info_screen.dart';
 import './screens/login_screen.dart';
 import './screens/signup_screen.dart';
@@ -84,6 +85,7 @@ class MyApp extends StatelessWidget {
         LoginScreen.routeName: (ctx) => LoginScreen(),
         SignupScreen.routeName: (ctx) => SignupScreen(),
         SignupPersonalInfoScreen.routeName: (ctx) => SignupPersonalInfoScreen(),
+        SignupProfileScreen.routeName: (ctx) => SignupProfileScreen(),
       },
     );
   }
