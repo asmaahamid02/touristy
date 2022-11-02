@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../widgets/logo.dart';
 import '../widgets/country_list.dart';
 import '../widgets/radio_button.dart';
+import '../screens/signup_profile_screen.dart';
 
 class SignupPersonalInfo extends StatefulWidget {
   const SignupPersonalInfo({super.key});
@@ -18,6 +19,7 @@ class SignupPersonalInfoState extends State<SignupPersonalInfo> {
   CountryCode? countrySelected;
   Gender? _gender;
   DateTime? _dateOfBirth;
+  TextEditingController dateInputController = TextEditingController();
 
   void _presentDatePicker() {
     showDatePicker(
@@ -31,6 +33,7 @@ class SignupPersonalInfoState extends State<SignupPersonalInfo> {
       }
       setState(() {
         _dateOfBirth = pickedDate;
+        dateInputController.text = DateFormat.yMMMd().format(pickedDate);
       });
     });
   }
@@ -39,6 +42,7 @@ class SignupPersonalInfoState extends State<SignupPersonalInfo> {
   void initState() {
     countrySelected = CountryCode(name: 'Egypt', code: 'EG');
     _gender = Gender.male;
+    dateInputController.text = DateFormat.yMMMd().format(DateTime.now());
     super.initState();
   }
 
@@ -48,8 +52,12 @@ class SignupPersonalInfoState extends State<SignupPersonalInfo> {
       return;
     }
     _form.currentState!.save();
-    print(_user);
-    print(countrySelected!.name);
+    _user['nationality'] = countrySelected!.name as String;
+    _user['gender'] = _gender!.name;
+    _user['date_of_birth'] = _dateOfBirth as DateTime;
+
+    Navigator.of(context)
+        .pushNamed(SignupProfileScreen.routeName, arguments: _user);
   }
 
   CountryCode _selectedCountry(CountryCode country) {
@@ -149,28 +157,31 @@ class SignupPersonalInfoState extends State<SignupPersonalInfo> {
                           ),
                         ),
                         const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.cake_outlined,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                                child: Text(_dateOfBirth == null
-                                    ? 'No Date Chosen!'
-                                    : DateFormat.yMMMd()
-                                        .format(_dateOfBirth!))),
-                            IconButton(
-                              onPressed: _presentDatePicker,
+                        TextFormField(
+                          decoration: InputDecoration(
+                            border: const UnderlineInputBorder(),
+                            labelText: 'Date of Birth',
+                            prefixIcon: const Icon(Icons.cake_outlined),
+                            suffixIcon: IconButton(
                               icon: Icon(
                                 Icons.calendar_month_outlined,
                                 color: Theme.of(context).primaryColor,
-                                size: 20,
                               ),
+                              onPressed: _presentDatePicker,
                             ),
-                          ],
-                        )
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please select your date of birth';
+                            }
+                            return null;
+                          },
+                          onTap: _presentDatePicker,
+                          readOnly: true,
+                          controller: dateInputController,
+                          onSaved: ((newValue) =>
+                              _user['date_of birth'] = newValue as String),
+                        ),
                       ],
                     ),
                   ],
