@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../screens/home_screen.dart';
 import '../widgets/logo.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -11,6 +12,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final String _token = 'token';
   @override
   Widget build(BuildContext context) {
     final appBar = AppBar();
@@ -56,9 +58,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                 child: ElevatedButton(
                   onPressed: () {
-                    // Navigator.of(context).pushReplacementNamed(
-                    //   HomeScreen.routeName,
-                    // );
+                    Navigator.of(context).pushReplacementNamed(
+                        HomeScreen.routeName,
+                        arguments: _token);
                   },
                   child: const Text('LOGIN'),
                 ),
