@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../widgets/user_avatar_with_flag.dart';
+import '../widgets/events_list.dart';
+import '../widgets/travelers_avatars_list.dart';
+import '../widgets/trips_list.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -9,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final String countryCode = 'us';
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -34,106 +36,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      body: Column(children: [
-        Container(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-          child: Text(
-            'Travelers around the world',
-            style: Theme.of(context).textTheme.headline5,
-          ),
-        ),
-        Container(
-          height: 100,
-          padding: const EdgeInsets.all(20),
-          decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: Color.fromRGBO(124, 124, 124, 0.3),
-                width: 3.0,
-              ),
-            ),
-          ),
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Suggeted Events',
-                style: Theme.of(context).textTheme.headline5,
-              ),
-              Text(
-                'See all',
-                style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      color: Theme.of(context).primaryColor,
-                    ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Suggested Trips',
-                style: Theme.of(context).textTheme.headline5,
-              ),
-              Text(
-                'See all',
-                style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      color: Theme.of(context).primaryColor,
-                    ),
-              ),
-            ],
-          ),
-        ),
-      ]),
+      body: SingleChildScrollView(
+        child: Column(children: [
+          TravelersAvatarsList(),
+          EventsList(),
+          TripsList(),
+        ]),
+      ),
     );
   }
 }
