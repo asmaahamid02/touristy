@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:location/location.dart';
+import 'package:touristy_frontend/screens/home_screen.dart';
 import 'dart:io';
-import 'dart:convert';
-import 'dart:typed_data';
 
 import '../widgets/logo.dart';
 import '../widgets/image_options_bottom_sheet.dart';
@@ -53,14 +53,22 @@ class _SignupProfileScreenState extends State<SignupProfileScreen> {
     }
   }
 
-  void _saveForm() {
+  void _saveForm() async {
     if (_image != null) {
       _user['profile_picture'] = _image as File;
     }
 
-    Navigator.of(context)
-        .pushNamed(SignupLocationScreen.routeName, arguments: _user);
-    print(_user);
+    PermissionStatus locationPermissionStatus =
+        await Location().hasPermission();
+    if (locationPermissionStatus == PermissionStatus.granted) {
+      if (!mounted) return;
+      Navigator.of(context)
+          .pushReplacementNamed(HomeScreen.routeName, arguments: _user);
+    } else {
+      if (!mounted) return;
+      Navigator.of(context)
+          .pushNamed(SignupLocationScreen.routeName, arguments: _user);
+    }
   }
 
   @override
