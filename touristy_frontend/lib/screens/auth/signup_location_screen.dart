@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart' as permissions;
-import 'package:touristy_frontend/screens/home_screen.dart';
-import 'package:touristy_frontend/widgets/logo.dart';
+import '../../screens/tabs.dart';
+import '../../widgets/logo.dart';
 
 class SignupLocationScreen extends StatefulWidget {
   const SignupLocationScreen({super.key});
@@ -91,8 +91,8 @@ class _SignupLocationScreenState extends State<SignupLocationScreen> {
                 child: ElevatedButton(
                   onPressed: _permissionStatus == PermissionStatus.granted
                       ? () {
-                          Navigator.of(context).pushNamed(HomeScreen.routeName,
-                              arguments: _user);
+                          Navigator.of(context)
+                              .pushNamed(Tabs.routeName, arguments: _user);
                         }
                       : _requestPermission,
                   child: Text(_permissionStatus == PermissionStatus.granted
@@ -107,7 +107,7 @@ class _SignupLocationScreenState extends State<SignupLocationScreen> {
                       ? null
                       : () {
                           Navigator.of(context).pushReplacementNamed(
-                              HomeScreen.routeName,
+                              Tabs.routeName,
                               arguments: _token);
                         },
                   child: const Text('SET UP LATER'),

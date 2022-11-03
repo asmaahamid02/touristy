@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:touristy_frontend/screens/tabs.dart';
 import '../../widgets/common_buttons.dart';
 import '../home_screen.dart';
 import '../../widgets/logo.dart';
@@ -37,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     _form.currentState!.save();
     Navigator.of(context)
-        .pushReplacementNamed(HomeScreen.routeName, arguments: _user);
+        .pushReplacementNamed(Tabs.routeName, arguments: _user);
 
     print(_user);
   }
@@ -81,6 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
         labelText: 'Email',
         prefixIcon: Icon(Icons.email_outlined),
       ),
+      autofocus: true,
       keyboardType: TextInputType.emailAddress,
       focusNode: _emailFocusNode,
       validator: (value) {

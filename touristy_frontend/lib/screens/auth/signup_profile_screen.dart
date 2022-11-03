@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
-import 'package:touristy_frontend/screens/home_screen.dart';
+import '../../screens/tabs.dart';
 import 'dart:io';
 
 import '../../widgets/logo.dart';
@@ -63,7 +63,7 @@ class _SignupProfileScreenState extends State<SignupProfileScreen> {
     if (locationPermissionStatus == PermissionStatus.granted) {
       if (!mounted) return;
       Navigator.of(context)
-          .pushReplacementNamed(HomeScreen.routeName, arguments: _user);
+          .pushReplacementNamed(Tabs.routeName, arguments: _user);
     } else {
       if (!mounted) return;
       Navigator.of(context)
