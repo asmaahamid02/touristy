@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import './screens/home_screen.dart';
 import './screens/signup_location_screen.dart';
 import './screens/signup_profile_screen.dart';
 import './screens/signup_pesronal_info_screen.dart';
@@ -55,6 +56,10 @@ class MyApp extends StatelessWidget {
             // fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
+          headline5: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
@@ -88,6 +93,7 @@ class MyApp extends StatelessWidget {
         SignupPersonalInfoScreen.routeName: (ctx) => SignupPersonalInfoScreen(),
         SignupProfileScreen.routeName: (ctx) => SignupProfileScreen(),
         SignupLocationScreen.routeName: (ctx) => SignupLocationScreen(),
+        HomeScreen.routeName: (ctx) => HomeScreen(),
       },
     );
   }
