@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/logo.dart';
+import '../../widgets/logo.dart';
 import 'signup_pesronal_info_screen.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -21,9 +21,8 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _passwordObscureText = true;
   bool _confirmPasswordObscureText = true;
   String _password = '';
-  String _confirmPassword = '';
 
-  var _user = <String, Object>{};
+  final _user = <String, Object>{};
 
   @override
   void dispose() {

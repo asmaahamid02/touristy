@@ -1,10 +1,10 @@
 import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../widgets/logo.dart';
-import '../widgets/country_list.dart';
-import '../widgets/radio_button.dart';
-import '../screens/signup_profile_screen.dart';
+import '../../widgets/logo.dart';
+import '../../widgets/country_list.dart';
+import '../../widgets/radio_button.dart';
+import './signup_profile_screen.dart';
 
 class SignupPersonalInfoScreen extends StatefulWidget {
   const SignupPersonalInfoScreen({super.key});
@@ -57,6 +57,8 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
 
     Navigator.of(context)
         .pushNamed(SignupProfileScreen.routeName, arguments: _user);
+
+    print(_user);
   }
 
   CountryCode _selectedCountry(CountryCode country) {
@@ -64,6 +66,18 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
       countrySelected = country;
     });
     return countrySelected!;
+  }
+
+  void _onChangeGender(Gender? gender) {
+    setState(() {
+      _gender = gender;
+    });
+  }
+
+  void _onSavedDateOfBirth(String? value) {
+    setState(() {
+      _user['date_of birth'] = value as String;
+    });
   }
 
   @override
@@ -89,97 +103,40 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
                 key: _form,
                 child: Column(
                   children: [
-                    Container(
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.only(left: 10),
-                      child: const Text(
-                        'Nationality',
-                      ),
-                    ),
+                    _buildTextFieldLabel('Nationality'),
                     const SizedBox(height: 10),
                     CountryList(
                         _selectedCountry, countrySelected!.code as String),
                     const SizedBox(height: 30),
                     Column(
                       children: [
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          padding: const EdgeInsets.only(left: 10),
-                          child: const Text(
-                            'Gender',
-                          ),
-                        ),
+                        _buildTextFieldLabel('Gender'),
                         const SizedBox(height: 20),
                         Row(
                           children: [
                             GenderRadioButton(
                                 value: Gender.male,
-                                title: Gender.male.name,
                                 gender: _gender as Gender,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _gender = value;
-                                  });
-                                }),
-                            const SizedBox(
-                              width: 8.0,
-                            ),
+                                onChanged: (value) => _onChangeGender(value)),
+                            const SizedBox(width: 8.0),
                             GenderRadioButton(
                                 value: Gender.female,
-                                title: Gender.female.name,
                                 gender: _gender as Gender,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _gender = value;
-                                  });
-                                }),
-                            const SizedBox(
-                              width: 8.0,
-                            ),
+                                onChanged: (value) => _onChangeGender(value)),
+                            const SizedBox(width: 8.0),
                             GenderRadioButton(
                                 value: Gender.other,
-                                title: Gender.other.name,
                                 gender: _gender as Gender,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _gender = value;
-                                  });
-                                }),
+                                onChanged: (value) => _onChangeGender(value)),
                           ],
                         ),
                         const SizedBox(height: 30),
-                        Container(
-                          alignment: Alignment.centerLeft,
-                          padding: const EdgeInsets.only(left: 10),
-                          child: const Text(
-                            'Date of Birth',
-                          ),
-                        ),
+                        _buildTextFieldLabel('Date of Birth'),
                         const SizedBox(height: 10),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            border: const UnderlineInputBorder(),
-                            labelText: 'Date of Birth',
-                            prefixIcon: const Icon(Icons.cake_outlined),
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                Icons.calendar_month_outlined,
-                                color: Theme.of(context).primaryColor,
-                              ),
-                              onPressed: _presentDatePicker,
-                            ),
-                          ),
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return 'Please select your date of birth';
-                            }
-                            return null;
-                          },
-                          onTap: _presentDatePicker,
-                          readOnly: true,
-                          controller: dateInputController,
-                          onSaved: ((newValue) =>
-                              _user['date_of birth'] = newValue as String),
+                        _buildDateTextField(
+                          'Date of Birth',
+                          dateInputController,
+                          _onSavedDateOfBirth,
                         ),
                       ],
                     ),
@@ -199,4 +156,68 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
       ),
     );
   }
+
+  Widget _buildDateTextField(
+      String labelText, TextEditingController controller, Function onSaved) {
+    return TextFormField(
+      decoration: InputDecoration(
+        border: const UnderlineInputBorder(),
+        labelText: labelText,
+        prefixIcon: const Icon(Icons.cake_outlined),
+        suffixIcon: IconButton(
+          icon: Icon(
+            Icons.calendar_month_outlined,
+            color: Theme.of(context).primaryColor,
+          ),
+          onPressed: _presentDatePicker,
+        ),
+      ),
+      validator: (value) {
+        if (value!.isEmpty) {
+          return 'Please select your date of birth';
+        }
+        return null;
+      },
+      onTap: _presentDatePicker,
+      readOnly: true,
+      controller: controller,
+      onSaved: (newValue) => onSaved(newValue),
+    );
+  }
+
+  Widget _buildTextFieldLabel(String labelText) {
+    return Container(
+      alignment: Alignment.centerLeft,
+      padding: const EdgeInsets.only(left: 10),
+      child: Text(
+        labelText,
+      ),
+    );
+  }
 }
+
+// TextFormField(
+//                           decoration: InputDecoration(
+//                             border: const UnderlineInputBorder(),
+//                             labelText: 'Date of Birth',
+//                             prefixIcon: const Icon(Icons.cake_outlined),
+//                             suffixIcon: IconButton(
+//                               icon: Icon(
+//                                 Icons.calendar_month_outlined,
+//                                 color: Theme.of(context).primaryColor,
+//                               ),
+//                               onPressed: _presentDatePicker,
+//                             ),
+//                           ),
+//                           validator: (value) {
+//                             if (value!.isEmpty) {
+//                               return 'Please select your date of birth';
+//                             }
+//                             return null;
+//                           },
+//                           onTap: _presentDatePicker,
+//                           readOnly: true,
+//                           controller: dateInputController,
+//                           onSaved: ((newValue) =>
+//                               _user['date_of birth'] = newValue as String),
+//                         )

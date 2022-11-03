@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:touristy_frontend/screens/signup_screen.dart';
-import '../screens/login_screen.dart';
+import './auth/signup_screen.dart';
+import 'auth/login_screen.dart';
 import 'package:video_player/video_player.dart';
 import '../widgets/logo.dart';
 

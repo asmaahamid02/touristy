@@ -5,9 +5,9 @@ import 'package:location/location.dart';
 import 'package:touristy_frontend/screens/home_screen.dart';
 import 'dart:io';
 
-import '../widgets/logo.dart';
-import '../widgets/image_options_bottom_sheet.dart';
-import '../screens/signup_location_screen.dart';
+import '../../widgets/logo.dart';
+import '../../widgets/image_options_bottom_sheet.dart';
+import './signup_location_screen.dart';
 
 class SignupProfileScreen extends StatefulWidget {
   const SignupProfileScreen({super.key});
