@@ -18,7 +18,8 @@ class UserAvatarWithFlag extends StatelessWidget {
         CircleAvatar(
           radius: 30,
           backgroundImage: avatarUrl == null
-              ? AssetImage('assets/images/profile_picture.png') as ImageProvider
+              ? const AssetImage('assets/images/profile_picture.png')
+                  as ImageProvider
               : NetworkImage(avatarUrl as String),
         ),
         Positioned(
