@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:touristy_frontend/screens/tabs.dart';
 import './screens/home_screen.dart';
 import './screens/auth/signup_location_screen.dart';
 import './screens/auth/signup_profile_screen.dart';
@@ -98,6 +99,7 @@ class MyApp extends StatelessWidget {
         SignupProfileScreen.routeName: (ctx) => SignupProfileScreen(),
         SignupLocationScreen.routeName: (ctx) => SignupLocationScreen(),
         HomeScreen.routeName: (ctx) => HomeScreen(),
+        Tabs.routeName: (ctx) => Tabs(),
       },
     );
   }
