@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
-import 'package:permission_handler/permission_handler.dart' as Permissions;
+import 'package:permission_handler/permission_handler.dart' as permissions;
+import 'package:touristy_frontend/screens/home_screen.dart';
 import 'package:touristy_frontend/widgets/logo.dart';
 
 class SignupLocationScreen extends StatefulWidget {
+  const SignupLocationScreen({super.key});
   static const routeName = '/signup-location';
 
   @override
@@ -12,6 +14,8 @@ class SignupLocationScreen extends StatefulWidget {
 
 class _SignupLocationScreenState extends State<SignupLocationScreen> {
   final Location location = Location();
+  Map<String, Object> _user = {};
+  final String _token = 'token';
 
   PermissionStatus? _permissionStatus;
 
@@ -33,12 +37,19 @@ class _SignupLocationScreenState extends State<SignupLocationScreen> {
     }
 
     if (_permissionStatus == PermissionStatus.deniedForever) {
-      Permissions.openAppSettings().then((value) => _checkPermission());
+      permissions.openAppSettings().then((value) => _checkPermission());
     }
   }
 
   @override
+  void initState() {
+    _checkPermission();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    _user = ModalRoute.of(context)!.settings.arguments as Map<String, Object>;
     return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -80,7 +91,8 @@ class _SignupLocationScreenState extends State<SignupLocationScreen> {
                 child: ElevatedButton(
                   onPressed: _permissionStatus == PermissionStatus.granted
                       ? () {
-                          print('grant');
+                          Navigator.of(context).pushNamed(HomeScreen.routeName,
+                              arguments: _user);
                         }
                       : _requestPermission,
                   child: Text(_permissionStatus == PermissionStatus.granted
@@ -94,7 +106,9 @@ class _SignupLocationScreenState extends State<SignupLocationScreen> {
                   onPressed: _permissionStatus == PermissionStatus.granted
                       ? null
                       : () {
-                          // Navigator.of(context).pushNamed(HomeScreen.routeName, arguments: _user);
+                          Navigator.of(context).pushReplacementNamed(
+                              HomeScreen.routeName,
+                              arguments: _token);
                         },
                   child: const Text('SET UP LATER'),
                 ),
