@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import './screens/home_screen.dart';
-import './screens/signup_location_screen.dart';
-import './screens/signup_profile_screen.dart';
-import './screens/signup_pesronal_info_screen.dart';
-import './screens/login_screen.dart';
-import './screens/signup_screen.dart';
+import './screens/auth/signup_location_screen.dart';
+import './screens/auth/signup_profile_screen.dart';
+import './screens/auth/signup_pesronal_info_screen.dart';
+import 'screens/auth/login_screen.dart';
+import './screens/auth/signup_screen.dart';
 import './screens/landing_screen.dart';
 
 void main() {
@@ -58,6 +58,10 @@ class MyApp extends StatelessWidget {
           ),
           headline5: TextStyle(
             fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+          headline6: TextStyle(
+            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
