@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class TripItem extends StatelessWidget {
-  const TripItem({super.key, required this.withIcon});
-
-  final bool withIcon;
+  final bool? withIcon;
+  final String coverImageUrl;
+  const TripItem({super.key, this.withIcon, required this.coverImageUrl});
 
   static double get _coverTripImageHeight => 70;
   static double get _userProfileTripImageHeight => 40;
@@ -14,7 +14,7 @@ class TripItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
+      elevation: 3.5,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -36,7 +36,7 @@ class TripItem extends StatelessWidget {
                         topRight: Radius.circular(10),
                       ),
                       child: Image.network(
-                        'https://picsum.photos/250?image=9',
+                        coverImageUrl,
                         width: double.infinity,
                         height: _coverTripImageHeight,
                         fit: BoxFit.cover,
@@ -75,7 +75,7 @@ class TripItem extends StatelessWidget {
                     ),
                   )
                 ]),
-            withIcon
+            withIcon != null && withIcon!
                 ? TextButton(
                     onPressed: null,
                     child: Column(
