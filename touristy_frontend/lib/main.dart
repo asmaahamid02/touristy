@@ -67,7 +67,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
+          backgroundColor: Colors.white,
           centerTitle: true,
           elevation: 0,
           iconTheme: IconThemeData(
@@ -89,6 +89,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
+        scaffoldBackgroundColor: Colors.grey[100],
       ),
       // home: LandingScreen(),
       routes: {
