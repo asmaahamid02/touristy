@@ -1,6 +1,5 @@
-import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter/material.dart';
-import './user_avatar_with_flag.dart';
+import './profile_avatar.dart';
 
 class TravelersAvatarsList extends StatelessWidget {
   TravelersAvatarsList({
@@ -42,9 +41,11 @@ class TravelersAvatarsList extends StatelessWidget {
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: UserAvatarWithFlag(
+                  child: ProfileAvatar(
                     countryCode: countries[index],
-                    avatarUrl: 'https://picsum.photos/${index + 100}',
+                    imageUrl: 'https://picsum.photos/${index + 100}',
+                    isActive: true,
+                    hasFlag: true,
                   ),
                 );
               },
