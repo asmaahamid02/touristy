@@ -86,6 +86,7 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
     final appBar = AppBar();
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: appBar,
       body: SingleChildScrollView(
         child: Column(

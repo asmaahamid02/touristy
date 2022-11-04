@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:touristy_frontend/screens/tabs.dart';
 import '../../widgets/common_buttons.dart';
-import '../home_screen.dart';
 import '../../widgets/logo.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -47,6 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final appBar = AppBar();
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: appBar,
       body: SingleChildScrollView(
         child: Column(

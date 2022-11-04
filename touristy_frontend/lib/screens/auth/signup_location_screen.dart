@@ -51,6 +51,7 @@ class _SignupLocationScreenState extends State<SignupLocationScreen> {
   Widget build(BuildContext context) {
     _user = ModalRoute.of(context)!.settings.arguments as Map<String, Object>;
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
