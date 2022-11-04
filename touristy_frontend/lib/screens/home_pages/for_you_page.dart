@@ -30,6 +30,7 @@ class ForYouPage extends StatelessWidget {
             sliver: SliverToBoxAdapter(
               child: EventsList(),
             )),
+        PostsList()
       ],
     );
   }
