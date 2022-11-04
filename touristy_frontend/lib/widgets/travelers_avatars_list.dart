@@ -1,80 +1,60 @@
+import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter/material.dart';
 import './user_avatar_with_flag.dart';
 
 class TravelersAvatarsList extends StatelessWidget {
-  const TravelersAvatarsList({
+  TravelersAvatarsList({
     Key? key,
   }) : super(key: key);
 
-  final String countryCode = 'us';
+  List<String> countries = [
+    'US',
+    'AF',
+    'AL',
+    'AZ',
+    'AD',
+    'AO',
+    'AQ',
+    'AG',
+    'AR',
+    'AM',
+    'AW',
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-          child: Text(
-            'Travelers around the world',
-            style: Theme.of(context).textTheme.headline5,
-          ),
-        ),
-        Container(
-          height: 100,
-          padding: const EdgeInsets.all(20),
-          decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: Color.fromRGBO(124, 124, 124, 0.3),
-                width: 3.0,
-              ),
+    return Container(
+      height: 140,
+      padding: const EdgeInsets.only(bottom: 10),
+      color: Colors.white,
+      child: Column(
+        children: [
+          Container(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Text(
+              'Travelers around the world',
+              style: Theme.of(context).textTheme.headline5,
             ),
           ),
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-              SizedBox(width: 15),
-              UserAvatarWithFlag(
-                countryCode: countryCode,
-                avatarUrl: 'https://picsum.photos/200',
-              ),
-            ],
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: UserAvatarWithFlag(
+                    countryCode: countries[index],
+                    avatarUrl: 'https://picsum.photos/${index + 100}',
+                  ),
+                );
+              },
+              itemCount: 10,
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              scrollDirection: Axis.horizontal,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
