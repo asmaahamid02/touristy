@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:touristy_frontend/widgets/profile_avatar.dart';
 
 class TripItem extends StatelessWidget {
-  final bool? withIcon;
+  final bool withIcon;
   final String coverImageUrl;
-  const TripItem({super.key, this.withIcon, required this.coverImageUrl});
+  const TripItem(
+      {super.key, this.withIcon = false, required this.coverImageUrl});
 
   static double get _coverTripImageHeight => 70;
   static double get _userProfileTripImageHeight => 40;
@@ -67,15 +69,13 @@ class TripItem extends StatelessWidget {
                         color: Colors.white,
                       ),
                       padding: const EdgeInsets.all(3),
-                      child: CircleAvatar(
-                        radius: _userProfileTripImageHeight / 2,
-                        backgroundImage: const AssetImage(
-                            'assets/images/profile_picture.png'),
-                      ),
+                      child: ProfileAvatar(
+                          imageUrl: 'https://picsum.photos/200?random=1',
+                          radius: _userProfileTripImageHeight / 2),
                     ),
                   )
                 ]),
-            withIcon != null && withIcon!
+            withIcon
                 ? TextButton(
                     onPressed: null,
                     child: Column(
