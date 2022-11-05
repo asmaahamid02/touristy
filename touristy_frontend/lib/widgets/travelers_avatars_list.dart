@@ -1,27 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../constants.dart';
+import '../providers/users.dart';
 import './profile_avatar.dart';
 
-class TravelersAvatarsList extends StatelessWidget {
-  TravelersAvatarsList({
+class TravelersAvatarsList extends StatefulWidget {
+  const TravelersAvatarsList({
     Key? key,
   }) : super(key: key);
 
-  List<String> countries = [
-    'US',
-    'AF',
-    'AL',
-    'AZ',
-    'AD',
-    'AO',
-    'AQ',
-    'AG',
-    'AR',
-    'AM',
-    'AW',
-  ];
+  @override
+  State<TravelersAvatarsList> createState() => _TravelersAvatarsListState();
+}
+
+class _TravelersAvatarsListState extends State<TravelersAvatarsList> {
+  var _isInit = true;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      Provider.of<Users>(context).fetchAndSetUsers();
+    }
+    _isInit = false;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final usersData = Provider.of<Users>(context);
+    // final users = usersData.users;
+    final users = randomItems(usersData.users, 30);
     return Container(
       height: 140,
       padding: const EdgeInsets.only(bottom: 10),
@@ -42,14 +49,14 @@ class TravelersAvatarsList extends StatelessWidget {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: ProfileAvatar(
-                    countryCode: countries[index],
-                    imageUrl: 'https://picsum.photos/${index + 100}',
+                    countryCode: users[index].countryCode,
+                    imageUrl: users[index].profilePictureUrl as String,
                     isActive: true,
                     hasFlag: true,
                   ),
                 );
               },
-              itemCount: 10,
+              itemCount: users.length,
               padding: const EdgeInsets.symmetric(horizontal: 4.0),
               scrollDirection: Axis.horizontal,
             ),
