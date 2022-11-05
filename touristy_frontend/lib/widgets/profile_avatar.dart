@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:flag/flag.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/users.dart';
 
 class ProfileAvatar extends StatelessWidget {
   const ProfileAvatar({
@@ -10,13 +14,16 @@ class ProfileAvatar extends StatelessWidget {
     this.countryCode = '',
     this.radius = 30.0,
   });
+
   final String imageUrl;
   final bool isActive;
   final bool hasFlag;
   final String countryCode;
   final double radius;
+
   @override
   Widget build(BuildContext context) {
+    final token = Provider.of<Users>(context).authToken as String;
     return Stack(
       children: [
         CircleAvatar(
@@ -24,7 +31,9 @@ class ProfileAvatar extends StatelessWidget {
           backgroundImage: imageUrl == ''
               ? const AssetImage('assets/images/profile_picture.png')
                   as ImageProvider
-              : NetworkImage(imageUrl),
+              : NetworkImage(imageUrl, headers: {
+                  HttpHeaders.authorizationHeader: 'Bearer $token',
+                }),
         ),
         isActive
             ? Positioned(
