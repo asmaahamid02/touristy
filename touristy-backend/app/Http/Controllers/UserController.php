@@ -19,7 +19,12 @@ class UserController extends Controller
     use ResponseJson, MediaTrait, NationalityTrait;
     public function index()
     {
-        $users = User::where('is_deleted', 0)->get();
+        //get all users with nationality
+        $users = User::where('is_deleted', 0)->where('id', '!=', Auth::id())->with('nationality')->get();
+
+        if ($users->count() == 0)
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No Users found');
+        // $users = User::where('is_deleted', 0)->wi->get();
         return $this->jsonResponse($users, 'data', Response::HTTP_OK, 'Users');
     }
 
@@ -33,7 +38,7 @@ class UserController extends Controller
         $user = User::where('id', $id)->where('is_deleted', 0)->with(['nationality'])->first();
 
         if (!$user) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
         return $this->jsonResponse($user, 'data', Response::HTTP_OK, 'User');
@@ -47,11 +52,11 @@ class UserController extends Controller
         $user = User::where('id', $id)->where('is_deleted', 0)->first();
 
         if ($user == null) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
         if ($user->id != Auth::id() || ($user->id != Auth::id() && $user->user_type->type != 'admin')) {
-            return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+            return $this->jsonResponse('', 'errors', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
         }
 
         //Validate data
@@ -64,11 +69,12 @@ class UserController extends Controller
             'cover_picture' => 'nullable|base64image',
             'bio' => 'string|max:150',
             'nationality' => 'string',
+            'country_code' => 'string',
         ]);
 
         //Send failed response if request is not valid
         if ($validator->fails()) {
-            return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error');
+            return $this->jsonResponse($validator->errors(), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error');
         }
 
         $user->first_name = $request->first_name;
@@ -82,7 +88,7 @@ class UserController extends Controller
         }
 
         if ($request->has('nationality')) {
-            $user->nationality_id = $this->saveNationality($request->nationality);
+            $user->nationality_id = $this->saveNationality($request->nationality, $request->country_code);
         }
 
         if ($request->has('profile_picture')) {
@@ -109,15 +115,15 @@ class UserController extends Controller
         $user = User::where('id', $id)->where('is_deleted', 0)->first();
 
         if ($user == null) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
         if ($user->id != Auth::id() || ($user->id != Auth::id() && $user->user_type->type != 'admin')) {
-            return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+            return $this->jsonResponse('', 'errors', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
         }
 
         if ($user->user_type->type == 'admin') {
-            return $this->jsonResponse('', 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'Admin cannot be deleted');
+            return $this->jsonResponse('', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY, 'Admin cannot be deleted');
         }
 
         $user->is_deleted = 1;
@@ -137,11 +143,11 @@ class UserController extends Controller
         $user = User::where('id', $id)->where('is_deleted', 0)->first();
 
         if ($user == null) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
         if ($user->id == Auth::id()) {
-            return $this->jsonResponse('', 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'You cannot follow yourself');
+            return $this->jsonResponse('', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY, 'You cannot follow yourself');
         }
 
         //check if user is blocked or blocked by me
@@ -149,7 +155,7 @@ class UserController extends Controller
             $user->blockings()->where('blocked_user_id', Auth::id())->exists() ||
             $user->blockers()->where('user_id', Auth::id())->exists()
         ) {
-            return $this->jsonResponse('', 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'You cannot follow this user');
+            return $this->jsonResponse('', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY, 'You cannot follow this user');
         }
 
         //check if user is already followed, unfollow it
@@ -169,11 +175,11 @@ class UserController extends Controller
         $user = User::where('id', $id)->where('is_deleted', 0)->first();
 
         if ($user == null) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
         if ($user->id == Auth::id()) {
-            return $this->jsonResponse('', 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'You cannot block yourself');
+            return $this->jsonResponse('', 'errors', Response::HTTP_UNPROCESSABLE_ENTITY, 'You cannot block yourself');
         }
 
         //check if user is already blocked, unblock it
@@ -204,7 +210,7 @@ class UserController extends Controller
         $user = $id ? User::where('id', $id)->where('is_deleted', 0)->first() : Auth::user();
 
         if ($user == null) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
         $followers = $user->followers()->orderBy('created_at', 'DESC')->get();
@@ -222,7 +228,7 @@ class UserController extends Controller
         $user = $id ? User::where('id', $id)->where('is_deleted', 0)->first() : Auth::user();
 
         if ($user == null) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
         $followings = $user->followings()->orderBy('created_at', 'DESC')->get();
@@ -240,7 +246,7 @@ class UserController extends Controller
         $user = $id ? User::where('id', $id)->where('is_deleted', 0)->first() : Auth::user();
 
         if ($user == null) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'User not found');
+            return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
         $blockedUsers = $user->blockings()->orderBy('created_at', 'DESC')->get();
