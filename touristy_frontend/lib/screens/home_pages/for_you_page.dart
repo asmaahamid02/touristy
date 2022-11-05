@@ -11,22 +11,22 @@ class ForYouPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
+    return const CustomScrollView(
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
+          padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
           sliver: SliverToBoxAdapter(
             child: TravelersAvatarsList(),
           ),
         ),
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
+          padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
           sliver: SliverToBoxAdapter(
             child: TripsList(),
           ),
         ),
         SliverPadding(
-            padding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
             sliver: SliverToBoxAdapter(
               child: EventsList(),
             )),
