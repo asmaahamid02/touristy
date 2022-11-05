@@ -11,6 +11,7 @@ class Nationality extends Model
 
     protected $fillable = [
         'nationality',
+        'country_code'
     ];
 
     public function users()
