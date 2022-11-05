@@ -9,6 +9,7 @@ use App\Traits\MediaTrait;
 use App\Traits\NationalityTrait;
 use App\Traits\ResponseJson;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,13 +29,14 @@ class AuthController extends Controller
             'gender' => 'required|string',
             'date_of_birth' => 'required|date',
             'nationality' => 'string',
+            'country_code' => 'string',
             'profile_picture' => 'nullable|base64image',
             'role' => 'required|string',
         ]);
 
         //Send failed response if request is not valid
         if ($validator->fails()) {
-            return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error');
+            return $this->jsonResponse($validator->errors(), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error');
         }
 
         //Request is valid, create new user
@@ -55,7 +57,7 @@ class AuthController extends Controller
         $user->date_of_birth = $request->date_of_birth;
 
         if ($request->has('nationality')) {
-            $user->nationality_id = $this->saveNationality($request->nationality);
+            $user->nationality_id = $this->saveNationality($request->nationality, $request->country_code);
         }
 
         $user->save();
@@ -83,22 +85,22 @@ class AuthController extends Controller
 
         //Send failed response if request is not valid
         if ($validator->fails()) {
-            return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error');
+            return $this->jsonResponse($validator->errors(), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error');
         }
 
         //Request is validated
         //Crean token
         try {
             if (!$token = JWTAuth::attempt($credentials)) {
-                return $this->jsonResponse('', 'data', Response::HTTP_BAD_REQUEST, 'Invalid email or password');
+                return $this->jsonResponse('', 'errors', Response::HTTP_BAD_REQUEST, 'Invalid email or password');
             }
         } catch (JWTException $e) {
             return $credentials;
-            return $this->jsonResponse('', 'data', Response::HTTP_INTERNAL_SERVER_ERROR, 'Could not create token');
+            return $this->jsonResponse('', 'errors', Response::HTTP_INTERNAL_SERVER_ERROR, 'Could not create token');
         }
 
         //Token created, return with success response and jwt token
-        return $this->jsonResponse(['token' => $token], 'data', Response::HTTP_OK, 'Login successful');
+        return $this->jsonResponse(['token' => $token, 'user_id' => Auth::id(), 'expires_in' => env('JWT_TTL')], 'data', Response::HTTP_OK, 'Login successful');
     }
 
     public function me()
