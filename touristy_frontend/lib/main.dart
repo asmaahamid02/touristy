@@ -10,6 +10,7 @@ import './screens/auth/login_screen.dart';
 import './screens/auth/signup_screen.dart';
 import './screens/landing_screen.dart';
 
+import './providers/users.dart';
 import './providers/auth.dart';
 
 void main() {
@@ -29,6 +30,10 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider<Auth>(
           create: (_) => Auth(),
+        ),
+        ChangeNotifierProxyProvider<Auth, Users>(
+          create: (_) => Users(),
+          update: (_, auth, previousUsers) => previousUsers!..update(auth),
         ),
       ],
       child: Consumer<Auth>(
