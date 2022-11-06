@@ -23,7 +23,8 @@ class ProfileAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final token = Provider.of<Users>(context).authToken as String;
+    final token =
+        Provider.of<Users>(context, listen: false).authToken as String;
     return Stack(
       children: [
         CircleAvatar(
