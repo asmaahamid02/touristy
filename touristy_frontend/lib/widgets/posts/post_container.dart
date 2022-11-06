@@ -157,6 +157,7 @@ class _PostStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final posts = Provider.of<Posts>(context);
     return Column(
       children: [
         Row(
@@ -176,12 +177,17 @@ class _PostStats extends StatelessWidget {
               children: [
                 _PostButton(
                     icon: Icon(
-                      Icons.favorite_border_outlined,
+                      post.isLiked! ? Icons.favorite : Icons.favorite_border,
                       size: 20.0,
-                      color: Colors.grey[600],
+                      color: post.isLiked!
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[600],
                     ),
                     label: 'Like',
-                    onTap: () {}),
+                    isActive: post.isLiked!,
+                    onTap: () {
+                      posts.toggleLikeStatus(post.id);
+                    }),
                 _PostButton(
                     icon: Icon(Icons.message_outlined,
                         size: 20.0, color: Colors.grey[600]),
@@ -205,10 +211,14 @@ class _PostStats extends StatelessWidget {
 class _PostButton extends StatelessWidget {
   final Icon icon;
   final String label;
+  bool? isActive = false;
   final VoidCallback onTap;
 
-  const _PostButton(
-      {required this.icon, required this.label, required this.onTap});
+  _PostButton(
+      {required this.icon,
+      required this.label,
+      required this.onTap,
+      this.isActive});
 
   @override
   Widget build(BuildContext context) {
@@ -223,7 +233,11 @@ class _PostButton extends StatelessWidget {
             children: [
               icon,
               const SizedBox(width: 4.0),
-              Text(label, style: Theme.of(context).textTheme.bodySmall),
+              Text(label,
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                      color: isActive != null && isActive!
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[600])),
             ],
           ),
         ),
