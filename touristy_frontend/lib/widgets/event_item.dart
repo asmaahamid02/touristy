@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class EventItem extends StatelessWidget {
-  const EventItem({super.key});
-
+  const EventItem({super.key, required this.eventImageUrl});
+  final String eventImageUrl;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -17,7 +17,7 @@ class EventItem extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: Image.network(
-              'https://picsum.photos/250?image=9',
+              eventImageUrl,
               width: double.infinity,
               height: 200,
               fit: BoxFit.cover,
@@ -81,7 +81,8 @@ class EventItem extends StatelessWidget {
             left: 20,
             child: Row(
               children: [
-                const Icon(Icons.star_border, color: Colors.white, size: 15),
+                const Icon(Icons.star_border_rounded,
+                    color: Colors.white, size: 15),
                 const SizedBox(width: 5),
                 Text(
                   '100',
@@ -103,7 +104,7 @@ class EventItem extends StatelessWidget {
                 color: Colors.white,
               ),
               child: const Icon(
-                Icons.star_border,
+                Icons.star_border_rounded,
                 color: Colors.red,
               ),
             ),

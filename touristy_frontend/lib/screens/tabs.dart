@@ -57,7 +57,7 @@ class _TabsState extends State<Tabs> {
         showUnselectedLabels: false,
         type: BottomNavigationBarType.fixed,
         onTap: _selectPage,
-        unselectedItemColor: Colors.grey,
+        unselectedItemColor: Colors.grey[600],
         selectedItemColor: Theme.of(context).primaryColor,
         currentIndex: _selectedPageIndex,
         items: const [

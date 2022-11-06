@@ -11,52 +11,48 @@ class EventsList extends StatefulWidget {
 class _EventsListState extends State<EventsList> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Suggeted Events',
-                style: Theme.of(context).textTheme.headline5,
-              ),
-              Text(
-                'See all',
-                style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                      color: Theme.of(context).primaryColor,
-                    ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          height: 210,
-          padding: const EdgeInsets.all(20),
-          decoration: const BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: Color.fromRGBO(124, 124, 124, 0.3),
-                width: 3.0,
-              ),
+    return Container(
+      height: 250,
+      padding: const EdgeInsets.only(bottom: 10),
+      color: Colors.white,
+      child: Column(
+        children: [
+          Container(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Suggeted Events',
+                  style: Theme.of(context).textTheme.headline5,
+                ),
+                Text(
+                  'See all',
+                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                        color: Theme.of(context).primaryColor,
+                      ),
+                ),
+              ],
             ),
           ),
-          child: ListView(
-              shrinkWrap: true,
+          Expanded(
+            child: ListView.builder(
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: EventItem(
+                    eventImageUrl: 'https://picsum.photos/${index + 100}',
+                  ),
+                );
+              },
+              itemCount: 10,
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
               scrollDirection: Axis.horizontal,
-              children: [
-                EventItem(),
-                SizedBox(width: 15),
-                EventItem(),
-                SizedBox(width: 15),
-                EventItem(),
-                SizedBox(width: 15),
-                EventItem(),
-              ]),
-        ),
-      ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

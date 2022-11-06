@@ -8,12 +8,15 @@ trait NationalityTrait
 {
     //save nationality
 
-    public function saveNationality($country)
+    public function saveNationality($country, $country_code)
     {
-        $nationality = Nationality::where('nationality', $country)->first();
+        $nationality = Nationality::where('country_code', $country_code)->first();
 
         if (!$nationality) {
-            $nationality = Nationality::create(['nationality' => $country]);
+            $nationality = Nationality::create([
+                'nationality' => $country,
+                'country_code' => $country_code
+            ]);
         }
 
         return $nationality->id;
