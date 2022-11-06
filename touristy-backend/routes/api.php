@@ -38,15 +38,17 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/followings/{id?}', [UserController::class, 'getFollowings'])->where('id', '[0-9]+');
             Route::get('/blocked/{id?}', [UserController::class, 'getBlockedUsers'])->where('id', '[0-9]+');
             Route::get('/unfollowed', [UserController::class, 'getUnfollowedUsers']);
+            Route::get('/random/{count?}', [UserController::class, 'getRandomUsers'])->where('count', '[0-9]+');
         });
 
         //posts
         Route::group(['prefix' => 'posts'], function () {
             Route::get('/', [PostController::class, 'index']);
-            Route::get('/{id}', [PostController::class, 'show']);
+            Route::get('/{id}', [PostController::class, 'show'])->where('id', '[0-9]+');
             Route::post('/', [PostController::class, 'create']);
-            Route::put('/{id}', [PostController::class, 'update']);
-            Route::delete('/{id}', [PostController::class, 'delete']);
+            Route::put('/{id}', [PostController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [PostController::class, 'delete'])->where('id', '[0-9]+');
+            Route::get('/like/{id}', [PostController::class, 'like'])->where('id', '[0-9]+');
         });
 
         //trips
