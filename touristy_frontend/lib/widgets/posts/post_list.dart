@@ -26,22 +26,22 @@ class _PostsListState extends State<PostsList> {
   }
 
   @override
-  void didChangeDependencies() {
+  void didChangeDependencies() async {
     super.didChangeDependencies();
     if (isInit) {
       setState(() {
         _isLoading = true;
       });
       try {
-        Provider.of<Posts>(context).fetchAndSetPosts().then((_) {
-          setState(() {
-            _isLoading = false;
-          });
-        });
+        await Provider.of<Posts>(context).fetchAndSetPosts();
       } on HttpException catch (error) {
         _showSnakeBar(error.toString());
       } catch (error) {
         _showSnakeBar('Could not fetch posts. Please try again later.');
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
       isInit = false;
     }
