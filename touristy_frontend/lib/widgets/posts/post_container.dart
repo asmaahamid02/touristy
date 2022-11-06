@@ -1,4 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/posts.dart';
 import '../profile_avatar.dart';
 import '../../models/post.dart';
 
@@ -6,8 +11,22 @@ class PostContainer extends StatelessWidget {
   const PostContainer({super.key, required this.post});
   final Post post;
 
+//get image from url with token
+  Widget _getImage(String? url, String? token) {
+    if (url != null) {
+      return Image.network(
+        url,
+        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
+      );
+    } else {
+      return const SizedBox.shrink();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final token =
+        Provider.of<Posts>(context, listen: false).authToken as String;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5.0),
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -23,20 +42,27 @@ class PostContainer extends StatelessWidget {
                     post: post,
                   ),
                   const SizedBox(height: 6.0),
-                  Text(post.caption),
+                  post.content != null
+                      ? Text(
+                          post.content!,
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                          ),
+                        )
+                      : const SizedBox.shrink(),
                   const SizedBox(height: 6.0),
-                  post.imageUrl != ''
+                  post.mediaUrls != null
                       ? const SizedBox.shrink()
                       : const SizedBox(
                           height: 6.0,
                         ),
                 ]),
           ),
-          post.imageUrl != ''
+          post.mediaUrls != null && post.mediaUrls!.isNotEmpty
               ? Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Image.network(post.imageUrl, fit: BoxFit.cover),
+                  child: _getImage(post.mediaUrls![0]['media_path'], token),
                 )
               : const SizedBox.shrink(),
           Padding(
@@ -58,7 +84,7 @@ class _PostHeader extends StatelessWidget {
     return Row(
       children: [
         ProfileAvatar(
-          imageUrl: post.user.imageUrl,
+          imageUrl: post.user.profilePictureUrl as String,
           radius: 20,
         ),
         const SizedBox(width: 8.0),
@@ -69,11 +95,11 @@ class _PostHeader extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
-                  post.user.name,
+                  '${post.user.firstName} ${post.user.lastName}',
                   style: Theme.of(context).textTheme.headline6,
                 ),
               ),
-              post.location != ''
+              post.location != null
                   ? Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Row(children: [
@@ -81,7 +107,7 @@ class _PostHeader extends StatelessWidget {
                             color: Colors.red[600], size: 12.0),
                         const SizedBox(width: 5.0),
                         Text(
-                          post.location,
+                          post.location as String,
                           style: Theme.of(context).textTheme.bodySmall,
                         ),
                       ]),
