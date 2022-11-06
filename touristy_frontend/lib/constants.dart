@@ -1,5 +1,6 @@
 //---- STRINGS ------
 
+import 'dart:io';
 import 'dart:math';
 
 const String baseUrl = 'http://10.0.2.2:8000/api/v0.1';
@@ -34,4 +35,12 @@ String getResponseError(dynamic responseData) {
     error = responseData['message'];
   }
   return error;
+}
+
+getHeaders(String token) {
+  return {
+    HttpHeaders.contentTypeHeader: 'application/json',
+    HttpHeaders.acceptHeader: 'application/json',
+    HttpHeaders.authorizationHeader: 'Bearer $token',
+  };
 }
