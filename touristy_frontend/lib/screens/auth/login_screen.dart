@@ -76,6 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
           .login(_user['email'] as String, _user['password'] as String);
 
       if (!mounted) return;
+      Navigator.of(context).popUntil((route) => route.isFirst);
       Navigator.of(context).pushReplacementNamed('/');
     } on HttpException catch (error) {
       final errorMessage = error.toString();
@@ -87,8 +88,6 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() {
       _isLoading = false;
     });
-    // Navigator.of(context)
-    //     .pushReplacementNamed(Tabs.routeName, arguments: _user);
   }
 
   @override
