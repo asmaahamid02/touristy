@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../constants.dart';
 import '../providers/users.dart';
 import './profile_avatar.dart';
 
@@ -27,8 +26,7 @@ class _TravelersAvatarsListState extends State<TravelersAvatarsList> {
   @override
   Widget build(BuildContext context) {
     final usersData = Provider.of<Users>(context);
-    // final users = usersData.users;
-    final users = randomItems(usersData.users, 30);
+    final users = usersData.users;
     return Container(
       height: 140,
       padding: const EdgeInsets.only(bottom: 10),
