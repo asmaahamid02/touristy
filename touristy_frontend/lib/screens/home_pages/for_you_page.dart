@@ -7,6 +7,7 @@ import '../../widgets/trips_list.dart';
 import '../../widgets/events_list.dart';
 
 import '../../providers/posts.dart';
+import '../../providers/users.dart';
 
 class ForYouPage extends StatelessWidget {
   const ForYouPage({
@@ -15,6 +16,7 @@ class ForYouPage extends StatelessWidget {
 
   Future<void> _refreshData(BuildContext context) async {
     await Provider.of<Posts>(context, listen: false).fetchAndSetPosts();
+    await Provider.of<Users>(context, listen: false).fetchAndSetUsers();
     // await Provider.of<Events>(context, listen: false).fetchAndSetEvents();
     // await Provider.of<Trips>(context, listen: false).fetchAndSetTrips();
     // await Provider.of<Travelers>(context, listen: false).fetchAndSetTravelers();
