@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
@@ -12,6 +13,7 @@ class Auth with ChangeNotifier {
   String? _token;
   DateTime? _expiryDate;
   int? _userId;
+  Timer? _authTimer;
 
   bool get isAuth {
     return token != null;
@@ -57,6 +59,7 @@ class Auth with ChangeNotifier {
           minutes: int.parse(responseData['data']['expires_in']),
         ),
       );
+      _autoLogout();
       notifyListeners();
 
       final prefs = await SharedPreferences.getInstance();
@@ -98,8 +101,22 @@ class Auth with ChangeNotifier {
     _token = null;
     _userId = null;
     _expiryDate = null;
+
+    if (_authTimer != null) {
+      _authTimer!.cancel();
+      _authTimer = null;
+    }
+
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     prefs.clear();
+  }
+
+  void _autoLogout() {
+    if (_authTimer != null) {
+      _authTimer!.cancel();
+    }
+    final timeToExpiry = _expiryDate!.difference(DateTime.now()).inSeconds;
+    Timer(Duration(seconds: timeToExpiry), logout);
   }
 }
