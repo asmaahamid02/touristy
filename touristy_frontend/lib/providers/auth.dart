@@ -29,6 +29,10 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  int? get userId {
+    return _userId;
+  }
+
   Future<void> login(String email, String password) async {
     String error = '';
     try {
