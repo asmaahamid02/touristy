@@ -7,14 +7,14 @@ class Posts with ChangeNotifier {
   List<Post> _posts = [];
 
   String? authToken;
-  int? userId;
+  int? currentUserId;
 
   void update(
     Auth auth,
   ) {
     if (auth.token != null) {
       authToken = auth.token;
-      userId = auth.userId;
+      currentUserId = auth.userId;
       notifyListeners();
     }
   }
