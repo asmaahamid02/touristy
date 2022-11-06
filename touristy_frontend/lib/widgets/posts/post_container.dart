@@ -82,6 +82,8 @@ class _PostHeader extends StatelessWidget {
   final Post post;
   @override
   Widget build(BuildContext context) {
+    final currentUserId =
+        Provider.of<Users>(context, listen: false).currentUserId;
     return Row(
       children: [
         ProfileAvatar(
@@ -128,16 +130,25 @@ class _PostHeader extends StatelessWidget {
         ),
         Row(
           children: [
-            Consumer<Users>(
-              builder: (_, value, __) => TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    value.isFollowed(post.user.id) ? 'Following' : 'Follow',
-                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.bold),
-                  )),
-            ),
+            post.user.id != currentUserId
+                ? Consumer<Users>(
+                    builder: (_, value, __) => TextButton(
+                        onPressed: () {
+                          value.followUser(post.user.id);
+                        },
+                        child: Text(
+                          value.isFollowed(post.user.id)
+                              ? 'Following'
+                              : 'Follow',
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium!
+                              .copyWith(
+                                  color: Theme.of(context).primaryColor,
+                                  fontWeight: FontWeight.bold),
+                        )),
+                  )
+                : const SizedBox.shrink(),
             IconButton(
               onPressed: () {},
               icon: Icon(
