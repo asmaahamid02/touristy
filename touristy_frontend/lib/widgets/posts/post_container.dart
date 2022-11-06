@@ -2,11 +2,11 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:touristy_frontend/providers/users.dart';
 
-import '../../providers/posts.dart';
 import '../profile_avatar.dart';
 import '../../models/post.dart';
+import '../../providers/users.dart';
+import '../../providers/posts.dart';
 
 class PostContainer extends StatelessWidget {
   const PostContainer({super.key, required this.post});
