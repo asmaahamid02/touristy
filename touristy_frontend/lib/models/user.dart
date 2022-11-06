@@ -14,6 +14,7 @@ class User {
   String? bio;
   String? createdAt;
   String? token;
+  bool? isFollowing;
 
   User({
     required this.id,
@@ -29,6 +30,7 @@ class User {
     this.bio,
     this.createdAt,
     this.token,
+    this.isFollowing,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -49,6 +51,8 @@ class User {
           : '',
       bio: json['bio'] != null ? json['bio'] as String : '',
       createdAt: json['created_at'] as String,
+      isFollowing:
+          json['isFollowing'] == null ? false : json['isFollowing'] ?? false,
     );
   }
 }
