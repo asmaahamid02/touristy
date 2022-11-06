@@ -9,8 +9,10 @@ class Users with ChangeNotifier {
   String? authToken;
 
   void update(Auth auth) {
-    final String newAuthToken = auth.token as String;
-    authToken = newAuthToken;
+    if (auth.token != null) {
+      authToken = auth.token;
+      notifyListeners();
+    }
   }
 
   List<User> get users {
