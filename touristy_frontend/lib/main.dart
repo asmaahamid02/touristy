@@ -13,6 +13,7 @@ import './screens/landing_screen.dart';
 
 import './providers/users.dart';
 import './providers/auth.dart';
+import './providers/posts.dart';
 
 void main() {
   //portrait mode only
@@ -36,6 +37,10 @@ class MyApp extends StatelessWidget {
           create: (_) => Users(),
           update: (_, auth, previousUsers) => previousUsers!..update(auth),
         ),
+        ChangeNotifierProxyProvider<Auth, Posts>(
+          create: (_) => Posts(),
+          update: (_, auth, previousPosts) => previousPosts!..update(auth),
+        )
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
