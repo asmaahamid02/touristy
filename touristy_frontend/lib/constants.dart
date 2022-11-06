@@ -27,8 +27,8 @@ List<T> randomItems<T>(List<T> items, int count) {
 //get response error
 String getResponseError(dynamic responseData) {
   String error = '';
-  if (responseData['error'] != null) {
-    final errors = responseData['error'];
+  if (responseData['errors'] != null) {
+    final errors = responseData['errors'];
     error = errors[errors.keys.first][0];
   } else {
     error = responseData['message'];
