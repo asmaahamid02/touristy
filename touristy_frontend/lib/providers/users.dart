@@ -27,4 +27,8 @@ class Users with ChangeNotifier {
 
     notifyListeners();
   }
+
+  bool isFollowed(int userId) {
+    return _users.any((user) => user.id == userId && user.isFollowing == true);
+  }
 }
