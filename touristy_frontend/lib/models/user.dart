@@ -1,3 +1,5 @@
+import '../constants.dart';
+
 class User {
   final int id;
   final String firstName;
@@ -30,7 +32,6 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
-    const String fileBaseUrl = 'http://10.0.2.2:8000/api/v0.1/common/file/';
     return User(
       id: json['id'] as int,
       firstName: json['first_name'] as String,
