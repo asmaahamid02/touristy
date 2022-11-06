@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth.dart';
 import './home_pages/for_you_page.dart';
 import './home_pages/following_page.dart';
 import './home_pages/map_page.dart';
@@ -30,6 +32,11 @@ class _HomeScreenState extends State<HomeScreen> {
               icon: const Icon(Icons.search),
               onPressed: () {},
             ),
+            IconButton(
+                onPressed: () {
+                  Provider.of<Auth>(context, listen: false).logout();
+                },
+                icon: const Icon(Icons.logout))
           ],
           bottom: TabBar(
             labelColor: Theme.of(context).primaryColor,
@@ -47,10 +54,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: [
-            ForYouPage(),
-            FollowingPage(),
+            const ForYouPage(),
+            const FollowingPage(),
             MapPage(),
           ],
         ),
