@@ -8,10 +8,11 @@ class Post {
   final User user;
   List<Map<String, dynamic>>? mediaUrls;
   String? content;
-  final int? likes;
+  int? likes;
   final int comments;
   final String timeAgo;
   String? location;
+  bool? isLiked;
 
   Post({
     required this.id,
@@ -22,10 +23,13 @@ class Post {
     required this.user,
     required this.timeAgo,
     this.location,
+    this.isLiked,
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
-    return Post(
+    var likes = json['likes'] as List<dynamic>;
+    print('likes: $likes');
+    Post post = Post(
       id: json['id'] as int,
       mediaUrls: json['media'].length > 0
           ? (json['media'] as List<dynamic>).map((e) {
@@ -43,6 +47,8 @@ class Post {
       location: json['location'] != null
           ? '${json['location']['city']}, ${json['location']['country']}'
           : null,
+      isLiked: likes.isNotEmpty ? true : false,
     );
+    return post;
   }
 }
