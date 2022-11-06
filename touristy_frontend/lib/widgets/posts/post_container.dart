@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:touristy_frontend/providers/users.dart';
 
 import '../../providers/posts.dart';
 import '../profile_avatar.dart';
@@ -127,14 +128,16 @@ class _PostHeader extends StatelessWidget {
         ),
         Row(
           children: [
-            TextButton(
-                onPressed: () {},
-                child: Text(
-                  'Follow',
-                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Theme.of(context).primaryColor,
-                      fontWeight: FontWeight.bold),
-                )),
+            Consumer<Users>(
+              builder: (_, value, __) => TextButton(
+                  onPressed: () {},
+                  child: Text(
+                    value.isFollowed(post.user.id) ? 'Following' : 'Follow',
+                    style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.bold),
+                  )),
+            ),
             IconButton(
               onPressed: () {},
               icon: Icon(
@@ -157,7 +160,7 @@ class _PostStats extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final posts = Provider.of<Posts>(context);
+    final posts = Provider.of<Posts>(context, listen: false);
     return Column(
       children: [
         Row(
