@@ -20,7 +20,9 @@ class PostsService {
       if (response.statusCode != 200) {
         throw HttpException(getResponseError(responseData));
       } else {
-        if (responseData['data'] != null) {
+        if (responseData['data'] != null &&
+            responseData['data'] != '' &&
+            responseData['data'].length > 0) {
           final List<dynamic> postsList = responseData['data'];
           return postsList.map((post) => Post.fromJson(post)).toList();
         } else {
