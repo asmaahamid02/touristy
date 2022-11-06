@@ -84,10 +84,11 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (error) {
       const errorMessage = 'Authentication failed';
       _showErrorDialog(errorMessage);
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   @override
