@@ -29,11 +29,20 @@ class PostController extends Controller
                     $query->where('user_id', Auth::id());
                 });
         })
-            ->with('user')->with('tags')->with('comments')->with('likes')->with('media')
+            ->with('user.nationality')
+            ->with('location')
+            ->with('tags', function ($query) {
+                return $query->select('tags.id', 'tag');
+            })
+            ->withCount('comments', 'likes')
+            ->with('likes', function ($query) {
+                return $query->where('user_id', Auth::id())->select('user_id', 'post_id')->get();
+            })
+            ->with('media')
             ->orderBy('created_at', 'desc')->get();
 
         if ($posts->count() == 0) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'No posts found');
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No posts found');
         }
 
         return $this->jsonResponse($posts->load(['tags', 'media']), 'data', Response::HTTP_OK, 'Posts');
@@ -125,10 +134,10 @@ class PostController extends Controller
                 $this->saveMedia($request->media, $post);
             }
 
-            return $this->jsonResponse($post->load(['tags', 'media', 'comments', 'likes']), 'data', Response::HTTP_CREATED, 'Post created');
+            return $this->jsonResponse($post->load(['tags', 'media', 'comments', 'likes']), 'data', Response::HTTP_OK, 'Post created');
         } catch (Exception $error) {
 
-            return $this->jsonResponse($error->getMessage(), 'data', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
+            return $this->jsonResponse($error->getMessage(), 'errors', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
         }
     }
 
@@ -137,7 +146,7 @@ class PostController extends Controller
         $post = Post::where('id', $id)->where('is_deleted', 0)->first();
 
         if (!$post) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Post not found');
+            return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'Post not found');
         }
 
         return $this->jsonResponse($post->load(['tags', 'media', 'user', 'likes', 'comments']), 'data', Response::HTTP_OK, 'Post');
@@ -206,12 +215,12 @@ class PostController extends Controller
             $post = Post::where('id', $id)->where('is_deleted', 0)->first();
 
             if (!$post) {
-                return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Post not found');
+                return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'Post not found');
             }
 
             //check if user is owner of post
             if ($post->user_id != Auth::id()) {
-                return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+                return $this->jsonResponse('', 'errors', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
             }
 
             //update post
@@ -247,7 +256,7 @@ class PostController extends Controller
             return $this->jsonResponse($post->load(['tags', 'media', 'likes', 'comments']), 'data', Response::HTTP_OK, 'Post updated');
         } catch (Exception $error) {
 
-            return $this->jsonResponse($error->getMessage(), 'data', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
+            return $this->jsonResponse($error->getMessage(), 'errors', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
         }
     }
 
@@ -258,12 +267,12 @@ class PostController extends Controller
             $post = Post::where('id', $id)->where('is_deleted', 0)->first();
 
             if (!$post) {
-                return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Post not found');
+                return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'Post not found');
             }
 
             //check if user is owner of post
             if ($post->user_id != Auth::id()) {
-                return $this->jsonResponse('', 'data', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+                return $this->jsonResponse('', 'errors', Response::HTTP_UNAUTHORIZED, 'Unauthorized');
             }
 
             $post->is_deleted = 1;
@@ -272,11 +281,9 @@ class PostController extends Controller
 
             return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Post deleted');
         } catch (Exception $error) {
-            return $this->jsonResponse($error->getMessage(), 'data', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
+            return $this->jsonResponse($error->getMessage(), 'errors', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
         }
     }
-
-
 
     public function saveMedia($media, $post)
     {
@@ -295,5 +302,26 @@ class PostController extends Controller
                 ]);
             }
         }
+    }
+
+    //like post
+    public function like($id)
+    {
+        //get post
+        $post = Post::where('id', $id)->where('is_deleted', 0)->first();
+
+        if (!$post) {
+            return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'Post not found');
+        }
+
+        //check if user already liked post
+        if ($post->likes()->where('user_id', Auth::id())->exists()) {
+            //if user already liked post, unlike it
+            $post->likes()->detach(Auth::id());
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Post unliked');
+        }
+
+        $post->likes()->attach(Auth::id());
+        return $this->jsonResponse($post->likes()->count(), 'data', Response::HTTP_OK, 'Post liked');
     }
 }
