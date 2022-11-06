@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import './screens/splash_screen.dart';
 import './screens/tabs.dart';
 import './screens/home_screen.dart';
 import './screens/auth/signup_location_screen.dart';
@@ -106,7 +107,16 @@ class MyApp extends StatelessWidget {
             ),
             scaffoldBackgroundColor: Colors.grey[100],
           ),
-          home: auth.isAuth ? const Tabs() : const LandingScreen(),
+          home: auth.isAuth
+              ? const Tabs()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (ctx, authResultSnapshot) =>
+                      authResultSnapshot.connectionState ==
+                              ConnectionState.waiting
+                          ? SplashScreen()
+                          : const LandingScreen(),
+                ),
           routes: {
             LoginScreen.routeName: (ctx) => const LoginScreen(),
             SignupScreen.routeName: (ctx) => const SignupScreen(),
