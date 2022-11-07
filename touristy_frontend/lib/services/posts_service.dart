@@ -42,4 +42,44 @@ class PostsService {
     }
     return true;
   }
+
+  //add post
+  Future<Post> addPost(String token, String? content, List<File>? media) async {
+    try {
+      http.MultipartRequest request =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/posts'));
+
+      request.headers.addAll(getHeaders(token));
+
+      if (content != null && content != '') {
+        request.fields['content'] = content;
+      }
+
+      request.fields['publicity'] = 'public';
+
+      if (media != null && media.isNotEmpty) {
+        for (var i = 0; i < media.length; i++) {
+          request.files.add(http.MultipartFile('media[]',
+              media[i].readAsBytes().asStream(), media[i].lengthSync(),
+              filename: media[i].path.split('/').last));
+        }
+      }
+
+      final response = await request.send();
+      final responseData = await response.stream.toBytes();
+
+      final responseString = String.fromCharCodes(responseData);
+      final decodedResponse =
+          json.decode(responseString) as Map<String, dynamic>;
+
+      //check if response is has error, throw exception
+      if (response.statusCode != 200) {
+        throw HttpException(getResponseError(json.decode(responseString)));
+      }
+
+      return Post.fromJson(decodedResponse['data']);
+    } catch (error) {
+      rethrow;
+    }
+  }
 }
