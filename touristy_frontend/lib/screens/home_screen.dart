@@ -4,6 +4,7 @@ import '../providers/auth.dart';
 import './home_pages/for_you_page.dart';
 import './home_pages/following_page.dart';
 import './home_pages/map_page.dart';
+import '../screens/new_post_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,6 +14,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  //show modal bottom sheet
+  void _showModalBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return SizedBox(
+            height: MediaQuery.of(context).size.height * 0.95,
+            child: const NewPostScreen());
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -26,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
           actions: [
             IconButton(
               icon: const Icon(Icons.add_box_outlined),
-              onPressed: () {},
+              onPressed: _showModalBottomSheet,
             ),
             IconButton(
               icon: const Icon(Icons.search),
