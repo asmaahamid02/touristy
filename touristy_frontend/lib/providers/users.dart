@@ -18,7 +18,12 @@ class Users with ChangeNotifier {
   }
 
   List<User> get users {
-    return [..._users];
+    //return users without the current user
+    return _users.where((user) => user.id != currentUserId).toList();
+  }
+
+  User get currentUser {
+    return _users.firstWhere((user) => user.id == currentUserId);
   }
 
   //get users
