@@ -57,6 +57,19 @@ class _NewPostScreenState extends State<NewPostScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
               _PostHeader(),
+              Expanded(
+                child: Card(
+                    elevation: 0,
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: TextField(
+                        maxLines: null,
+                        autofocus: true,
+                        decoration: InputDecoration.collapsed(
+                            hintText: "Type a memory..."),
+                      ),
+                    )),
+              ),
             ],
           ),
         ),
