@@ -18,6 +18,7 @@ class PostContainer extends StatelessWidget {
       return Image.network(
         url,
         headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
+        fit: BoxFit.cover,
       );
     } else {
       return const SizedBox.shrink();
