@@ -27,8 +27,7 @@ class Post {
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
-    var likes = json['likes'] as List<dynamic>;
-    print('likes: $likes');
+    var likes = json['likes'] != null ? json['likes'] as List<dynamic> : [];
     Post post = Post(
       id: json['id'] as int,
       mediaUrls: json['media'].length > 0
@@ -39,9 +38,10 @@ class Post {
               };
             }).toList()
           : null,
-      content: json['content'] as String,
-      likes: json['likes_count'] as int,
-      comments: json['comments_count'] as int,
+      content: json['content'] != null ? json['content'] as String : null,
+      likes: json['likes_count'] != null ? json['likes_count'] as int : 0,
+      comments:
+          json['comments_count'] != null ? json['comments_count'] as int : 0,
       user: User.fromJson(json['user'] as Map<String, dynamic>),
       timeAgo: timeago.format(DateTime.parse(json['created_at']), locale: 'en'),
       location: json['location'] != null
