@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import './screens/new_post_screen.dart';
 import './screens/splash_screen.dart';
 import './screens/tabs.dart';
 import './screens/home_screen.dart';
@@ -132,6 +133,7 @@ class MyApp extends StatelessWidget {
                 const SignupLocationScreen(),
             HomeScreen.routeName: (ctx) => const HomeScreen(),
             Tabs.routeName: (ctx) => const Tabs(),
+            NewPostScreen.routeName: (ctx) => const NewPostScreen(),
           },
         ),
       ),
