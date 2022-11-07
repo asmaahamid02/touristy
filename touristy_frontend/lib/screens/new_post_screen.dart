@@ -64,3 +64,84 @@ class _NewPostScreenState extends State<NewPostScreen> {
     );
   }
 }
+
+class _PostHeader extends StatelessWidget {
+  const _PostHeader({
+    Key? key,
+  }) : super(key: key);
+
+  DropdownMenuItem<String> _buildDropdownMenuItem(
+      BuildContext context, String value, IconData icon) {
+    return DropdownMenuItem(
+      value: value,
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 15,
+            color: Colors.white,
+          ),
+          const SizedBox(width: 5),
+          Text(value.toLowerCase(),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyText1!
+                  .copyWith(color: Colors.white)),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      child: Row(
+        children: [
+          const ProfileAvatar(
+            imageUrl: 'https://picsum.photos/200',
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Username', style: Theme.of(context).textTheme.headline6),
+              const SizedBox(height: 5),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.4,
+                child: DropdownButtonFormField(
+                    decoration: InputDecoration(
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 2),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            width: 1, color: Theme.of(context).primaryColor),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(8)),
+                      ),
+                      filled: true,
+                      fillColor: Theme.of(context).backgroundColor,
+                    ),
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 15,
+                      color: Colors.white,
+                    ),
+                    items: [
+                      _buildDropdownMenuItem(context, 'Public', Icons.public),
+                      _buildDropdownMenuItem(context, 'Friends', Icons.people),
+                    ],
+                    dropdownColor: Theme.of(context).primaryColor,
+                    value: 'Public',
+                    onChanged: (value) {
+                      print(value);
+                    }),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
