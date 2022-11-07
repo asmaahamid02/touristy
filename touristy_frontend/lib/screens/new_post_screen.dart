@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import 'package:touristy_frontend/providers/posts.dart';
 import '../widgets/profile_avatar.dart';
 
 class NewPostScreen extends StatefulWidget {
@@ -15,6 +17,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
   late ImagePicker imagePicker;
   late int idGenerator;
   late List<XFile> imageFileList;
+
+  //cation controller
+  final captionController = TextEditingController();
+
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -38,6 +45,51 @@ class _NewPostScreenState extends State<NewPostScreen> {
     setState(() {});
   }
 
+  void _showSnakeBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Theme.of(context).errorColor,
+      ),
+    );
+  }
+
+  Future<void> _addNewPost() async {
+    if (captionController.text.isEmpty && imageFileList.isEmpty) {
+      return;
+    }
+
+    final List<File> imageFileListConverted =
+        imageFileList.map((image) => File(image.path)).toList(growable: false);
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      //add post
+      await Provider.of<Posts>(context, listen: false).addPost(
+        captionController.text,
+        imageFileListConverted,
+      );
+    } on HttpException catch (error) {
+      _showSnakeBar(error.toString());
+    } catch (error) {
+      _showSnakeBar('Could not add post. Please try again later.');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.of(context).pop();
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    captionController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     var appBar = AppBar(
@@ -58,7 +110,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
         Container(
           margin: const EdgeInsets.all(10),
           child: TextButton(
-            onPressed: () {},
+            onPressed: () {
+              _addNewPost();
+            },
             style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(
                     Theme.of(context).primaryColor)),
@@ -73,40 +127,46 @@ class _NewPostScreenState extends State<NewPostScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: appBar,
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: (MediaQuery.of(context).size.height -
-                  appBar.preferredSize.height -
-                  MediaQuery.of(context).padding.top) *
-              0.95,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const _PostHeader(),
-              const Expanded(
-                child: Card(
-                    elevation: 0,
-                    child: Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: TextField(
-                        maxLines: null,
-                        autofocus: true,
-                        decoration: InputDecoration.collapsed(
-                            hintText: "Type a memory..."),
-                      ),
-                    )),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : SingleChildScrollView(
+              child: SizedBox(
+                height: (MediaQuery.of(context).size.height -
+                        appBar.preferredSize.height -
+                        MediaQuery.of(context).padding.top) *
+                    0.95,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const _PostHeader(),
+                    Expanded(
+                      child: Card(
+                          elevation: 0,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextField(
+                              maxLines: null,
+                              autofocus: true,
+                              controller: captionController,
+                              decoration: const InputDecoration.collapsed(
+                                  hintText: "Type a memory..."),
+                            ),
+                          )),
+                    ),
+                    Column(
+                      children: [
+                        _ImagesGrid(
+                            imageFileList: imageFileList,
+                            deleteImage: _deleteImage),
+                        _BottomActionBar(selectImages: _selectImages),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              Column(
-                children: [
-                  _ImagesGrid(
-                      imageFileList: imageFileList, deleteImage: _deleteImage),
-                  _BottomActionBar(selectImages: _selectImages),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }
