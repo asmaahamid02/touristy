@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:touristy_frontend/services/posts_service.dart';
 import './auth.dart';
@@ -51,6 +53,19 @@ class Posts with ChangeNotifier {
             : _posts[postIndex].likes! - 1;
         notifyListeners();
       }
+    }
+  }
+
+//add post
+  Future<void> addPost(String? content, List<File>? media) async {
+    try {
+      final post =
+          await PostsService().addPost(authToken as String, content, media);
+      _posts.add(post);
+
+      notifyListeners();
+    } catch (error) {
+      rethrow;
     }
   }
 }
