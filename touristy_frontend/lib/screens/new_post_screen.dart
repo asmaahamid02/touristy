@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:touristy_frontend/providers/posts.dart';
+import 'package:touristy_frontend/providers/users.dart';
 import '../widgets/profile_avatar.dart';
 
 class NewPostScreen extends StatefulWidget {
@@ -200,18 +201,23 @@ class _PostHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentUser = Provider.of<Users>(context).currentUser;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Row(
         children: [
-          const ProfileAvatar(
-            imageUrl: 'https://picsum.photos/200',
+          ProfileAvatar(
+            imageUrl: currentUser.profilePictureUrl != null &&
+                    currentUser.profilePictureUrl!.isNotEmpty
+                ? currentUser.profilePictureUrl as String
+                : '',
           ),
           const SizedBox(width: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Username', style: Theme.of(context).textTheme.headline6),
+              Text('${currentUser.firstName} ${currentUser.lastName}',
+                  style: Theme.of(context).textTheme.headline6),
               const SizedBox(height: 5),
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.4,
