@@ -12,6 +12,32 @@ class NewPostScreen extends StatefulWidget {
 }
 
 class _NewPostScreenState extends State<NewPostScreen> {
+  late ImagePicker imagePicker;
+  late int idGenerator;
+  late List<XFile> imageFileList;
+
+  @override
+  void initState() {
+    super.initState();
+
+    imageFileList = [];
+    imagePicker = ImagePicker();
+  }
+
+  Future<void> _selectImages() async {
+    final List<XFile> selectedImages = await imagePicker.pickMultiImage();
+    if (selectedImages.isNotEmpty) {
+      //check if the image is already selected
+      imageFileList.addAll(selectedImages);
+    }
+    setState(() {});
+  }
+
+  void _deleteImage(int index) {
+    imageFileList.removeAt(index);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     var appBar = AppBar(
@@ -55,9 +81,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
               0.95,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              _PostHeader(),
-              Expanded(
+            children: [
+              const _PostHeader(),
+              const Expanded(
                 child: Card(
                     elevation: 0,
                     child: Padding(
@@ -69,6 +95,13 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             hintText: "Type a memory..."),
                       ),
                     )),
+              ),
+              Column(
+                children: [
+                  _ImagesGrid(
+                      imageFileList: imageFileList, deleteImage: _deleteImage),
+                  _BottomActionBar(selectImages: _selectImages),
+                ],
               ),
             ],
           ),
@@ -154,6 +187,97 @@ class _PostHeader extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _BottomActionBar extends StatelessWidget {
+  const _BottomActionBar({required this.selectImages});
+  final Function() selectImages;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+      ),
+      child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+        IconButton(
+            onPressed: () {
+              selectImages();
+            },
+            icon: Icon(
+              Icons.image_outlined,
+              color: Colors.lightGreen[600],
+            )),
+        IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Icons.location_on,
+              color: Colors.red[600],
+            ))
+      ]),
+    );
+  }
+}
+
+class _ImagesGrid extends StatelessWidget {
+  _ImagesGrid({required this.imageFileList, required this.deleteImage});
+  final List<XFile> imageFileList;
+  final Function(int index) deleteImage;
+
+  double imageWidth = 100;
+  double imageHeight = 80;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 100,
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        shrinkWrap: true,
+        itemCount: imageFileList.length,
+        itemBuilder: (context, index) {
+          return Container(
+            margin: const EdgeInsets.all(5),
+            child: Stack(children: [
+              SizedBox(
+                height: imageHeight,
+                width: imageWidth,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(
+                    File(imageFileList[index].path),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 0,
+                top: 0,
+                child: InkWell(
+                  onTap: () {
+                    deleteImage(index);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.black.withOpacity(0.7),
+                    ),
+                    child: const Icon(
+                      Icons.clear,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              )
+            ]),
+          );
+        },
       ),
     );
   }
