@@ -19,7 +19,7 @@ class PostController extends Controller
     {
         $posts  = Post::where('is_deleted', 0)->whereHas('user', function ($query) {
             $query->where('is_deleted', 0)
-                ->where('id', '!=', Auth::id())
+                // ->where('id', '!=', Auth::id())
                 //remove blocked users
                 ->whereDoesntHave('blockings', function ($query) {
                     $query->where('blocked_user_id', Auth::id());
@@ -45,7 +45,7 @@ class PostController extends Controller
             return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No posts found');
         }
 
-        return $this->jsonResponse($posts->load(['tags', 'media']), 'data', Response::HTTP_OK, 'Posts');
+        return $this->jsonResponse($posts, 'data', Response::HTTP_OK, 'Posts');
     }
 
     public function create(Request $request)
@@ -134,7 +134,7 @@ class PostController extends Controller
                 $this->saveMedia($request->media, $post);
             }
 
-            return $this->jsonResponse($post->load(['tags', 'media', 'comments', 'likes']), 'data', Response::HTTP_OK, 'Post created');
+            return $this->jsonResponse($post->load(['user.nationality', 'tags', 'media', 'location']), 'data', Response::HTTP_OK, 'Post created');
         } catch (Exception $error) {
 
             return $this->jsonResponse($error->getMessage(), 'errors', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
@@ -202,7 +202,7 @@ class PostController extends Controller
                     }
                 },
             ],
-            'publicity' => 'required|string|in:public,followers',
+            'publicity' => 'string|in:public,followers',
         ]);
 
         //return error if validation fails
@@ -229,7 +229,9 @@ class PostController extends Controller
                 $post->content = $request->content;
             }
 
-            $post->publicity = $request->publicity;
+            if ($request->has('publicity')) {
+                $post->publicity = $request->publicity;
+            }
 
             $post->save();
 
