@@ -25,6 +25,11 @@ class Posts with ChangeNotifier {
     return [..._posts];
   }
 
+//find post by id
+  Post? findById(int id) {
+    return _posts.firstWhere((post) => post.id == id);
+  }
+
   //get posts
   Future<void> fetchAndSetPosts() async {
     final posts = await PostsService().getPosts(authToken as String);
