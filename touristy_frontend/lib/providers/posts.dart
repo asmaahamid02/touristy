@@ -73,4 +73,22 @@ class Posts with ChangeNotifier {
       rethrow;
     }
   }
+
+  //delete post
+  Future<void> deletePost(int postId) async {
+    final int postIndex = _posts.indexWhere((post) => post.id == postId);
+
+    if (postIndex >= 0) {
+      final post = _posts[postIndex];
+      _posts.removeAt(postIndex);
+      notifyListeners();
+
+      try {
+        await PostsService().deletePost(authToken as String, postId);
+      } catch (error) {
+        _posts.insert(postIndex, post);
+        notifyListeners();
+      }
+    }
+  }
 }
