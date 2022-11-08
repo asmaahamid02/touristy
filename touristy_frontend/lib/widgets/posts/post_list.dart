@@ -51,18 +51,26 @@ class _PostsListState extends State<PostsList> {
   Widget build(BuildContext context) {
     final postsData = Provider.of<Posts>(context);
     final posts = postsData.posts;
-    return _isLoading
-        ? const SliverToBoxAdapter(
-            child: Center(child: CircularProgressIndicator()))
-        : SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                return PostContainer(
-                  post: posts[index],
-                );
-              },
-              childCount: posts.length,
-            ),
-          );
+    if (posts.isEmpty) {
+      return const SliverToBoxAdapter(
+        child: Center(
+          child: Text('No posts yet.'),
+        ),
+      );
+    } else {
+      return _isLoading
+          ? const SliverToBoxAdapter(
+              child: Center(child: CircularProgressIndicator()))
+          : SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return PostContainer(
+                    post: posts[index],
+                  );
+                },
+                childCount: posts.length,
+              ),
+            );
+    }
   }
 }
