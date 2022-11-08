@@ -91,4 +91,21 @@ class Posts with ChangeNotifier {
       }
     }
   }
+
+  //edit post
+  Future<void> editPost(int postId, String? content, List<File>? media) async {
+    final int postIndex = _posts.indexWhere((post) => post.id == postId);
+
+    if (postIndex >= 0) {
+      try {
+        final updatedPost = await PostsService()
+            .editPost(authToken as String, postId, content, media);
+        _posts[postIndex] = updatedPost;
+        notifyListeners();
+      } catch (error) {
+        print(error);
+        rethrow;
+      }
+    }
+  }
 }
