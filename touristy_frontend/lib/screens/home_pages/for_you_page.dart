@@ -26,21 +26,21 @@ class ForYouPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () => _refreshData(context),
-      child: const CustomScrollView(
+      child: CustomScrollView(
         slivers: [
-          SliverPadding(
+          const SliverPadding(
             padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
             sliver: SliverToBoxAdapter(
               child: TravelersAvatarsList(),
             ),
           ),
-          SliverPadding(
+          const SliverPadding(
             padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
             sliver: SliverToBoxAdapter(
               child: TripsList(),
             ),
           ),
-          SliverPadding(
+          const SliverPadding(
               padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
               sliver: SliverToBoxAdapter(
                 child: EventsList(),
