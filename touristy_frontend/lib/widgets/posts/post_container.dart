@@ -2,34 +2,62 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:touristy_frontend/screens/new_post_screen.dart';
 
+import '../../screens/new_post_screen.dart';
 import '../profile_avatar.dart';
 import '../../models/post.dart';
 import '../../providers/users.dart';
 import '../../providers/posts.dart';
 
-class PostContainer extends StatelessWidget {
+class PostContainer extends StatefulWidget {
   const PostContainer({super.key, required this.post});
   final Post post;
 
-//get image from url with token
-  Widget _getImage(String? url, String? token) {
+  @override
+  State<PostContainer> createState() => _PostContainerState();
+}
+
+class _PostContainerState extends State<PostContainer> {
+  Image? _image;
+
+  bool _loading = true;
+  Future<void> _loadImage() async {
+    final token = Provider.of<Posts>(context, listen: false).authToken;
+    final url = widget.post.mediaUrls![0]['media_path'];
     if (url != null) {
-      return Image.network(
+      //get image from url
+      _image = Image.network(
         url,
-        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
+        headers: {
+          HttpHeaders.authorizationHeader: 'Bearer $token',
+          HttpHeaders.contentTypeHeader: 'image/*, video/*, multipart/form-data'
+        },
         fit: BoxFit.cover,
       );
-    } else {
-      return const SizedBox.shrink();
+
+      //resolve image to get image stream and add listener to it
+      _image!.image.resolve(const ImageConfiguration()).addListener(
+        ImageStreamListener(
+          (ImageInfo info, bool _) {
+            if (mounted) {
+              setState(() {
+                _loading = false;
+              });
+            }
+          },
+        ),
+      );
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadImage();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final token =
-        Provider.of<Posts>(context, listen: false).authToken as String;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5.0),
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -42,35 +70,45 @@ class PostContainer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _PostHeader(
-                    post: post,
+                    post: widget.post,
                   ),
                   const SizedBox(height: 6.0),
-                  post.content != null
+                  widget.post.content != null
                       ? Text(
-                          post.content!,
+                          widget.post.content!,
                           style: const TextStyle(
                             fontSize: 16.0,
                           ),
                         )
                       : const SizedBox.shrink(),
                   const SizedBox(height: 6.0),
-                  post.mediaUrls != null
+                  widget.post.mediaUrls != null
                       ? const SizedBox.shrink()
                       : const SizedBox(
                           height: 6.0,
                         ),
                 ]),
           ),
-          post.mediaUrls != null && post.mediaUrls!.isNotEmpty
+          widget.post.mediaUrls != null && widget.post.mediaUrls!.isNotEmpty
               ? Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: _getImage(post.mediaUrls![0]['media_path'], token),
+                  child: _loading
+                      ? Center(
+                          child: Text(
+                          'Loading...',
+                          style:
+                              Theme.of(context).textTheme.bodyText2!.copyWith(
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                        ))
+                      : _image,
+                  // _getImage(widget.post.mediaUrls![0]['media_path'], token),
                 )
               : const SizedBox.shrink(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: _PostStats(post: post),
+            child: _PostStats(post: widget.post),
           )
         ],
       ),
