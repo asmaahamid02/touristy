@@ -82,4 +82,16 @@ class PostsService {
       rethrow;
     }
   }
+
+  //delete post
+  Future<bool> deletePost(String token, int postId) async {
+    final response = await http.delete(Uri.parse('$baseUrl/posts/$postId'),
+        headers: getHeaders(token));
+
+    //check if response is has error, throw exception
+    if (response.statusCode != 200) {
+      return false;
+    }
+    return true;
+  }
 }
