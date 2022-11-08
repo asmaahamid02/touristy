@@ -20,11 +20,11 @@ class UserController extends Controller
     public function index()
     {
         //get all users with nationality
-        $users = User::where('is_deleted', 0)->where('id', '!=', Auth::id())->with('nationality')->get();
+        $users = User::where('is_deleted', 0)->with('nationality')->get();
 
         if ($users->count() == 0)
             return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No Users found');
-        // $users = User::where('is_deleted', 0)->wi->get();
+
         return $this->jsonResponse($users, 'data', Response::HTTP_OK, 'Users');
     }
 
