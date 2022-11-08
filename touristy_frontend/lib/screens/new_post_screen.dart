@@ -1,10 +1,10 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
-import 'package:touristy_frontend/providers/posts.dart';
-import 'package:touristy_frontend/providers/users.dart';
+
+import '../providers/posts.dart';
+import '../providers/users.dart';
 import '../widgets/profile_avatar.dart';
 
 class NewPostScreen extends StatefulWidget {
@@ -23,6 +23,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
   final captionController = TextEditingController();
 
   bool _isLoading = false;
+  bool _isInit = true;
+
+  int? postId;
 
   @override
   void initState() {
@@ -32,6 +35,52 @@ class _NewPostScreenState extends State<NewPostScreen> {
     imagePicker = ImagePicker();
   }
 
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+
+    if (_isInit) {
+      postId = ModalRoute.of(context)!.settings.arguments != null
+          ? ModalRoute.of(context)!.settings.arguments as int
+          : 0;
+      if (postId! > 0) {
+        final post =
+            Provider.of<Posts>(context, listen: false).findById(postId as int);
+
+        captionController.text = post!.content != null ? post.content! : '';
+
+        for (var i = 0; i < post.mediaUrls!.length; i++) {
+          var url = post.mediaUrls![i]['media_path'].toString();
+
+          // try {
+          //   var response = await http.get(Uri.parse(url), headers: {
+          //     'Authorization':
+          //         'Bearer ${Provider.of<Users>(context, listen: false).authToken}',
+          //     'Content-Type': 'image/*',
+          //   });
+          //   print(response.statusCode);
+          //   var documentDirectory = await getExternalStorageDirectory();
+          //   print(documentDirectory!.path);
+          //   var file = File('/storage/emulated/0/Download/test.jpg');
+
+          //   file.writeAsBytesSync(response.bodyBytes);
+          //   imageFileList.add(XFile(file.path));
+          // } catch (e) {
+          //   print(e.toString());
+          // }
+        }
+      }
+    }
+    _isInit = false;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    captionController.dispose();
+  }
+
+//add image from gallery
   Future<void> _selectImages() async {
     final List<XFile> selectedImages = await imagePicker.pickMultiImage();
     if (selectedImages.isNotEmpty) {
@@ -41,6 +90,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
     setState(() {});
   }
 
+//DELETE IMAGE FROM LIST
   void _deleteImage(int index) {
     imageFileList.removeAt(index);
     setState(() {});
@@ -55,40 +105,51 @@ class _NewPostScreenState extends State<NewPostScreen> {
     );
   }
 
+//SAVE POST / UPDATE POST
   Future<void> _addNewPost() async {
     if (captionController.text.isEmpty && imageFileList.isEmpty) {
       return;
     }
 
-    final List<File> imageFileListConverted =
-        imageFileList.map((image) => File(image.path)).toList(growable: false);
-
+    List<File> imageFileListConverted = [];
+    if (imageFileList.isNotEmpty) {
+      imageFileListConverted = imageFileList
+          .map((image) => File(image.path))
+          .toList(growable: false);
+    }
     setState(() {
       _isLoading = true;
     });
 
     try {
       //add post
-      await Provider.of<Posts>(context, listen: false).addPost(
-        captionController.text,
-        imageFileListConverted,
-      );
+      if (postId == null || postId == 0) {
+        await Provider.of<Posts>(context, listen: false).addPost(
+          captionController.text,
+          imageFileListConverted,
+        );
+        //update post
+      } else {
+        // await Provider.of<Posts>(context, listen: false).editPost(
+        //   postId as int,
+        //   captionController.text,
+        //   imageFileListConverted,
+        // );
+      }
     } on HttpException catch (error) {
       _showSnakeBar(error.toString());
     } catch (error) {
-      _showSnakeBar('Could not add post. Please try again later.');
+      String msg = 'add';
+      if (postId! > 0) {
+        msg = 'update';
+      }
+      _showSnakeBar('Could not $msg post. Please try again later.');
     } finally {
       setState(() {
         _isLoading = false;
       });
       Navigator.of(context).pop();
     }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    captionController.dispose();
   }
 
   @override
@@ -149,7 +210,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
                             padding: const EdgeInsets.all(8.0),
                             child: TextField(
                               maxLines: null,
-                              autofocus: true,
+                              // autofocus: true,
                               controller: captionController,
                               decoration: const InputDecoration.collapsed(
                                   hintText: "Type a memory..."),
