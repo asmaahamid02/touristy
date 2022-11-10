@@ -1,32 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import './screens/new_post_screen.dart';
-import './screens/splash_screen.dart';
-import './screens/tabs.dart';
-import './screens/home_screen.dart';
-import './screens/auth/signup_location_screen.dart';
-import './screens/auth/signup_profile_screen.dart';
-import './screens/auth/signup_pesronal_info_screen.dart';
-import './screens/auth/login_screen.dart';
-import './screens/auth/signup_screen.dart';
-import './screens/landing_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import './theme.dart';
 
-import './providers/users.dart';
-import './providers/auth.dart';
-import './providers/posts.dart';
+import './screens/screens.dart';
 
-void main() {
+import './providers/providers.dart';
+
+void main() async {
   //portrait mode only
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
-    runApp(const MyApp());
+    runApp(MyApp(
+      appTheme: AppTheme(),
+    ));
   });
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.appTheme});
+
+  final AppTheme appTheme;
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -46,73 +43,9 @@ class MyApp extends StatelessWidget {
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
           title: 'Touristy',
-          theme: ThemeData(
-            brightness: Brightness.light,
-            primarySwatch: Colors.lightBlue,
-            fontFamily: 'Raleway',
-            elevatedButtonTheme: ElevatedButtonThemeData(
-              style: ButtonStyle(
-                padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                  const EdgeInsets.symmetric(
-                    vertical: 20,
-                    horizontal: 40,
-                  ),
-                ),
-                //secondary background color
-                backgroundColor: MaterialStateProperty.all<Color>(
-                  Colors.lightBlue,
-                ),
-
-                foregroundColor: MaterialStateProperty.all(Colors.white),
-                shape: MaterialStateProperty.all<OutlinedBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                minimumSize: MaterialStateProperty.all<Size>(
-                  const Size(double.infinity, 36),
-                ),
-              ),
-            ),
-            textTheme: const TextTheme(
-              button: TextStyle(
-                // fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-              headline5: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-              headline6: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            appBarTheme: const AppBarTheme(
-              backgroundColor: Colors.white,
-              centerTitle: true,
-              elevation: 0,
-              iconTheme: IconThemeData(
-                color: Colors.black,
-              ),
-              titleTextStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            iconTheme: const IconThemeData(
-              size: 24,
-            ),
-            textButtonTheme: TextButtonThemeData(
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all<Color>(
-                  Colors.black,
-                ),
-              ),
-            ),
-            scaffoldBackgroundColor: Colors.grey[100],
-          ),
+          theme: appTheme.light,
+          darkTheme: appTheme.dark,
+          themeMode: ThemeMode.light,
           home: auth.isAuth
               ? const Tabs()
               : FutureBuilder(
