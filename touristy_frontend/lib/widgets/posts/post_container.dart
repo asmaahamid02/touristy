@@ -1,13 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../screens/new_post_screen.dart';
-import '../profile_avatar.dart';
-import '../../models/post.dart';
-import '../../providers/users.dart';
-import '../../providers/posts.dart';
+import '../../screens/screens.dart';
+import '../../widgets/widgets.dart';
+import '../../models/models.dart';
+import '../../providers/providers.dart';
 
 class PostContainer extends StatefulWidget {
   const PostContainer({super.key, required this.post});
@@ -23,15 +20,11 @@ class _PostContainerState extends State<PostContainer> {
   bool _loading = true;
   Future<void> _loadImage() async {
     final token = Provider.of<Posts>(context, listen: false).authToken;
-    final url = widget.post.mediaUrls![0]['media_path'];
+    final url = widget.post.mediaUrls![0]['path'];
     if (url != null) {
       //get image from url
       _image = Image.network(
         url,
-        headers: {
-          HttpHeaders.authorizationHeader: 'Bearer $token',
-          HttpHeaders.contentTypeHeader: 'image/*, video/*, multipart/form-data'
-        },
         fit: BoxFit.cover,
       );
 
@@ -61,7 +54,7 @@ class _PostContainerState extends State<PostContainer> {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5.0),
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       child: Column(
         children: [
           Padding(
@@ -182,11 +175,17 @@ class _PostHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUserId =
         Provider.of<Users>(context, listen: false).currentUserId;
+    final Avatar avatar = Avatar(
+      url: post.user!.profilePictureUrl,
+      isOnline: true,
+    );
+
     return Row(
       children: [
         ProfileAvatar(
-          imageUrl: post.user.profilePictureUrl as String,
+          avatar: avatar,
           radius: 20,
+          onTap: (context) => null,
         ),
         const SizedBox(width: 8.0),
         Expanded(
@@ -196,7 +195,7 @@ class _PostHeader extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
-                  '${post.user.firstName} ${post.user.lastName}',
+                  '${post.user!.firstName} ${post.user!.lastName}',
                   style: Theme.of(context).textTheme.headline6,
                 ),
               ),
@@ -228,14 +227,14 @@ class _PostHeader extends StatelessWidget {
         ),
         Row(
           children: [
-            post.user.id != currentUserId
+            post.user!.id != currentUserId
                 ? Consumer<Users>(
                     builder: (_, value, __) => TextButton(
                         onPressed: () {
-                          value.followUser(post.user.id);
+                          value.followUser(post.user!.id);
                         },
                         child: Text(
-                          value.isFollowed(post.user.id)
+                          value.isFollowed(post.user!.id)
                               ? 'Following'
                               : 'Follow',
                           style: Theme.of(context)
@@ -248,7 +247,7 @@ class _PostHeader extends StatelessWidget {
                   )
                 : const SizedBox.shrink(),
             PopupMenuButton(
-              itemBuilder: (_) => post.user.id != currentUserId
+              itemBuilder: (_) => post.user!.id != currentUserId
                   ? [
                       PopupMenuItem(
                         value: PostOptions.block,
