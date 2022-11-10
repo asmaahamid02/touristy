@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PostResource;
+use App\Http\Resources\UserResource;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Traits\MediaTrait;
@@ -39,13 +41,23 @@ class PostController extends Controller
                 return $query->where('user_id', Auth::id())->select('user_id', 'post_id')->get();
             })
             ->with('media')
-            ->orderBy('created_at', 'desc')->get();
+            ->orderBy('created_at', 'desc')->paginate(10);
 
         if ($posts->count() == 0) {
             return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No posts found');
         }
 
-        return $this->jsonResponse($posts, 'data', Response::HTTP_OK, 'Posts');
+        //add isLikedByUser to each post
+        foreach ($posts as $post) {
+            $post->isLikedByUser = $post->likes->count() > 0 ? true : false;
+        }
+
+        //add isFollowedByUser to each post
+        foreach ($posts as $post) {
+            $post->user->isFollowedByUser = $post->user->followers->contains(Auth::id());
+        }
+
+        return $this->jsonResponse(PostResource::collection($posts), 'data', Response::HTTP_OK, 'Posts');
     }
 
     public function create(Request $request)
@@ -129,8 +141,14 @@ class PostController extends Controller
                 }
             }
 
+            // if ($request->has('image')) {
+            //     $path =  $this->saveImage($request->media, 'posts/' . $post->id);
+            //     dd($path);
+            // }
+
             //save media
             if ($request->has('media')) {
+
                 $this->saveMedia($request->media, $post);
             }
 
@@ -212,7 +230,16 @@ class PostController extends Controller
 
         try {
             //get post
-            $post = Post::where('id', $id)->where('is_deleted', 0)->first();
+            $post = Post::where('id', $id)->where('is_deleted', 0)->with('user.nationality')
+                ->with('location')
+                ->with('tags', function ($query) {
+                    return $query->select('tags.id', 'tag');
+                })
+                ->withCount('comments', 'likes')
+                ->with('likes', function ($query) {
+                    return $query->where('user_id', Auth::id())->select('user_id', 'post_id')->get();
+                })
+                ->with('media')->first();
 
             if (!$post) {
                 return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'Post not found');
@@ -247,11 +274,12 @@ class PostController extends Controller
                 $post->tags()->sync($tags);
             }
 
-            //delete media to re insert them
-            $post->media()->delete();
+
 
             //save media
             if ($request->has('media')) {
+                //delete media to re insert them
+                $post->media()->delete();
                 $this->saveMedia($request->media, $post);
             }
 
