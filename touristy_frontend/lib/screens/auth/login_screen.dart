@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../widgets/common_buttons.dart';
-import '../../widgets/logo.dart';
 
-import '../../providers/auth.dart';
-
-import '../../models/http_exception.dart';
+import '../../widgets/widgets.dart';
+import '../../providers/providers.dart';
+import '../../exceptions/http_exception.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -27,12 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final _user = <String, Object>{};
   var _isLoading = false;
-  @override
-  void dispose() {
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    super.dispose();
-  }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -67,13 +59,15 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     _form.currentState!.save();
+    FocusScope.of(context).unfocus();
 
     setState(() {
       _isLoading = true;
     });
     try {
-      await Provider.of<Auth>(context, listen: false)
-          .login(_user['email'] as String, _user['password'] as String);
+      await Provider.of<Auth>(context, listen: false).login(
+          _user['email'].toString().trim(),
+          _user['password'].toString().trim());
 
       if (!mounted) return;
       Navigator.of(context).popUntil((route) => route.isFirst);
@@ -92,6 +86,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final appBar = AppBar();
     return Scaffold(
@@ -102,20 +103,21 @@ class _LoginScreenState extends State<LoginScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const LogoHorizontal('assets/images/logo_horizontal.png', 100),
-              Container(
+              Padding(
                 padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
                 child: Form(
                   key: _form,
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildEmailTextField(),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       _buildPasswordTextField(),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               _isLoading
                   ? const CircularProgressIndicator()
                   : PrimaryButton(
