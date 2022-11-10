@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/http_exception.dart';
+import '../../exceptions/http_exception.dart';
 import '../../providers/posts.dart';
-import './post_container.dart';
+import '../widgets.dart';
 
 class PostsList extends StatefulWidget {
   const PostsList({super.key});
@@ -29,9 +29,8 @@ class _PostsListState extends State<PostsList> {
   void didChangeDependencies() async {
     super.didChangeDependencies();
     if (isInit) {
-      setState(() {
-        _isLoading = true;
-      });
+      _isLoading = true;
+
       try {
         await Provider.of<Posts>(context).fetchAndSetPosts();
       } on HttpException catch (error) {
@@ -39,6 +38,7 @@ class _PostsListState extends State<PostsList> {
       } catch (error) {
         _showSnakeBar('Could not fetch posts. Please try again later.');
       } finally {
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
         });
