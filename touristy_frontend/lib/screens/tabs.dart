@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/explore_screen.dart';
-import '../screens/messaging_screen.dart';
-import '../screens/notification_screen.dart';
-import '../screens/profile_screen.dart';
-
-import '../screens/home_screen.dart';
+import '../screens/screens.dart';
 
 class Tabs extends StatefulWidget {
   const Tabs({super.key});
@@ -24,20 +19,22 @@ class _TabsState extends State<Tabs> {
     super.initState();
 
     _pages = [
-      {
-        'page': const HomeScreen(),
-      },
-      {
-        'page': const ExploreScreen(),
-      },
+      {'page': const HomeScreen(), 'title': 'Home', 'icon': Icons.home},
+      {'page': const ExploreScreen(), 'title': 'Explore', 'icon': Icons.search},
       {
         'page': const ProfileScreen(),
+        'title': 'Profile',
+        'icon': Icons.account_circle
       },
       {
         'page': const NotificationScreen(),
+        'title': 'Notifications',
+        'icon': Icons.notifications_active
       },
       {
         'page': const MessagingScreen(),
+        'title': 'Messages',
+        'icon': Icons.message_rounded
       },
     ];
   }
@@ -57,31 +54,14 @@ class _TabsState extends State<Tabs> {
         showUnselectedLabels: false,
         type: BottomNavigationBarType.fixed,
         onTap: _selectPage,
-        unselectedItemColor: Colors.grey[600],
+        // unselectedItemColor: Colors.grey[600],
         selectedItemColor: Theme.of(context).primaryColor,
         currentIndex: _selectedPageIndex,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Explore',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_circle),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_active),
-            label: 'Notifications',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message_rounded),
-            label: 'Messages',
-          ),
-        ],
+        items: _pages
+            .map((page) => BottomNavigationBarItem(
+                icon: Icon(page['icon'] as IconData),
+                label: page['title'] as String))
+            .toList(),
       ),
     );
   }
