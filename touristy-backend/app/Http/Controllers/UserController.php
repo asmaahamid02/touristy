@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\UserType;
 use App\Traits\MediaTrait;
@@ -20,12 +21,19 @@ class UserController extends Controller
     public function index()
     {
         //get all users with nationality
-        $users = User::where('is_deleted', 0)->with('nationality')->get();
+        $users = User::where('is_deleted', 0)->with('nationality')->paginate();
 
         if ($users->count() == 0)
             return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No Users found');
+        //add isFollowedByUser to each user'
+        $users->map(function ($user) {
+            if ($user == Auth::user())
+                $user->isFollowedByUser = false;
+            else
+                $user->isFollowedByUser = $user->followers->contains(Auth::id());
+        });
 
-        return $this->jsonResponse($users, 'data', Response::HTTP_OK, 'Users');
+        return $this->jsonResponse(UserResource::collection($users), 'data', Response::HTTP_OK, 'Users');
     }
 
     public function show($id = null)
