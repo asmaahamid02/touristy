@@ -1,37 +1,60 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../profile_avatar.dart';
-import '../../models/post.dart';
-import '../../providers/users.dart';
-import '../../providers/posts.dart';
+import '../../screens/screens.dart';
+import '../../widgets/widgets.dart';
+import '../../models/models.dart';
+import '../../providers/providers.dart';
 
-class PostContainer extends StatelessWidget {
+class PostContainer extends StatefulWidget {
   const PostContainer({super.key, required this.post});
   final Post post;
 
-//get image from url with token
-  Widget _getImage(String? url, String? token) {
+  @override
+  State<PostContainer> createState() => _PostContainerState();
+}
+
+class _PostContainerState extends State<PostContainer> {
+  Image? _image;
+
+  bool _loading = true;
+  Future<void> _loadImage() async {
+    final token = Provider.of<Posts>(context, listen: false).authToken;
+    final url = widget.post.mediaUrls![0]['path'];
     if (url != null) {
-      return Image.network(
+      //get image from url
+      _image = Image.network(
         url,
-        headers: {HttpHeaders.authorizationHeader: 'Bearer $token'},
+        fit: BoxFit.cover,
       );
-    } else {
-      return const SizedBox.shrink();
+
+      //resolve image to get image stream and add listener to it
+      _image!.image.resolve(const ImageConfiguration()).addListener(
+        ImageStreamListener(
+          (ImageInfo info, bool _) {
+            if (mounted) {
+              setState(() {
+                _loading = false;
+              });
+            }
+          },
+        ),
+      );
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadImage();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final token =
-        Provider.of<Posts>(context, listen: false).authToken as String;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 5.0),
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       child: Column(
         children: [
           Padding(
@@ -40,35 +63,45 @@ class PostContainer extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _PostHeader(
-                    post: post,
+                    post: widget.post,
                   ),
                   const SizedBox(height: 6.0),
-                  post.content != null
+                  widget.post.content != null
                       ? Text(
-                          post.content!,
+                          widget.post.content!,
                           style: const TextStyle(
                             fontSize: 16.0,
                           ),
                         )
                       : const SizedBox.shrink(),
                   const SizedBox(height: 6.0),
-                  post.mediaUrls != null
+                  widget.post.mediaUrls != null
                       ? const SizedBox.shrink()
                       : const SizedBox(
                           height: 6.0,
                         ),
                 ]),
           ),
-          post.mediaUrls != null && post.mediaUrls!.isNotEmpty
+          widget.post.mediaUrls != null && widget.post.mediaUrls!.isNotEmpty
               ? Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: _getImage(post.mediaUrls![0]['media_path'], token),
+                  child: _loading
+                      ? Center(
+                          child: Text(
+                          'Loading...',
+                          style:
+                              Theme.of(context).textTheme.bodyText2!.copyWith(
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                        ))
+                      : _image,
+                  // _getImage(widget.post.mediaUrls![0]['media_path'], token),
                 )
               : const SizedBox.shrink(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: _PostStats(post: post),
+            child: _PostStats(post: widget.post),
           )
         ],
       ),
@@ -76,19 +109,83 @@ class PostContainer extends StatelessWidget {
   }
 }
 
+enum PostOptions {
+  edit,
+  delete,
+  block,
+}
+
 //post header widget
 class _PostHeader extends StatelessWidget {
   const _PostHeader({required this.post});
   final Post post;
+
+  Future<dynamic> _showDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Are you sure?'),
+        content: const Text(
+            'Do you want to delete this post? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: Theme.of(context).textButtonTheme.style!.copyWith(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                    Theme.of(context).errorColor,
+                  ),
+                  foregroundColor: MaterialStateProperty.all<Color>(
+                    Colors.white,
+                  ),
+                ),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              try {
+                Provider.of<Posts>(context, listen: false).deletePost(post.id);
+              } catch (e) {
+                //show error message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(e.toString()),
+                  ),
+                );
+              }
+            },
+            style: Theme.of(context).textButtonTheme.style!.copyWith(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                    Theme.of(context).primaryColor,
+                  ),
+                  foregroundColor: MaterialStateProperty.all<Color>(
+                    Colors.white,
+                  ),
+                ),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final currentUserId =
         Provider.of<Users>(context, listen: false).currentUserId;
+    final Avatar avatar = Avatar(
+      url: post.user!.profilePictureUrl,
+      isOnline: true,
+    );
+
     return Row(
       children: [
         ProfileAvatar(
-          imageUrl: post.user.profilePictureUrl as String,
+          avatar: avatar,
           radius: 20,
+          onTap: (context) => null,
         ),
         const SizedBox(width: 8.0),
         Expanded(
@@ -98,7 +195,7 @@ class _PostHeader extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
-                  '${post.user.firstName} ${post.user.lastName}',
+                  '${post.user!.firstName} ${post.user!.lastName}',
                   style: Theme.of(context).textTheme.headline6,
                 ),
               ),
@@ -130,14 +227,14 @@ class _PostHeader extends StatelessWidget {
         ),
         Row(
           children: [
-            post.user.id != currentUserId
+            post.user!.id != currentUserId
                 ? Consumer<Users>(
                     builder: (_, value, __) => TextButton(
                         onPressed: () {
-                          value.followUser(post.user.id);
+                          value.followUser(post.user!.id);
                         },
                         child: Text(
-                          value.isFollowed(post.user.id)
+                          value.isFollowed(post.user!.id)
                               ? 'Following'
                               : 'Follow',
                           style: Theme.of(context)
@@ -149,12 +246,50 @@ class _PostHeader extends StatelessWidget {
                         )),
                   )
                 : const SizedBox.shrink(),
-            IconButton(
-              onPressed: () {},
+            PopupMenuButton(
+              itemBuilder: (_) => post.user!.id != currentUserId
+                  ? [
+                      PopupMenuItem(
+                        value: PostOptions.block,
+                        child: Text(PostOptions.block.name),
+                      )
+                    ]
+                  : [
+                      PopupMenuItem(
+                        value: PostOptions.edit,
+                        child: Text(PostOptions.edit.name),
+                      ),
+                      PopupMenuItem(
+                        value: PostOptions.delete,
+                        child: Text(PostOptions.delete.name),
+                      ),
+                    ],
               icon: Icon(
                 Icons.more_horiz,
                 color: Theme.of(context).primaryColor,
               ),
+              onSelected: (PostOptions value) {
+                switch (value) {
+                  case PostOptions.edit:
+                    {
+                      Navigator.of(context).pushNamed(
+                        NewPostScreen.routeName,
+                        arguments: post.id,
+                      );
+                    }
+                    break;
+                  case PostOptions.delete:
+                    {
+                      _showDialog(context);
+                    }
+                    break;
+                  case PostOptions.block:
+                    {
+                      print('block');
+                    }
+                    break;
+                }
+              },
             ),
           ],
         ),

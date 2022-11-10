@@ -1,13 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
-import '../../screens/tabs.dart';
-import 'dart:io';
 
-import '../../widgets/logo.dart';
-import '../../widgets/image_options_bottom_sheet.dart';
-import './signup_location_screen.dart';
+import '../../screens/screens.dart';
+
+import '../../widgets/widgets.dart';
 
 class SignupProfileScreen extends StatefulWidget {
   const SignupProfileScreen({super.key});
@@ -111,18 +111,18 @@ class _SignupProfileScreenState extends State<SignupProfileScreen> {
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: ElevatedButton(
-                  onPressed: _image == null ? _showBottomSheet : _saveForm,
-                  child: Text(_buttonText),
-                ),
+              PrimaryButton(
+                onTap: _image == null ? _showBottomSheet : _saveForm,
+                textLabel: _buttonText,
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: TextButton(
                   onPressed: _saveForm,
-                  child: const Text('SET UP LATER'),
+                  child: const Text(
+                    'SET UP LATER',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
             ],

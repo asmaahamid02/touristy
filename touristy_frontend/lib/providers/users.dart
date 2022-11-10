@@ -18,20 +18,28 @@ class Users with ChangeNotifier {
   }
 
   List<User> get users {
-    return [..._users];
+    //return users without the current user
+    return _users.where((user) => user.id != currentUserId).toList();
+  }
+
+  User get currentUser {
+    return _users.firstWhere((user) => user.id == currentUserId);
   }
 
   //get users
   Future<void> fetchAndSetUsers() async {
-    final users = await UsersService().getUsers(authToken as String);
-
-    _users = users;
-
-    notifyListeners();
+    try {
+      final users = await UsersService().getUsers(authToken!);
+      _users = users;
+      notifyListeners();
+    } catch (error) {
+      rethrow;
+    }
   }
 
   bool isFollowed(int userId) {
-    return _users.any((user) => user.id == userId && user.isFollowing == true);
+    return _users
+        .any((user) => user.id == userId && user.isFollowedByUser == true);
   }
 
   //follow user
@@ -39,13 +47,14 @@ class Users with ChangeNotifier {
     final int userIndex = _users.indexWhere((user) => user.id == userId);
 
     if (userIndex >= 0) {
-      _users[userIndex].isFollowing = !_users[userIndex].isFollowing!;
+      _users[userIndex].isFollowedByUser = !_users[userIndex].isFollowedByUser!;
       notifyListeners();
 
       try {
         await UsersService().followUser(authToken as String, userId);
       } catch (error) {
-        _users[userIndex].isFollowing = !_users[userIndex].isFollowing!;
+        _users[userIndex].isFollowedByUser =
+            !_users[userIndex].isFollowedByUser!;
         notifyListeners();
       }
     }

@@ -1,10 +1,9 @@
 import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../widgets/logo.dart';
-import '../../widgets/country_list.dart';
-import '../../widgets/radio_button.dart';
-import './signup_profile_screen.dart';
+import '../../widgets/widgets.dart';
+
+import '../screens.dart';
 
 class SignupPersonalInfoScreen extends StatefulWidget {
   const SignupPersonalInfoScreen({super.key});
@@ -145,12 +144,9 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: ElevatedButton(
-                onPressed: _saveForm,
-                child: const Text('NEXT'),
-              ),
+            PrimaryButton(
+              onTap: _saveForm,
+              textLabel: 'NEXT',
             ),
           ],
         ),

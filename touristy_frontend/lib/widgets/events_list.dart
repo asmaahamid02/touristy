@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/event_item.dart';
+import '../widgets/widgets.dart';
 
 class EventsList extends StatefulWidget {
   const EventsList({super.key});
@@ -14,7 +14,7 @@ class _EventsListState extends State<EventsList> {
     return Container(
       height: 250,
       padding: const EdgeInsets.only(bottom: 10),
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       child: Column(
         children: [
           Container(

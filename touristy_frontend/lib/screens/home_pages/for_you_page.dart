@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../widgets/posts/post_list.dart';
-import '../../widgets/travelers_avatars_list.dart';
-import '../../widgets/trips_list.dart';
-import '../../widgets/events_list.dart';
+import '../../widgets/widgets.dart';
 
-import '../../providers/posts.dart';
-import '../../providers/users.dart';
+import '../../providers/providers.dart';
 
 class ForYouPage extends StatelessWidget {
   const ForYouPage({

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/trip_item.dart';
+import '../widgets/widgets.dart';
 
 class TripsList extends StatelessWidget {
   const TripsList({
@@ -11,7 +11,7 @@ class TripsList extends StatelessWidget {
     return Container(
       height: 250,
       padding: const EdgeInsets.only(bottom: 10),
-      color: Colors.white,
+      color: Theme.of(context).cardColor,
       child: Column(
         children: [
           Container(

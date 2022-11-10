@@ -17,7 +17,7 @@ class CreatePostsTable extends Migration
             $table->id();
             $table->integer('user_id')->unsigned();
             $table->integer('location_id')->nullable()->unsigned();
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->enum('publicity', ['public', 'followers'])->default('public');
             $table->tinyInteger('is_deleted')->default(0);
             $table->timestamps();
