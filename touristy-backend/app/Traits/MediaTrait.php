@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 trait MediaTrait
 {
@@ -20,9 +21,9 @@ trait MediaTrait
         //create a unique file name
         $imageName = uniqid() . time() . '.' . $extension;
         //save the file to the server
-        $path = 'uploads/' . $folderName . '/' . time() . '/' . $imageName;
+        $path = $folderName . '/' . time() . '/' . $imageName;
 
-        Storage::put($path, $fileData);
+        Storage::disk('uploads')->put($path, $fileData);
 
         return $path;
     }
@@ -30,8 +31,9 @@ trait MediaTrait
     public function uploadMedia($file, $folderName)
     {
         $fileName = uniqid() . time() . '.' . $file->getClientOriginalExtension();
-        $path = 'uploads/' . $folderName . '/' . time() . '/' . $fileName;
-        Storage::put($path, file_get_contents($file));
+        // $path = 'uploads/' . $folderName . '/' . time() . '/' . $fileName;
+        $path = $folderName . '/' . time() . '/' . $fileName;
+        Storage::disk('uploads')->put($path, file_get_contents($file));
 
         return $path;
     }
