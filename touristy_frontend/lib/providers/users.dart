@@ -28,15 +28,18 @@ class Users with ChangeNotifier {
 
   //get users
   Future<void> fetchAndSetUsers() async {
-    final users = await UsersService().getUsers(authToken as String);
-
-    _users = users;
-
-    notifyListeners();
+    try {
+      final users = await UsersService().getUsers(authToken!);
+      _users = users;
+      notifyListeners();
+    } catch (error) {
+      rethrow;
+    }
   }
 
   bool isFollowed(int userId) {
-    return _users.any((user) => user.id == userId && user.isFollowing == true);
+    return _users
+        .any((user) => user.id == userId && user.isFollowedByUser == true);
   }
 
   //follow user
@@ -44,13 +47,14 @@ class Users with ChangeNotifier {
     final int userIndex = _users.indexWhere((user) => user.id == userId);
 
     if (userIndex >= 0) {
-      _users[userIndex].isFollowing = !_users[userIndex].isFollowing!;
+      _users[userIndex].isFollowedByUser = !_users[userIndex].isFollowedByUser!;
       notifyListeners();
 
       try {
         await UsersService().followUser(authToken as String, userId);
       } catch (error) {
-        _users[userIndex].isFollowing = !_users[userIndex].isFollowing!;
+        _users[userIndex].isFollowedByUser =
+            !_users[userIndex].isFollowedByUser!;
         notifyListeners();
       }
     }
