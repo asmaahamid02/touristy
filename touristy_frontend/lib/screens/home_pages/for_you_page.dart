@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../widgets/posts/post_list.dart';
-import '../../widgets/travelers_avatars_list.dart';
-import '../../widgets/trips_list.dart';
-import '../../widgets/events_list.dart';
+import '../../widgets/widgets.dart';
 
-import '../../providers/posts.dart';
-import '../../providers/users.dart';
+import '../../providers/providers.dart';
 
 class ForYouPage extends StatelessWidget {
   const ForYouPage({
@@ -26,21 +22,21 @@ class ForYouPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return RefreshIndicator(
       onRefresh: () => _refreshData(context),
-      child: CustomScrollView(
+      child: const CustomScrollView(
         slivers: [
-          const SliverPadding(
+          SliverPadding(
             padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
             sliver: SliverToBoxAdapter(
               child: TravelersAvatarsList(),
             ),
           ),
-          const SliverPadding(
+          SliverPadding(
             padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
             sliver: SliverToBoxAdapter(
               child: TripsList(),
             ),
           ),
-          const SliverPadding(
+          SliverPadding(
               padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
               sliver: SliverToBoxAdapter(
                 child: EventsList(),
