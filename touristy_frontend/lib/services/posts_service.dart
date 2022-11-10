@@ -2,9 +2,9 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-import '../constants.dart';
+import '../utilities/constants.dart';
 
-import '../models/post.dart';
+import '../models/models.dart';
 
 class PostsService {
   Future<List<Post>> getPosts(String token) async {

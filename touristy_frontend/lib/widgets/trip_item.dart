@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:touristy_frontend/widgets/profile_avatar.dart';
+import '../widgets/widgets.dart';
+import '../models/models.dart';
 
 class TripItem extends StatelessWidget {
   final bool withIcon;
@@ -20,7 +21,7 @@ class TripItem extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Container(
+      child: SizedBox(
         height: 200,
         width: 150,
         child: Column(
@@ -33,7 +34,7 @@ class TripItem extends StatelessWidget {
                     margin:
                         EdgeInsets.only(bottom: _topPositionForUserProfile / 2),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.only(
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(10),
                         topRight: Radius.circular(10),
                       ),
@@ -70,7 +71,10 @@ class TripItem extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.all(3),
                       child: ProfileAvatar(
-                          imageUrl: 'https://picsum.photos/200?random=1',
+                          avatar: Avatar(
+                            url: 'https://picsum.photos/200',
+                          ),
+                          onTap: (context) => print('tapped'),
                           radius: _userProfileTripImageHeight / 2),
                     ),
                   )

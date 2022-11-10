@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart' as permissions;
-import '../../screens/tabs.dart';
-import '../../widgets/logo.dart';
+import '../../screens/screens.dart';
+import '../../widgets/widgets.dart';
 
 class SignupLocationScreen extends StatefulWidget {
   const SignupLocationScreen({super.key});
@@ -87,19 +87,16 @@ class _SignupLocationScreenState extends State<SignupLocationScreen> {
           Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: ElevatedButton(
-                  onPressed: _permissionStatus == PermissionStatus.granted
-                      ? () {
-                          Navigator.of(context)
-                              .pushNamed(Tabs.routeName, arguments: _user);
-                        }
-                      : _requestPermission,
-                  child: Text(_permissionStatus == PermissionStatus.granted
-                      ? 'NEXT'
-                      : 'ENABLE LOCATION'),
-                ),
+              PrimaryButton(
+                onTap: _permissionStatus == PermissionStatus.granted
+                    ? () {
+                        Navigator.of(context)
+                            .pushNamed(Tabs.routeName, arguments: _user);
+                      }
+                    : _requestPermission,
+                textLabel: _permissionStatus == PermissionStatus.granted
+                    ? 'NEXT'
+                    : 'ENABLE LOCATION',
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -111,7 +108,8 @@ class _SignupLocationScreenState extends State<SignupLocationScreen> {
                               Tabs.routeName,
                               arguments: _token);
                         },
-                  child: const Text('SET UP LATER'),
+                  child: const Text('SET UP LATER',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],

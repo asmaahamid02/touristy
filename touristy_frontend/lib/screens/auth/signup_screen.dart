@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../widgets/logo.dart';
-import 'signup_pesronal_info_screen.dart';
+import '../../widgets/widgets.dart';
+import '../screens.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -204,12 +204,9 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: ElevatedButton(
-                onPressed: _saveForm,
-                child: const Text('NEXT'),
-              ),
+            PrimaryButton(
+              onTap: _saveForm,
+              textLabel: 'NEXT',
             ),
           ],
         ),

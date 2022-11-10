@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
-import './home_pages/for_you_page.dart';
-import './home_pages/following_page.dart';
-import './home_pages/map_page.dart';
-import '../screens/new_post_screen.dart';
+import './screens.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -53,8 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: const Icon(Icons.logout))
           ],
           bottom: TabBar(
-            labelColor: Theme.of(context).primaryColor,
-            unselectedLabelColor: Colors.grey,
+            labelColor: Theme.of(context).colorScheme.primary,
+            unselectedLabelColor: Theme.of(context).unselectedWidgetColor,
+            indicatorColor: Theme.of(context).colorScheme.primary,
             tabs: const [
               Tab(
                 text: 'For you',
