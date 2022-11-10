@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/posts.dart';
-import '../providers/users.dart';
-import '../widgets/profile_avatar.dart';
+import '../models/models.dart';
+import '../providers/providers.dart';
+import '../widgets/widgets.dart';
 
 class NewPostScreen extends StatefulWidget {
   const NewPostScreen({super.key});
@@ -263,15 +263,17 @@ class _PostHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = Provider.of<Users>(context).currentUser;
+    final Avatar avatar = Avatar(
+      url: currentUser.profilePictureUrl,
+      isOnline: true,
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Row(
         children: [
           ProfileAvatar(
-            imageUrl: currentUser.profilePictureUrl != null &&
-                    currentUser.profilePictureUrl!.isNotEmpty
-                ? currentUser.profilePictureUrl as String
-                : '',
+            onTap: (context) => null,
+            avatar: avatar,
           ),
           const SizedBox(width: 10),
           Column(
