@@ -4,7 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 const String baseUrl = 'http://10.0.2.2:8000/api/v0.1';
-const String fileBaseUrl = 'http://10.0.2.2:8000/storage/uploads';
+const String fileBaseUrl = 'http://10.0.2.2:8000/storage/uploads/';
 const String loginUrl = '$baseUrl/auth/login';
 const String registerUrl = '$baseUrl/auth/register';
 
