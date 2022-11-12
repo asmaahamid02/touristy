@@ -284,4 +284,30 @@ class UserController extends Controller
 
         return $this->jsonResponse($unfollowedUsers->load(['nationality']), 'data', Response::HTTP_OK, 'Unfollowed users');
     }
+
+    //get suggested users
+    public function getSuggestedUsers($limit = 10)
+    {
+        $user = Auth::user();
+        $suggestedUsers = User::where('id', '!=', $user->id)
+            ->where('is_deleted', 0)
+            ->whereNotIn('id', $user->followings()->pluck('followed_user_id')->toArray())
+            ->whereNotIn('id', $user->blockers()->pluck('user_id')->toArray())
+            ->whereNotIn('id', $user->blockings()->pluck('blocked_user_id')->toArray())
+            ->with(['nationality' => function ($q) {
+                $q->select('id', 'country_code');
+            }])
+            ->inRandomOrder()
+            ->limit($limit)
+            ->get(
+                ['id', 'first_name', 'last_name', 'profile_picture', 'nationality_id']
+
+            );
+
+        if ($suggestedUsers->count() == 0) {
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No suggested users found');
+        }
+
+        return $this->jsonResponse($suggestedUsers, 'data', Response::HTTP_OK, 'Suggested users');
+    }
 }
