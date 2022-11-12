@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:touristy_frontend/utilities/theme.dart';
 
 import '../../screens/screens.dart';
 import '../../widgets/widgets.dart';
@@ -20,7 +21,7 @@ class _PostContainerState extends State<PostContainer> {
   bool _loading = true;
   Future<void> _loadImage() async {
     final token = Provider.of<Posts>(context, listen: false).authToken;
-    final url = widget.post.mediaUrls![0]['path'];
+    final url = widget.post.mediaUrls?[0]['path'];
     if (url != null) {
       //get image from url
       _image = Image.network(
@@ -58,7 +59,8 @@ class _PostContainerState extends State<PostContainer> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -96,7 +98,6 @@ class _PostContainerState extends State<PostContainer> {
                                   ),
                         ))
                       : _image,
-                  // _getImage(widget.post.mediaUrls![0]['media_path'], token),
                 )
               : const SizedBox.shrink(),
           Padding(
@@ -175,18 +176,14 @@ class _PostHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUserId =
         Provider.of<Users>(context, listen: false).currentUserId;
-    final Avatar avatar = Avatar(
+    final StoryData avatar = StoryData(
       url: post.user!.profilePictureUrl,
       isOnline: true,
     );
 
     return Row(
       children: [
-        ProfileAvatar(
-          avatar: avatar,
-          radius: 20,
-          onTap: (context) => null,
-        ),
+        Avatar(radius: 20.0, imageUrl: post.user!.profilePictureUrl),
         const SizedBox(width: 8.0),
         Expanded(
           child: Column(
@@ -196,7 +193,8 @@ class _PostHeader extends StatelessWidget {
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Text(
                   '${post.user!.firstName} ${post.user!.lastName}',
-                  style: Theme.of(context).textTheme.headline6,
+                  style: const TextStyle(
+                      fontSize: 16.0, fontWeight: FontWeight.w700),
                 ),
               ),
               post.location != null
@@ -208,7 +206,8 @@ class _PostHeader extends StatelessWidget {
                         const SizedBox(width: 5.0),
                         Text(
                           post.location as String,
-                          style: Theme.of(context).textTheme.bodySmall,
+                          style: const TextStyle(
+                              color: AppColors.textFaded, fontSize: 12.0),
                         ),
                       ]),
                     )
@@ -217,7 +216,8 @@ class _PostHeader extends StatelessWidget {
                 children: [
                   Text(
                     '${post.timeAgo} • ',
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: const TextStyle(
+                        color: AppColors.textFaded, fontSize: 12.0),
                   ),
                   Icon(Icons.public, size: 12.0, color: Colors.grey[600]),
                 ],
@@ -230,20 +230,19 @@ class _PostHeader extends StatelessWidget {
             post.user!.id != currentUserId
                 ? Consumer<Users>(
                     builder: (_, value, __) => TextButton(
-                        onPressed: () {
-                          value.followUser(post.user!.id);
-                        },
-                        child: Text(
-                          value.isFollowed(post.user!.id)
-                              ? 'Following'
-                              : 'Follow',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.bold),
-                        )),
+                      onPressed: () {
+                        value.followUser(post.user!.id);
+                      },
+                      child: Text(
+                        value.isFollowed(post.user!.id)
+                            ? 'Following'
+                            : 'Follow',
+                        style: const TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   )
                 : const SizedBox.shrink(),
             PopupMenuButton(
@@ -264,10 +263,7 @@ class _PostHeader extends StatelessWidget {
                         child: Text(PostOptions.delete.name),
                       ),
                     ],
-              icon: Icon(
-                Icons.more_horiz,
-                color: Theme.of(context).primaryColor,
-              ),
+              icon: const Icon(Icons.more_horiz, color: AppColors.secondary),
               onSelected: (PostOptions value) {
                 switch (value) {
                   case PostOptions.edit:
@@ -313,9 +309,11 @@ class _PostStats extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('${post.likes} Likes',
-                style: Theme.of(context).textTheme.bodySmall),
+                style: const TextStyle(
+                    color: AppColors.textFaded, fontSize: 12.0)),
             Text('${post.comments} Comments',
-                style: Theme.of(context).textTheme.bodySmall),
+                style: const TextStyle(
+                    color: AppColors.textFaded, fontSize: 12.0)),
           ],
         ),
         const Divider(),
@@ -330,7 +328,7 @@ class _PostStats extends StatelessWidget {
                       size: 20.0,
                       color: post.isLiked!
                           ? Theme.of(context).primaryColor
-                          : Colors.grey[600],
+                          : Theme.of(context).iconTheme.color,
                     ),
                     label: 'Like',
                     isActive: post.isLiked!,
@@ -338,15 +336,13 @@ class _PostStats extends StatelessWidget {
                       posts.toggleLikeStatus(post.id);
                     }),
                 _PostButton(
-                    icon: Icon(Icons.message_outlined,
-                        size: 20.0, color: Colors.grey[600]),
+                    icon: const Icon(Icons.message_outlined, size: 20.0),
                     label: 'Comment',
                     onTap: () {}),
               ],
             )),
             _PostButton(
-                icon: Icon(Icons.near_me_outlined,
-                    size: 20.0, color: Colors.grey[600]),
+                icon: const Icon(Icons.near_me_outlined, size: 20.0),
                 label: 'Share',
                 onTap: () {}),
           ],
@@ -383,10 +379,11 @@ class _PostButton extends StatelessWidget {
               icon,
               const SizedBox(width: 4.0),
               Text(label,
-                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  style: TextStyle(
                       color: isActive != null && isActive!
                           ? Theme.of(context).primaryColor
-                          : Colors.grey[600])),
+                          : null,
+                      fontSize: 12.0)),
             ],
           ),
         ),
