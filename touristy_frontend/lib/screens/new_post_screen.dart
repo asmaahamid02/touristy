@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:touristy_frontend/utilities/theme.dart';
 
 import '../models/models.dart';
 import '../providers/providers.dart';
@@ -157,11 +158,9 @@ class _NewPostScreenState extends State<NewPostScreen> {
     var appBar = AppBar(
       title: const Text('New Post'),
       leading: TextButton(
-        child: Text(
+        child: const Text(
           'Cancel',
-          style: Theme.of(context).textTheme.headline6!.copyWith(
-                color: Theme.of(context).primaryColor,
-              ),
+          style: TextStyle(fontSize: 16.0, color: AppColors.accent),
         ),
         onPressed: () {
           Navigator.of(context).pop();
@@ -171,23 +170,20 @@ class _NewPostScreenState extends State<NewPostScreen> {
       actions: [
         Container(
           margin: const EdgeInsets.all(10),
-          child: TextButton(
+          child: ElevatedButton(
             onPressed: () {
               _addNewPost();
             },
-            style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all<Color>(
-                    Theme.of(context).primaryColor)),
             child: const Text(
               'Post',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(fontWeight: FontWeight.w700),
             ),
           ),
         )
       ],
     );
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).cardColor,
       appBar: appBar,
       body: _isLoading
           ? const Center(
@@ -263,7 +259,7 @@ class _PostHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final currentUser = Provider.of<Users>(context).currentUser;
-    final Avatar avatar = Avatar(
+    final StoryData storyData = StoryData(
       url: currentUser.profilePictureUrl,
       isOnline: true,
     );
@@ -271,9 +267,8 @@ class _PostHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Row(
         children: [
-          ProfileAvatar(
-            onTap: (context) => null,
-            avatar: avatar,
+          Avatar.medium(
+            imageUrl: storyData.url,
           ),
           const SizedBox(width: 10),
           Column(
