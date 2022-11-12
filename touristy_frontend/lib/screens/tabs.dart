@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:touristy_frontend/utilities/theme.dart';
 import '../screens/screens.dart';
 
 class Tabs extends StatefulWidget {
@@ -32,7 +33,7 @@ class _TabsState extends State<Tabs> {
         'icon': Icons.notifications_active
       },
       {
-        'page': const MessagingScreen(),
+        'page': MessagingScreen(),
         'title': 'Messages',
         'icon': Icons.message_rounded
       },
@@ -50,12 +51,14 @@ class _TabsState extends State<Tabs> {
     return Scaffold(
       body: _pages[_selectedPageIndex]['page'] as Widget,
       bottomNavigationBar: BottomNavigationBar(
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
+        selectedFontSize: 12.0,
+        unselectedFontSize: 12.0,
+        // showSelectedLabels: true,
+        // showUnselectedLabels: true,
         type: BottomNavigationBarType.fixed,
         onTap: _selectPage,
         // unselectedItemColor: Colors.grey[600],
-        selectedItemColor: Theme.of(context).primaryColor,
+        selectedItemColor: AppColors.secondary,
         currentIndex: _selectedPageIndex,
         items: _pages
             .map((page) => BottomNavigationBarItem(
