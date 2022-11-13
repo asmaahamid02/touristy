@@ -74,7 +74,9 @@ class _ChatScreenState extends State<ChatScreen> {
           : GestureDetector(
               onTap: () => FocusScope.of(context).unfocus(),
               child: Column(
-                children: const [],
+                children: [
+                  _ChatMessages(chatDocId: chatDocId),
+                ],
               )),
     );
   }
@@ -122,5 +124,72 @@ class _AppBarTitle extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _ChatMessages extends StatelessWidget {
+  const _ChatMessages({Key? key, this.chatDocId}) : super(key: key);
+  final String? chatDocId;
+
+  @override
+  Widget build(BuildContext context) {
+    final userId = Provider.of<Auth>(context, listen: false).userId;
+    final messageData =
+        ModalRoute.of(context)!.settings.arguments as MessageData;
+
+    print(chatDocId);
+    return Expanded(
+        child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+      child: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('chats')
+              .doc(chatDocId)
+              .collection('messages')
+              .orderBy('sentAt', descending: true)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return const Center(
+                child: Text('Something went wrong'),
+              );
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
+            if (snapshot.hasData) {
+              final messages = snapshot.data!.docs;
+              print('messages: $messages');
+
+              return ListView.builder(
+                reverse: true,
+                itemCount: messages.length,
+                itemBuilder: (context, index) {
+                  final message = messages[index].data();
+
+                  final messageText = message['text'];
+                  final messageTime =
+                      DateFormat.jm().format(message['sentAt'].toDate());
+                  final messageSenderId = message['sentBy'];
+                  final isMe = messageSenderId == userId;
+
+                  return MessageBubble(
+                    message: messageText,
+                    time: messageTime,
+                    isMe: isMe,
+                    avatarUrl: messageData.profilePicture,
+                  );
+                },
+              );
+            }
+
+            return const Center(
+              child: Text('No messages'),
+            );
+          }),
+    ));
   }
 }
