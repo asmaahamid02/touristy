@@ -183,8 +183,6 @@ class _ChatMessages extends StatelessWidget {
     final userId = Provider.of<Auth>(context, listen: false).userId;
     final messageData =
         ModalRoute.of(context)!.settings.arguments as MessageData;
-
-    print(chatDocId);
     return Expanded(
         child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
@@ -209,7 +207,6 @@ class _ChatMessages extends StatelessWidget {
 
             if (snapshot.hasData) {
               final messages = snapshot.data!.docs;
-              print('messages: $messages');
 
               return ListView.builder(
                 reverse: true,
@@ -225,26 +222,12 @@ class _ChatMessages extends StatelessWidget {
 
                   //update message to read
                   if (!isMe && !message['isRead']) {
-                    FirebaseFirestore.instance
-                        .collection('chats')
-                        .doc(chatDocId)
-                        .collection('messages')
-                        .doc(messages[index].id)
-                        .update({
-                      'isRead': true,
-                      'readAt': DateTime.now(),
-                    });
+                    _updateMessageReadStatus(messages, index);
                   }
 
                   //update latest message to read
                   if (!isMe && index == 0 && !message['isRead']) {
-                    FirebaseFirestore.instance
-                        .collection('chats')
-                        .doc(chatDocId)
-                        .update({
-                      'latestMessage.isRead': true,
-                      'latestMessage.readAt': DateTime.now(),
-                    });
+                    _updateLastMessageReadStatus();
                   }
                   return MessageBubble(
                     message: messageText,
@@ -261,5 +244,25 @@ class _ChatMessages extends StatelessWidget {
             );
           }),
     ));
+  }
+
+  void _updateLastMessageReadStatus() {
+    FirebaseFirestore.instance.collection('chats').doc(chatDocId).update({
+      'latestMessage.isRead': true,
+      'latestMessage.readAt': DateTime.now(),
+    });
+  }
+
+  void _updateMessageReadStatus(
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> messages, int index) {
+    FirebaseFirestore.instance
+        .collection('chats')
+        .doc(chatDocId)
+        .collection('messages')
+        .doc(messages[index].id)
+        .update({
+      'isRead': true,
+      'readAt': DateTime.now(),
+    });
   }
 }
