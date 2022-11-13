@@ -132,4 +132,29 @@ class PostsService {
       rethrow;
     }
   }
+
+  //get posts of following users
+  Future<List<Post>> getFollowingPosts(String token) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/posts/following'),
+          headers: getHeaders(token));
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      //check if response is has error, throw exception
+      if (response.statusCode != 200) {
+        throw HttpException(getResponseError(responseData));
+      } else {
+        if (responseData['data'] != null &&
+            responseData['data'] != '' &&
+            responseData['data'].length > 0) {
+          final List<dynamic> postsList = responseData['data'];
+          return postsList.map((post) => Post.fromJson(post)).toList();
+        } else {
+          return [];
+        }
+      }
+    } catch (error) {
+      rethrow;
+    }
+  }
 }
