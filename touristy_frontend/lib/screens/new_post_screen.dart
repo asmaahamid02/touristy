@@ -260,6 +260,7 @@ class _PostHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUser = Provider.of<Users>(context).currentUser;
     final StoryData storyData = StoryData(
+      id: currentUser.id,
       url: currentUser.profilePictureUrl,
       isOnline: true,
     );
