@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:faker/faker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -21,6 +20,8 @@ class _MessagingScreenState extends State<MessagingScreen> {
   List<int> friendsIds = [];
   bool _isInit = true;
   bool _isLoading = false;
+
+  List<User> randomUsers = [];
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
@@ -34,6 +35,15 @@ class _MessagingScreenState extends State<MessagingScreen> {
           _isLoading = true;
         });
         await Provider.of<Users>(context, listen: false).fetchAndSetUsers();
+
+        //get random users limit 20
+        setState(() {
+          randomUsers =
+              Provider.of<Users>(context, listen: false).getRandomUsers(20);
+        });
+        for (var element in randomUsers) {
+          print(element.id);
+        }
       } catch (error) {
         //show error snackbar
         ScaffoldMessenger.of(context).showSnackBar(
@@ -91,28 +101,16 @@ class _MessagingScreenState extends State<MessagingScreen> {
                       //stories
                       SliverToBoxAdapter(
                         child: Stories(
-                          storiesData: [
-                            StoryData(
-                              name: faker.person.name(),
-                              url:
-                                  'https://picsum.photos/200?random=${faker.randomGenerator.integer(70)}',
-                            ),
-                            StoryData(
-                              name: faker.person.name(),
-                              url:
-                                  'https://picsum.photos/200?random=${faker.randomGenerator.integer(70)}',
-                            ),
-                            StoryData(
-                              name: faker.person.name(),
-                              url:
-                                  'https://picsum.photos/200?random=${faker.randomGenerator.integer(70)}',
-                            ),
-                            StoryData(
-                              name: faker.person.name(),
-                              url:
-                                  'https://picsum.photos/200?random=${faker.randomGenerator.integer(70)}',
-                            ),
-                          ],
+                          storiesData: randomUsers
+                              .map(
+                                (user) => StoryData(
+                                  id: user.id,
+                                  name: '${user.firstName} ${user.lastName}',
+                                  countryCode: user.countryCode,
+                                  url: user.profilePictureUrl,
+                                ),
+                              )
+                              .toList(),
                         ),
                       ),
 
