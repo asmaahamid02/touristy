@@ -212,62 +212,10 @@ class _ChatMessages extends StatelessWidget {
 
             if (snapshot.hasData) {
               final messages = snapshot.data!.docs;
-
               //group messages by date
-              final groupedMessages = groupBy(messages, (obj) {
-                final date = (obj['sentAt'] as Timestamp).toDate();
-                //format date to only show date without time (e.g. Wed, 12 May 2021)
-                return DateFormat('EEE, d MMM yyyy').format(date);
-              });
-
-              return ListView.builder(
-                reverse: true,
-                itemCount: groupedMessages.length,
-                itemBuilder: (context, index) {
-                  final date = groupedMessages.keys.elementAt(index);
-                  final messages = groupedMessages[date]
-                      as List<QueryDocumentSnapshot<Map<String, dynamic>>>;
-
-                  return Column(
-                    children: [
-                      ChatDateLabel(label: date),
-                      const SizedBox(height: 4.0),
-                      ListView.builder(
-                        reverse: true,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: messages.length,
-                        itemBuilder: (context, index) {
-                          final message = messages[index];
-
-                          final messageText = message['text'];
-                          final messageTime = DateFormat.jm()
-                              .format(message['sentAt'].toDate());
-                          final messageSenderId = message['sentBy'];
-                          final isMe = messageSenderId == userId;
-
-                          //update message to read
-                          if (!isMe && !message['isRead']) {
-                            _updateMessageReadStatus(messages, index);
-                          }
-
-                          //update latest message to read
-                          if (!isMe && index == 0 && !message['isRead']) {
-                            _updateLastMessageReadStatus();
-                          }
-
-                          return MessageBubble(
-                            message: messageText,
-                            time: messageTime,
-                            isMe: isMe,
-                            avatarUrl: messageData.profilePicture,
-                          );
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
+              final groupedMessages = _groupMessagesByDate(messages);
+              //return messages
+              return _buildChatList(groupedMessages, userId, messageData);
             }
 
             return const Center(
@@ -275,6 +223,76 @@ class _ChatMessages extends StatelessWidget {
             );
           }),
     ));
+  }
+
+  Map<String, List<QueryDocumentSnapshot<Map<String, dynamic>>>>
+      _groupMessagesByDate(
+          List<QueryDocumentSnapshot<Map<String, dynamic>>> messages) {
+    return groupBy(messages, (obj) {
+      final date = (obj['sentAt'] as Timestamp).toDate();
+      //format date to only show date without time (e.g. Wed, 12 May 2021)
+      return DateFormat('EEE, d MMM yyyy').format(date);
+    });
+  }
+
+  ListView _buildChatList(
+      Map<String, List<QueryDocumentSnapshot<Map<String, dynamic>>>>
+          groupedMessages,
+      int? userId,
+      MessageData messageData) {
+    return ListView.builder(
+      reverse: true,
+      itemCount: groupedMessages.length,
+      itemBuilder: (context, index) {
+        final date = groupedMessages.keys.elementAt(index);
+        final messages = groupedMessages[date]
+            as List<QueryDocumentSnapshot<Map<String, dynamic>>>;
+
+        return Column(
+          children: [
+            ChatDateLabel(label: date),
+            const SizedBox(height: 4.0),
+            _buildChatListByDate(messages, userId, messageData),
+          ],
+        );
+      },
+    );
+  }
+
+  ListView _buildChatListByDate(
+      List<QueryDocumentSnapshot<Map<String, dynamic>>> messages,
+      int? userId,
+      MessageData messageData) {
+    return ListView.builder(
+      reverse: true,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: messages.length,
+      itemBuilder: (context, index) {
+        final message = messages[index];
+        final messageText = message['text'];
+        final messageTime = DateFormat.jm().format(message['sentAt'].toDate());
+        final messageSenderId = message['sentBy'];
+        final isMe = messageSenderId == userId;
+
+        //update message to read
+        if (!isMe && !message['isRead']) {
+          _updateMessageReadStatus(messages, index);
+        }
+
+        //update latest message to read
+        if (!isMe && index == 0 && !message['isRead']) {
+          _updateLastMessageReadStatus();
+        }
+
+        return MessageBubble(
+          message: messageText,
+          time: messageTime,
+          isMe: isMe,
+          avatarUrl: messageData.profilePicture,
+        );
+      },
+    );
   }
 
   void _updateLastMessageReadStatus() {
