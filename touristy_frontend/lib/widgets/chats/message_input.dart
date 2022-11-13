@@ -8,11 +8,15 @@ class MessageInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
     return SafeArea(
       bottom: true,
       top: false,
       child: Card(
         elevation: 0.0,
+        color: brightness == Brightness.light
+            ? AppColors.backgroundLightGrey
+            : Theme.of(context).cardColor,
         margin: const EdgeInsets.all(0.0),
         child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
           Padding(
