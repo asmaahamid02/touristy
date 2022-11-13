@@ -1,30 +1,81 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../utilities/utilities.dart';
 import '../models/models.dart';
 import '../widgets/widgets.dart';
+import '../providers/providers.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
   static const String routeName = '/chat';
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final CollectionReference chats =
+      FirebaseFirestore.instance.collection('chats');
+
+  MessageData? messageData;
+  int? userId;
+  String? chatDocId;
+  bool _isInit = true;
+  bool _isLoading = false;
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+
+    if (_isInit) {
+      messageData = ModalRoute.of(context)!.settings.arguments as MessageData;
+      userId = Provider.of<Auth>(context, listen: false).userId;
+      setState(() {
+        _isLoading = true;
+      });
+
+      await chats
+          .where('chatUsers', whereIn: [
+            [userId, messageData!.senderId],
+            [messageData!.senderId, userId]
+          ])
+          .limit(1)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+            if (querySnapshot.docs.isNotEmpty) {
+              chatDocId = querySnapshot.docs.single.id;
+            } else {
+              chatDocId = null;
+            }
+          })
+          .catchError((onError) {});
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
+    _isInit = false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final messageData =
-        ModalRoute.of(context)!.settings.arguments as MessageData;
     return Scaffold(
       appBar: AppBar(
         title: _AppBarTitle(
-          messageData: messageData,
+          messageData: messageData!,
         ),
       ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Column(
-          children: const [
-            Expanded(child: MessageList()),
-            MessageInput(),
-          ],
-        ),
-      ),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              child: Column(
+                children: const [],
+              )),
     );
   }
 }
@@ -38,7 +89,7 @@ class _AppBarTitle extends StatelessWidget {
       onTap: () {},
       child: Row(
         children: [
-          Avatar.small(imageUrl: 'https://picsum.photos/200'),
+          Avatar.small(imageUrl: messageData.profilePicture),
           const SizedBox(width: 10),
           Expanded(
               child: Column(
