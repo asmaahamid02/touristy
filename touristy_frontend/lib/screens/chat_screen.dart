@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:collection/collection.dart';
 import 'package:provider/provider.dart';
 import '../utilities/utilities.dart';
 import '../models/models.dart';
@@ -107,11 +108,15 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
     return Scaffold(
+      backgroundColor:
+          brightness == Brightness.light ? Theme.of(context).cardColor : null,
       appBar: AppBar(
         title: _AppBarTitle(
           messageData: messageData!,
         ),
+        elevation: 1.0,
       ),
       body: _isLoading
           ? const Center(
@@ -208,32 +213,58 @@ class _ChatMessages extends StatelessWidget {
             if (snapshot.hasData) {
               final messages = snapshot.data!.docs;
 
+              //group messages by date
+              final groupedMessages = groupBy(messages, (obj) {
+                final date = (obj['sentAt'] as Timestamp).toDate();
+                //format date to only show date without time (e.g. Wed, 12 May 2021)
+                return DateFormat('EEE, d MMM yyyy').format(date);
+              });
+
               return ListView.builder(
                 reverse: true,
-                itemCount: messages.length,
+                itemCount: groupedMessages.length,
                 itemBuilder: (context, index) {
-                  final message = messages[index].data();
+                  final date = groupedMessages.keys.elementAt(index);
+                  final messages = groupedMessages[date]
+                      as List<QueryDocumentSnapshot<Map<String, dynamic>>>;
 
-                  final messageText = message['text'];
-                  final messageTime =
-                      DateFormat.jm().format(message['sentAt'].toDate());
-                  final messageSenderId = message['sentBy'];
-                  final isMe = messageSenderId == userId;
+                  return Column(
+                    children: [
+                      ChatDateLabel(label: date),
+                      const SizedBox(height: 4.0),
+                      ListView.builder(
+                        reverse: true,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: messages.length,
+                        itemBuilder: (context, index) {
+                          final message = messages[index];
 
-                  //update message to read
-                  if (!isMe && !message['isRead']) {
-                    _updateMessageReadStatus(messages, index);
-                  }
+                          final messageText = message['text'];
+                          final messageTime = DateFormat.jm()
+                              .format(message['sentAt'].toDate());
+                          final messageSenderId = message['sentBy'];
+                          final isMe = messageSenderId == userId;
 
-                  //update latest message to read
-                  if (!isMe && index == 0 && !message['isRead']) {
-                    _updateLastMessageReadStatus();
-                  }
-                  return MessageBubble(
-                    message: messageText,
-                    time: messageTime,
-                    isMe: isMe,
-                    avatarUrl: messageData.profilePicture,
+                          //update message to read
+                          if (!isMe && !message['isRead']) {
+                            _updateMessageReadStatus(messages, index);
+                          }
+
+                          //update latest message to read
+                          if (!isMe && index == 0 && !message['isRead']) {
+                            _updateLastMessageReadStatus();
+                          }
+
+                          return MessageBubble(
+                            message: messageText,
+                            time: messageTime,
+                            isMe: isMe,
+                            avatarUrl: messageData.profilePicture,
+                          );
+                        },
+                      ),
+                    ],
                   );
                 },
               );
