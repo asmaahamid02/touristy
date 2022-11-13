@@ -176,6 +176,29 @@ class _ChatMessages extends StatelessWidget {
                   final messageSenderId = message['sentBy'];
                   final isMe = messageSenderId == userId;
 
+                  //update message to read
+                  if (!isMe && !message['isRead']) {
+                    FirebaseFirestore.instance
+                        .collection('chats')
+                        .doc(chatDocId)
+                        .collection('messages')
+                        .doc(messages[index].id)
+                        .update({
+                      'isRead': true,
+                      'readAt': DateTime.now(),
+                    });
+                  }
+
+                  //update latest message to read
+                  if (!isMe && index == 0 && !message['isRead']) {
+                    FirebaseFirestore.instance
+                        .collection('chats')
+                        .doc(chatDocId)
+                        .update({
+                      'latestMessage.isRead': true,
+                      'latestMessage.readAt': DateTime.now(),
+                    });
+                  }
                   return MessageBubble(
                     message: messageText,
                     time: messageTime,
