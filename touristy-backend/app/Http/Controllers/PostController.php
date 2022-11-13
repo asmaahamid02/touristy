@@ -354,4 +354,52 @@ class PostController extends Controller
         $post->likes()->attach(Auth::id());
         return $this->jsonResponse($post->likes()->count(), 'data', Response::HTTP_OK, 'Post liked');
     }
+
+    //get post of following users
+    public function getFollowingPosts()
+    {
+        $posts =  Post::where('is_deleted', 0)->whereHas('user', function ($query) {
+            $query->where('is_deleted', 0)
+                ->where('id', '!=', Auth::id())
+                //remove blocked users
+                ->whereDoesntHave('blockings', function ($query) {
+                    $query->where('blocked_user_id', Auth::id());
+                })
+                //remove blocked by users
+                ->whereDoesntHave('blockers', function ($query) {
+                    $query->where('user_id', Auth::id());
+                })
+                ->whereHas('followers', function ($query) {
+                    $query->where('follower_user_id', Auth::id());
+                });
+        })
+            ->with('user.nationality')
+            ->with('location')
+            ->with('tags', function ($query) {
+                return $query->select('tags.id', 'tag');
+            })
+            ->withCount('comments', 'likes')
+            ->with('likes', function ($query) {
+                return $query->where('user_id', Auth::id())->select('user_id', 'post_id')->get();
+            })
+            ->with('media')
+            ->orderBy('created_at', 'desc')->paginate(10);
+
+        if ($posts->isEmpty()) {
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No posts found');
+        }
+
+        //add isLikedByUser to each post
+        foreach ($posts as $post) {
+            $post->isLikedByUser = $post->likes->count() > 0 ? true : false;
+        }
+
+        //add isFollowedByUser to each post
+        foreach ($posts as $post) {
+            $post->user->isFollowedByUser = $post->user->followers->contains(Auth::id());
+        }
+
+
+        return $this->jsonResponse(PostResource::collection($posts), 'data', Response::HTTP_OK, 'Posts found');
+    }
 }
