@@ -177,6 +177,7 @@ class _PostHeader extends StatelessWidget {
     final currentUserId =
         Provider.of<Users>(context, listen: false).currentUserId;
     final StoryData avatar = StoryData(
+      id: post.user!.id,
       url: post.user!.profilePictureUrl,
       isOnline: true,
     );
