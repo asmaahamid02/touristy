@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../../utilities/utilities.dart';
 
 class MessageInput extends StatelessWidget {
-  const MessageInput({super.key});
+  MessageInput({super.key, required this.sendMessage});
+  final Function(String message) sendMessage;
+  final TextEditingController _messageController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -24,19 +26,23 @@ class MessageInput extends StatelessWidget {
               ),
             ),
           ),
-          const Expanded(
+          Expanded(
             child: TextField(
-              style: TextStyle(fontSize: 14.0),
-              decoration: InputDecoration(
+              style: const TextStyle(fontSize: 14.0),
+              decoration: const InputDecoration(
                 hintText: 'Type a message',
                 border: InputBorder.none,
               ),
+              controller: _messageController,
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: IconButton(
-              onPressed: () {},
+              onPressed: () {
+                sendMessage(_messageController.text);
+                _messageController.clear();
+              },
               icon: const Icon(
                 Icons.send,
                 color: AppColors.secondary,
