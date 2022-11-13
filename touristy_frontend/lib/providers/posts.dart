@@ -2,11 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:touristy_frontend/services/posts_service.dart';
+import 'package:touristy_frontend/services/services.dart';
 import './auth.dart';
 import '../models/post.dart';
 
 class Posts with ChangeNotifier {
   List<Post> _posts = [];
+  List<Post> _followingPosts = [];
 
   String? authToken;
   int? currentUserId;
@@ -23,6 +25,10 @@ class Posts with ChangeNotifier {
 
   List<Post> get posts {
     return [..._posts];
+  }
+
+  List<Post> get followingPosts {
+    return [..._followingPosts];
   }
 
 //find post by id
@@ -107,5 +113,14 @@ class Posts with ChangeNotifier {
         rethrow;
       }
     }
+  }
+
+  //fetch following posts
+  Future<void> fetchAndSetFollowingPosts() async {
+    final posts = await PostsService().getFollowingPosts(authToken as String);
+
+    _followingPosts = posts;
+
+    notifyListeners();
   }
 }
