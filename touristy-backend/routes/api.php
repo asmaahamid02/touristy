@@ -49,6 +49,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::put('/{id}', [PostController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [PostController::class, 'delete'])->where('id', '[0-9]+');
             Route::get('/like/{id}', [PostController::class, 'like'])->where('id', '[0-9]+');
+            Route::get('/following', [PostController::class, 'getFollowingPosts']);
         });
 
         //trips
