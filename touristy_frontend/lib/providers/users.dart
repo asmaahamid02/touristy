@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import './auth.dart';
 import '../models/user.dart';
@@ -58,5 +60,31 @@ class Users with ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  //get random users from _users
+  List<User> getRandomUsers(int limit) {
+    final List<User> randomUsers = [];
+    final List<User> users = _users
+        .where((user) =>
+            user.id != currentUserId && user.isFollowedByUser == false)
+        .toList();
+
+    if (users.isNotEmpty) {
+      if (limit > users.length) {
+        limit = users.length;
+      }
+      for (int i = 0; i < limit; i++) {
+        //get random user from users that is not already in randomUsers
+        final randomUser = users[Random().nextInt(users.length)];
+        if (!randomUsers.contains(randomUser)) {
+          randomUsers.add(randomUser);
+        } else {
+          i--;
+        }
+      }
+    }
+
+    return randomUsers;
   }
 }
