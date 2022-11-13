@@ -59,6 +59,52 @@ class _ChatScreenState extends State<ChatScreen> {
     _isInit = false;
   }
 
+  void _sendMessage(String message) {
+    if (chatDocId == null) {
+      //create new chat
+      chats.add({
+        'chatUsers': [userId, messageData!.senderId],
+        'latestMessage': {
+          'text': message,
+          'sentAt': DateTime.now(),
+          'sentBy': userId,
+          'isRead': false,
+          'readAt': null,
+        },
+      }).then((value) {
+        setState(() {
+          chatDocId = value.id;
+        });
+        chats.doc(value.id).collection('messages').add({
+          'text': message,
+          'sentAt': DateTime.now(),
+          'sentBy': userId,
+          'isRead': false,
+          'readAt': null,
+        });
+      }).catchError((onError) {});
+    } else {
+      //update existing chat
+      chats.doc(chatDocId).update({
+        'latestMessage': {
+          'text': message,
+          'sentAt': DateTime.now(),
+          'sentBy': userId,
+          'isRead': false,
+          'readAt': null,
+        },
+      }).then((_) {
+        chats.doc(chatDocId).collection('messages').add({
+          'text': message,
+          'sentAt': DateTime.now(),
+          'sentBy': userId,
+          'isRead': false,
+          'readAt': null,
+        });
+      }).catchError((onError) {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,6 +122,7 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Column(
                 children: [
                   _ChatMessages(chatDocId: chatDocId),
+                  MessageInput(sendMessage: _sendMessage),
                 ],
               )),
     );
