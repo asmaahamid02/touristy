@@ -7,9 +7,11 @@ import '../models/models.dart';
 import '../utilities/utilities.dart';
 
 class TravelersService {
-  Future<List<TravelerUser>> getTravelersUsers(String token) async {
+  Future<List<TravelerUser>> getTravelersUsers(String token,
+      {int limit = 20}) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/users/suggested/20'),
+      final response = await http.get(
+          Uri.parse('$baseUrl/users/suggested/$limit'),
           headers: getHeaders(token));
       final responseData = jsonDecode(response.body) as Map<String, dynamic>;
       if (response.statusCode != 200) {
