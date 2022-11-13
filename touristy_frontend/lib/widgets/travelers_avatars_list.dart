@@ -80,6 +80,7 @@ class _TravelersAvatarsListState extends State<TravelersAvatarsList> {
               : Stories(
                   storiesData: travelersUsers
                       .map((user) => StoryData(
+                          id: user.id,
                           name: user.fullName,
                           url: user.profilePictureUrl,
                           countryCode: user.countryCode))
