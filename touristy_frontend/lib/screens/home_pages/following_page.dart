@@ -5,8 +5,82 @@ import '../../exceptions/http_exception.dart';
 import '../../providers/posts.dart';
 import '../../widgets/widgets.dart';
 
-class FollowingPage extends StatelessWidget {
+class FollowingPage extends StatefulWidget {
   const FollowingPage({super.key});
+
+  @override
+  State<FollowingPage> createState() => _FollowingPageState();
+}
+
+class _FollowingPageState extends State<FollowingPage> {
+  late ScrollController _scrollController;
+
+  final int maxLength = 10;
+
+  bool _isLoading = false;
+
+  bool _isInit = true;
+
+  bool _hasMore = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent * 0.95 &&
+          !_isLoading) {
+        if (_hasMore) {
+          _loadMore();
+        }
+      }
+    });
+  }
+
+  @override
+  didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_isInit) {
+      _loadMore();
+      _isInit = false;
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
+
+  void _loadMore() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final posts = await Provider.of<Posts>(context, listen: false)
+          .fetchAndSetFollowingPosts();
+      setState(() {
+        _isLoading = false;
+        if (posts.length < maxLength) {
+          _hasMore = false;
+        }
+      });
+    } on HttpException catch (error) {
+      setState(() {
+        _isLoading = false;
+        _hasMore = false;
+      });
+      SnakeBarCommon.show(context, error.toString());
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+        _hasMore = false;
+      });
+      SnakeBarCommon.show(context, error.toString());
+    }
+  }
 
   Future<void> _refreshData(BuildContext context) async {
     await Provider.of<Posts>(context, listen: false)
@@ -16,73 +90,28 @@ class FollowingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh: () => _refreshData(context),
-      child: const CustomScrollView(
-        slivers: [
-          _PostsList(),
-        ],
-      ),
-    );
-  }
-}
-
-class _PostsList extends StatefulWidget {
-  const _PostsList();
-
-  @override
-  State<_PostsList> createState() => __PostsListState();
-}
-
-class __PostsListState extends State<_PostsList> {
-  var isInit = true;
-  var _isLoading = false;
-
-  @override
-  void didChangeDependencies() async {
-    super.didChangeDependencies();
-    if (isInit) {
-      _isLoading = true;
-
-      try {
-        await Provider.of<Posts>(context).fetchAndSetFollowingPosts();
-      } on HttpException catch (error) {
-        SnakeBar.show(context, error.toString());
-      } catch (error) {
-        SnakeBar.show(context, 'Could not fetch posts, try again later.');
-      }
-      setState(() {
-        _isLoading = false;
-      });
-
-      isInit = false;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final postsData = Provider.of<Posts>(context);
-    final posts = postsData.followingPosts;
-
-    if (posts.isEmpty) {
-      return const SliverToBoxAdapter(
-        child: Center(
-          child: Text('No posts yet.'),
-        ),
-      );
-    } else {
-      return _isLoading
-          ? const SliverToBoxAdapter(
-              child: Center(child: CircularProgressIndicator()),
-            )
-          : SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final post = posts[index];
+        onRefresh: () => _refreshData(context),
+        child: SafeArea(
+          child: Consumer<Posts>(
+            builder: (context, postsData, _) => ListView.builder(
+                itemCount: postsData.followingPosts.length + (_hasMore ? 1 : 0),
+                itemBuilder: ((context, index) {
+                  if (index == postsData.followingPosts.length) {
+                    return SizedBox(
+                      height: 50,
+                      child: Center(
+                        child: _hasMore
+                            ? const CircularProgressIndicator()
+                            : const Center(
+                                child: Text('No more posts'),
+                              ),
+                      ),
+                    );
+                  }
+                  final post = postsData.followingPosts[index];
                   return PostContainer(post: post);
-                },
-                childCount: posts.length,
-              ),
-            );
-    }
+                })),
+          ),
+        ));
   }
 }
