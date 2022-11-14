@@ -21,8 +21,20 @@ class StoryCard extends StatelessWidget {
           margin: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
           child: Stack(
             children: [
-              Avatar.medium(
-                imageUrl: storyData.url,
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.0),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.3),
+                      offset: const Offset(0, 2),
+                      blurRadius: 6.0,
+                    ),
+                  ],
+                ),
+                child: Avatar.medium(
+                  imageUrl: storyData.url,
+                ),
               ),
               if (storyData.isOnline != null && storyData.isOnline!)
                 Positioned(
