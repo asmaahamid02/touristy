@@ -31,14 +31,15 @@ class UsersService {
   }
 
   //follow user
-  Future<bool> followUser(String token, int userId) async {
-    var response = await http.post(Uri.parse('$baseUrl/users/follow/$userId'),
-        headers: getHeaders(token));
+  Future<String> followUser(String token, int userId) async {
+    try {
+      var response = await http.get(Uri.parse('$baseUrl/users/follow/$userId'),
+          headers: getHeaders(token));
 
-    if (response.statusCode == 200) {
-      return true;
-    } else {
-      return false;
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+      return responseData['message'];
+    } catch (error) {
+      rethrow;
     }
   }
 }
