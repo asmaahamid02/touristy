@@ -15,7 +15,7 @@ class Stories extends StatelessWidget {
       elevation: 0,
       margin: const EdgeInsets.all(0),
       child: Container(
-        height: 110,
+        height: 120,
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: ListView.builder(
           shrinkWrap: true,
