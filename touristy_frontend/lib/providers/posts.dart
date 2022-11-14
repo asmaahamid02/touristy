@@ -7,8 +7,11 @@ import './auth.dart';
 import '../models/post.dart';
 
 class Posts with ChangeNotifier {
-  List<Post> _posts = [];
-  List<Post> _followingPosts = [];
+  final List<Post> _posts = [];
+  final List<Post> _followingPosts = [];
+
+  int _currentPage = 1;
+  int _currentPageFollowing = 1;
 
   String? authToken;
   int? currentUserId;
@@ -37,12 +40,24 @@ class Posts with ChangeNotifier {
   }
 
   //get posts
-  Future<void> fetchAndSetPosts() async {
-    final posts = await PostsService().getPosts(authToken as String);
+  Future<List<Post>> fetchAndSetPosts() async {
+    try {
+      final posts =
+          await PostsService().getPosts(authToken as String, _currentPage);
 
-    _posts = posts;
+      _currentPage++;
+      //add posts that are not already in the list
+      for (var post in posts) {
+        if (!_posts.any((element) => element.id == post.id)) {
+          _posts.add(post);
+        }
+      }
 
-    notifyListeners();
+      notifyListeners();
+      return posts;
+    } catch (error) {
+      rethrow;
+    }
   }
 
   Future<void> toggleLikeStatus(int postId) async {
@@ -116,11 +131,23 @@ class Posts with ChangeNotifier {
   }
 
   //fetch following posts
-  Future<void> fetchAndSetFollowingPosts() async {
-    final posts = await PostsService().getFollowingPosts(authToken as String);
+  Future<List<Post>> fetchAndSetFollowingPosts() async {
+    try {
+      final posts = await PostsService()
+          .getFollowingPosts(authToken as String, _currentPageFollowing);
 
-    _followingPosts = posts;
+      _currentPageFollowing++;
+      //add posts that are not already in the list
+      for (var post in posts) {
+        if (!_posts.any((element) => element.id == post.id)) {
+          _followingPosts.add(post);
+        }
+      }
 
-    notifyListeners();
+      notifyListeners();
+      return posts;
+    } catch (error) {
+      rethrow;
+    }
   }
 }
