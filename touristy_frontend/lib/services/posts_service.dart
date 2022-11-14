@@ -7,9 +7,10 @@ import '../utilities/constants.dart';
 import '../models/models.dart';
 
 class PostsService {
-  Future<List<Post>> getPosts(String token) async {
+  Future<List<Post>> getPosts(String token, int currentPage) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/posts'),
+      final response = await http.get(
+          Uri.parse('$baseUrl/posts?page=$currentPage'),
           headers: getHeaders(token));
       final responseData = json.decode(response.body) as Map<String, dynamic>;
 
@@ -134,9 +135,10 @@ class PostsService {
   }
 
   //get posts of following users
-  Future<List<Post>> getFollowingPosts(String token) async {
+  Future<List<Post>> getFollowingPosts(String token, int currentPage) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/posts/following'),
+      final response = await http.get(
+          Uri.parse('$baseUrl/posts/following?page=$currentPage'),
           headers: getHeaders(token));
       final responseData = json.decode(response.body) as Map<String, dynamic>;
 
