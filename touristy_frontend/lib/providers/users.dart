@@ -45,21 +45,24 @@ class Users with ChangeNotifier {
   }
 
   //follow user
-  Future<void> followUser(int userId) async {
+  Future<String> followUser(int userId) async {
     final int userIndex = _users.indexWhere((user) => user.id == userId);
-
     if (userIndex >= 0) {
       _users[userIndex].isFollowedByUser = !_users[userIndex].isFollowedByUser!;
       notifyListeners();
 
       try {
-        await UsersService().followUser(authToken as String, userId);
+        final String response =
+            await UsersService().followUser(authToken as String, userId);
+
+        return response;
       } catch (error) {
         _users[userIndex].isFollowedByUser =
             !_users[userIndex].isFollowedByUser!;
         notifyListeners();
       }
     }
+    return 'User not found';
   }
 
   //get random users from _users
