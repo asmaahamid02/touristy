@@ -34,6 +34,16 @@ class Posts with ChangeNotifier {
     return [..._followingPosts];
   }
 
+  void resetPosts() {
+    _currentPage = 1;
+    _posts.clear();
+  }
+
+  void resetFollowingPosts() {
+    _currentPageFollowing = 1;
+    _followingPosts.clear();
+  }
+
 //find post by id
   Post? findById(int id) {
     return _posts.firstWhere((post) => post.id == id);
@@ -83,11 +93,14 @@ class Posts with ChangeNotifier {
   }
 
 //add post
-  Future<void> addPost(String? content, List<File>? media) async {
+  Future<void> addPost(String? content, List<File>? media,
+      Map<String, dynamic> coordinates) async {
     try {
-      final post =
-          await PostsService().addPost(authToken as String, content, media);
-      _posts.add(post);
+      final post = await PostsService()
+          .addPost(authToken as String, content, media, coordinates);
+
+      //add post to the top of the list
+      _posts.insert(0, post);
 
       notifyListeners();
     } catch (error) {
@@ -139,7 +152,7 @@ class Posts with ChangeNotifier {
       _currentPageFollowing++;
       //add posts that are not already in the list
       for (var post in posts) {
-        if (!_posts.any((element) => element.id == post.id)) {
+        if (!_followingPosts.any((element) => element.id == post.id)) {
           _followingPosts.add(post);
         }
       }
