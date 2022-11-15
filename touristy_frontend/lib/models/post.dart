@@ -10,7 +10,7 @@ class Post {
   int? likes;
   int? comments;
   String? timeAgo;
-  String? location;
+  String? address;
   bool? isLiked;
 
   Post({
@@ -21,7 +21,7 @@ class Post {
     this.comments,
     this.user,
     this.timeAgo,
-    this.location,
+    this.address,
     this.isLiked,
   });
 
@@ -37,14 +37,12 @@ class Post {
             }).toList()
           : null,
       content: json['content'],
-      likes: json['likes'] as int,
-      comments: json['comments'] as int,
+      likes: json['likes'] ?? 0,
+      comments: json['comments'] ?? 0,
       user: User.fromJson(json['user'] as Map<String, dynamic>),
       timeAgo: timeago.format(DateTime.parse(json['created_at']), locale: 'en'),
-      location: json['location'] != null
-          ? '${json['location']['city']}, ${json['location']['country']}'
-          : null,
-      isLiked: json['isLikedByUser'],
+      address: json['location'] != null ? json['location']['address'] : null,
+      isLiked: json['isLikedByUser'] ?? false,
     );
     return post;
   }
