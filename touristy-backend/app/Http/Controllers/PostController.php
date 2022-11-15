@@ -6,6 +6,7 @@ use App\Http\Resources\PostResource;
 use App\Http\Resources\UserResource;
 use App\Models\Post;
 use App\Models\Tag;
+use App\Traits\LocationTrait;
 use App\Traits\MediaTrait;
 use App\Traits\ResponseJson;
 use Exception;
@@ -16,7 +17,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class PostController extends Controller
 {
-    use ResponseJson, MediaTrait;
+    use ResponseJson, MediaTrait, LocationTrait;
     public function index()
     {
         $posts  = Post::where('is_deleted', 0)->whereHas('user', function ($query) {
@@ -63,55 +64,7 @@ class PostController extends Controller
     public function create(Request $request)
     {
         //validate data
-        $validator = Validator::make($request->all(), [
-            'content' => 'required_without:media|string',
-            'tags' => 'nullable|array',
-            'tags.*' => 'string',
-            'media' => 'required_without:content|between:1,10|array',
-            'media.*' => [
-                function ($attribute, $value, $fail) {
-                    //check if is it image
-                    $is_image = Validator::make(
-                        ['upload' => $value],
-                        ['upload' => 'image|mimes:jpeg,png,jpg']
-                    )->passes();
-
-                    //check if is it video
-                    $is_video = Validator::make(
-                        ['upload' => $value],
-                        ['upload' => 'mimetypes:video/avi,video/mpeg,video/quicktime,video/mp4']
-                    )->passes();
-
-                    //return error if not image or video
-                    if (!$is_video && !$is_image) {
-                        $fail(':attribute must be image (.png, .jpeg, .jpg) or video.');
-                    }
-
-                    //if video, check if it is less than 10MB, less than 60 sec minutes
-                    if ($is_video) {
-                        $validator = Validator::make(
-                            ['video' => $value],
-                            ['video' => "max:102400"]
-                        );
-                        if ($validator->fails()) {
-                            $fail(":attribute must be 10 megabytes or less and 60 sec or less.");
-                        }
-                    }
-
-                    //if image, check if it is less than 2MB
-                    if ($is_image) {
-                        $validator = Validator::make(
-                            ['image' => $value],
-                            ['image' => "max:2048"]
-                        );
-                        if ($validator->fails()) {
-                            $fail(":attribute must be two megabytes or less.");
-                        }
-                    }
-                },
-            ],
-            'publicity' => 'required|string|in:public,followers',
-        ]);
+        $validator = $this->validateData($request);
 
         //return error if validation fails
         if ($validator->fails()) {
@@ -129,6 +82,11 @@ class PostController extends Controller
                 $postData['content'] = $request->content;
             }
 
+            if ($request->has('latitude') && $request->has('longitude') && $request->has('address')) {
+                $postData['location_id'] = $this->saveLocation($request->latitude, $request->longitude, $request->address);
+                $postData['address'] = $request->address;
+            }
+
             $postData['publicity'] = $request->publicity;
 
             $post = Post::create($postData);
@@ -141,18 +99,12 @@ class PostController extends Controller
                 }
             }
 
-            // if ($request->has('image')) {
-            //     $path =  $this->saveImage($request->media, 'posts/' . $post->id);
-            //     dd($path);
-            // }
-
             //save media
             if ($request->has('media')) {
-
                 $this->saveMedia($request->media, $post);
             }
 
-            return $this->jsonResponse($post->load(['user.nationality', 'tags', 'media', 'location']), 'data', Response::HTTP_OK, 'Post created');
+            return $this->jsonResponse(new PostResource($post->load(['media', 'user.nationality', 'location', 'tags'])), 'data', Response::HTTP_OK, 'Post created');
         } catch (Exception $error) {
 
             return $this->jsonResponse($error->getMessage(), 'errors', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
@@ -173,55 +125,7 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         //validate data
-        $validator = Validator::make($request->all(), [
-            'content' => 'required_without:media|string',
-            'tags' => 'nullable|array',
-            'tags.*' => 'string',
-            'media' => 'required_without:content|between:1,10|array',
-            'media.*' => [
-                function ($attribute, $value, $fail) {
-                    //check if is it image
-                    $is_image = Validator::make(
-                        ['upload' => $value],
-                        ['upload' => 'image|mimes:jpeg,png,jpg']
-                    )->passes();
-
-                    //check if is it video
-                    $is_video = Validator::make(
-                        ['upload' => $value],
-                        ['upload' => 'mimetypes:video/avi,video/mpeg,video/quicktime,video/mp4']
-                    )->passes();
-
-                    //return error if not image or video
-                    if (!$is_video && !$is_image) {
-                        $fail(':attribute must be image (.png, .jpeg, .jpg) or video.');
-                    }
-
-                    //if video, check if it is less than 10MB, less than 60 sec minutes
-                    if ($is_video) {
-                        $validator = Validator::make(
-                            ['video' => $value],
-                            ['video' => "max:102400"]
-                        );
-                        if ($validator->fails()) {
-                            $fail(":attribute must be 10 megabytes or less and 60 sec or less.");
-                        }
-                    }
-
-                    //if image, check if it is less than 2MB
-                    if ($is_image) {
-                        $validator = Validator::make(
-                            ['image' => $value],
-                            ['image' => "max:2048"]
-                        );
-                        if ($validator->fails()) {
-                            $fail(":attribute must be two megabytes or less.");
-                        }
-                    }
-                },
-            ],
-            'publicity' => 'string|in:public,followers',
-        ]);
+        $validator = $this->validateData($request);
 
         //return error if validation fails
         if ($validator->fails()) {
@@ -260,6 +164,10 @@ class PostController extends Controller
                 $post->publicity = $request->publicity;
             }
 
+            if ($request->has('latitude') && $request->has('longitude') && $request->has('address')) {
+                $post->location_id = $this->saveLocation($request->latitude, $request->longitude, $request->address);
+            }
+
             $post->save();
 
             //save tags
@@ -274,8 +182,6 @@ class PostController extends Controller
                 $post->tags()->sync($tags);
             }
 
-
-
             //save media
             if ($request->has('media')) {
                 //delete media to re insert them
@@ -283,7 +189,7 @@ class PostController extends Controller
                 $this->saveMedia($request->media, $post);
             }
 
-            return $this->jsonResponse($post->load(['tags', 'media', 'likes', 'comments']), 'data', Response::HTTP_OK, 'Post updated');
+            return $this->jsonResponse(new PostResource($post), 'data', Response::HTTP_OK, 'Post updated');
         } catch (Exception $error) {
 
             return $this->jsonResponse($error->getMessage(), 'errors', Response::HTTP_INTERNAL_SERVER_ERROR, 'Internal server error');
@@ -401,5 +307,59 @@ class PostController extends Controller
 
 
         return $this->jsonResponse(PostResource::collection($posts), 'data', Response::HTTP_OK, 'Posts found');
+    }
+
+    //validate data for creating and updating posts
+    public function validateData(Request $request)
+    {
+        return Validator::make($request->all(), [
+            'content' => 'required_without:media|string',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
+            'media' => 'required_without:content|between:1,10|array',
+            'media.*' => [
+                function ($attribute, $value, $fail) {
+                    //check if is it image
+                    $is_image = Validator::make(
+                        ['upload' => $value],
+                        ['upload' => 'image|mimes:jpeg,png,jpg']
+                    )->passes();
+
+                    //check if is it video
+                    $is_video = Validator::make(
+                        ['upload' => $value],
+                        ['upload' => 'mimetypes:video/avi,video/mpeg,video/quicktime,video/mp4']
+                    )->passes();
+
+                    //return error if not image or video
+                    if (!$is_video && !$is_image) {
+                        $fail(':attribute must be image (.png, .jpeg, .jpg) or video.');
+                    }
+
+                    //if video, check if it is less than 10MB, less than 60 sec minutes
+                    if ($is_video) {
+                        $validator = Validator::make(
+                            ['video' => $value],
+                            ['video' => "max:102400"]
+                        );
+                        if ($validator->fails()) {
+                            $fail(":attribute must be 10 megabytes or less and 60 sec or less.");
+                        }
+                    }
+
+                    //if image, check if it is less than 2MB
+                    if ($is_image) {
+                        $validator = Validator::make(
+                            ['image' => $value],
+                            ['image' => "max:2048"]
+                        );
+                        if ($validator->fails()) {
+                            $fail(":attribute must be two megabytes or less.");
+                        }
+                    }
+                },
+            ],
+            'publicity' => 'required|string|in:public,followers',
+        ]);
     }
 }
