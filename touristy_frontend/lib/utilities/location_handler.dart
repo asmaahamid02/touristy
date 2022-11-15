@@ -4,7 +4,7 @@ import 'package:geocoding/geocoding.dart';
 import './utilities.dart';
 
 class LocationHandler {
-  Future<String> getAddressFromLatLng(Position position) async {
+  static Future<String> getAddressFromLatLng(Position position) async {
     try {
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
@@ -34,7 +34,7 @@ class LocationHandler {
     }
   }
 
-  Future<bool> handleLocationPermission(BuildContext context) async {
+  static Future<bool> handleLocationPermission(BuildContext context) async {
     bool serviceEnabled;
     LocationPermission permission;
 

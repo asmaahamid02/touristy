@@ -364,7 +364,7 @@ class _LocationChoicesList extends StatefulWidget {
 class _LocationChoicesListState extends State<_LocationChoicesList> {
   Future<void> _getCurrentPosition() async {
     final hasPermission =
-        await LocationHandler().handleLocationPermission(context);
+        await LocationHandler.handleLocationPermission(context);
     if (!hasPermission) return;
     await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
         .then((Position position) {
@@ -380,7 +380,7 @@ class _LocationChoicesListState extends State<_LocationChoicesList> {
   Future<void> _getAddressFromLatLng(Position position) async {
     try {
       final String address =
-          await LocationHandler().getAddressFromLatLng(position);
+          await LocationHandler.getAddressFromLatLng(position);
       widget.coordinates['address'] = address;
 
       widget.updateAddress(address);
