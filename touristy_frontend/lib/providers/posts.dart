@@ -1,10 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:touristy_frontend/services/posts_service.dart';
-import 'package:touristy_frontend/services/services.dart';
-import './auth.dart';
-import '../models/post.dart';
+import '../services/services.dart';
+import './providers.dart';
+import '../models/models.dart';
 
 class Posts with ChangeNotifier {
   final List<Post> _posts = [];
@@ -93,8 +91,8 @@ class Posts with ChangeNotifier {
   }
 
 //add post
-  Future<void> addPost(String? content, List<File>? media,
-      Map<String, dynamic> coordinates) async {
+  Future<void> addPost(
+      String? content, List<File>? media, PlaceLocation coordinates) async {
     try {
       final post = await PostsService()
           .addPost(authToken as String, content, media, coordinates);

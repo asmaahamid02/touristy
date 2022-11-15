@@ -24,7 +24,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
   //cation controller
   final captionController = TextEditingController();
 
-  late Map<String, dynamic> _coordinates;
+  late PlaceLocation _coordinates;
 
   bool _isLoading = false;
   bool _isInit = true;
@@ -37,11 +37,8 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
     imageFileList = [];
     imagePicker = ImagePicker();
-    _coordinates = {
-      'latitude': null,
-      'longitude': null,
-      'address': null,
-    };
+    _coordinates =
+        PlaceLocation(latitude: null, longitude: null, address: null);
   }
 
   @override
@@ -62,7 +59,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
         //     .map((e) => XFile(e['media_path']))
         //     .toList(); //convert string to XFile
 
-        _coordinates['address'] = post.address;
+        _coordinates.address = post.address;
       }
     }
     _isInit = false;
@@ -270,7 +267,7 @@ class _BottomActionBar extends StatefulWidget {
   const _BottomActionBar(
       {required this.selectImages, required this.coordinates});
   final Function() selectImages;
-  final Map<String, dynamic> coordinates;
+  final PlaceLocation coordinates;
 
   @override
   State<_BottomActionBar> createState() => _BottomActionBarState();
@@ -283,7 +280,7 @@ class _BottomActionBarState extends State<_BottomActionBar> {
   void initState() {
     super.initState();
 
-    address = widget.coordinates['address'];
+    address = widget.coordinates.address;
   }
 
   void updateAddress(String newValue) {
@@ -354,7 +351,7 @@ class _LocationChoicesList extends StatefulWidget {
     required this.coordinates,
     required this.updateAddress,
   }) : super(key: key);
-  final Map<String, dynamic> coordinates;
+  final PlaceLocation coordinates;
   final Function(String) updateAddress;
 
   @override
@@ -363,9 +360,9 @@ class _LocationChoicesList extends StatefulWidget {
 
 class _LocationChoicesListState extends State<_LocationChoicesList> {
   Future<void> _getCurrentPosition() async {
-    LocationHandler.getCurrentPosition(context).then((Position position) {
-      widget.coordinates['latitude'] = position.latitude;
-      widget.coordinates['longitude'] = position.longitude;
+    await LocationHandler.getCurrentPosition(context).then((Position position) {
+      widget.coordinates.latitude = position.latitude;
+      widget.coordinates.longitude = position.longitude;
       _getAddressFromLatLng(position);
       Navigator.pop(context);
     }).catchError((e) {
@@ -376,7 +373,7 @@ class _LocationChoicesListState extends State<_LocationChoicesList> {
   Future<void> _getAddressFromLatLng(Position position) async {
     final String address =
         await LocationHandler.getAddressFromLatLng(context, position);
-    widget.coordinates['address'] = address;
+    widget.coordinates.address = address;
     widget.updateAddress(address);
   }
 
@@ -445,7 +442,7 @@ class LocationOption extends StatelessWidget {
 class _RemoveLocation extends StatefulWidget {
   const _RemoveLocation(
       {required this.coordinates, required this.updateAddress});
-  final Map<String, dynamic> coordinates;
+  final PlaceLocation coordinates;
   final Function(String) updateAddress;
 
   @override
@@ -465,11 +462,11 @@ class _RemoveLocationState extends State<_RemoveLocation> {
             icon: Icons.remove_circle_outline,
             label: 'Remove Location',
             onTap: () {
-              widget.coordinates['latitude'] = null;
-              widget.coordinates['longitude'] = null;
-              widget.coordinates['address'] = null;
+              widget.coordinates.latitude = null;
+              widget.coordinates.longitude = null;
+              widget.coordinates.address = null;
 
-              widget.updateAddress(widget.coordinates['address']);
+              widget.updateAddress('');
 
               Navigator.pop(context);
             },

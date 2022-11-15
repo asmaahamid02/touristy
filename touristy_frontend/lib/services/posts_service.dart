@@ -46,7 +46,7 @@ class PostsService {
 
   //add post
   Future<Post> addPost(String token, String? content, List<File>? media,
-      Map<String, dynamic> coordinates) async {
+      PlaceLocation coordinates) async {
     try {
       http.MultipartRequest request =
           http.MultipartRequest('POST', Uri.parse('$baseUrl/posts'));
@@ -59,10 +59,15 @@ class PostsService {
 
       request.fields['publicity'] = 'public';
 
-      if (coordinates['latitude'] != null && coordinates['longitude'] != null) {
-        request.fields['latitude'] = coordinates['latitude'].toString();
-        request.fields['longitude'] = coordinates['longitude'].toString();
-        request.fields['address'] = coordinates['address'].toString();
+      if (coordinates.latitude != null &&
+          coordinates.longitude != null &&
+          coordinates.address != null &&
+          coordinates.latitude != 0.0 &&
+          coordinates.longitude != 0.0 &&
+          coordinates.address != '') {
+        request.fields['latitude'] = coordinates.latitude.toString();
+        request.fields['longitude'] = coordinates.longitude.toString();
+        request.fields['address'] = coordinates.address.toString();
       }
 
       if (media != null && media.isNotEmpty) {
