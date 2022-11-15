@@ -3,8 +3,25 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import './utilities.dart';
 
+const GOOGLE_API_KEY = 'AIzaSyCTh9nt09BXB492g4fj3PfAdVwhlIdJcAM';
+
 class LocationHandler {
-  static Future<String> getAddressFromLatLng(Position position) async {
+  static Future<Position> getCurrentPosition(BuildContext context) async {
+    try {
+      final hasPermission = await handleLocationPermission(context);
+      if (!hasPermission) return Future.error('Location permission denied');
+      final Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+
+      return position;
+    } catch (error) {
+      SnakeBarCommon.show(context, error.toString());
+      return Future.error(error);
+    }
+  }
+
+  static Future<String> getAddressFromLatLng(
+      BuildContext context, Position position) async {
     try {
       List<Placemark> placemarks =
           await placemarkFromCoordinates(position.latitude, position.longitude);
@@ -30,7 +47,9 @@ class LocationHandler {
       }
       return address;
     } catch (error) {
-      return error.toString();
+      SnakeBarCommon.show(context,
+          'Could not get address from location. Please try again later.');
+      return '';
     }
   }
 
