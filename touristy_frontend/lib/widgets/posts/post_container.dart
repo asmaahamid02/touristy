@@ -130,7 +130,6 @@ class _PostHeader extends StatelessWidget {
       url: post.user!.profilePictureUrl,
       isOnline: true,
     );
-
     return Row(
       children: [
         Avatar(radius: 20.0, imageUrl: post.user!.profilePictureUrl),
@@ -140,28 +139,13 @@ class _PostHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 8.0),
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
                   '${post.user!.firstName} ${post.user!.lastName}',
                   style: const TextStyle(
                       fontSize: 16.0, fontWeight: FontWeight.w700),
                 ),
               ),
-              post.location != null
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Row(children: [
-                        Icon(Icons.location_on,
-                            color: Colors.red[600], size: 12.0),
-                        const SizedBox(width: 5.0),
-                        Text(
-                          post.location as String,
-                          style: const TextStyle(
-                              color: AppColors.textFaded, fontSize: 12.0),
-                        ),
-                      ]),
-                    )
-                  : const SizedBox.shrink(),
               Row(
                 children: [
                   Text(
@@ -171,7 +155,22 @@ class _PostHeader extends StatelessWidget {
                   ),
                   Icon(Icons.public, size: 12.0, color: Colors.grey[600]),
                 ],
-              )
+              ),
+              post.address != null && post.address != ''
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(children: [
+                        Icon(Icons.location_on,
+                            color: Colors.red[600], size: 12.0),
+                        const SizedBox(width: 5.0),
+                        Text(
+                          post.address as String,
+                          style: const TextStyle(
+                              color: AppColors.textFaded, fontSize: 12.0),
+                        ),
+                      ]),
+                    )
+                  : const SizedBox.shrink(),
             ],
           ),
         ),
