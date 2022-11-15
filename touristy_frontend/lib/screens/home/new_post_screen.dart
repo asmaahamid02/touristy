@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:touristy_frontend/utilities/utilities.dart';
 
@@ -361,6 +362,33 @@ class _LocationChoicesList extends StatefulWidget {
 }
 
 class _LocationChoicesListState extends State<_LocationChoicesList> {
+  Future<void> _getCurrentPosition() async {
+    final hasPermission =
+        await LocationHandler().handleLocationPermission(context);
+    if (!hasPermission) return;
+    await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high)
+        .then((Position position) {
+      widget.coordinates['latitude'] = position.latitude;
+      widget.coordinates['longitude'] = position.longitude;
+      _getAddressFromLatLng(position);
+      Navigator.pop(context);
+    }).catchError((e) {
+      SnakeBarCommon.show(context, 'Failed to get location');
+    });
+  }
+
+  Future<void> _getAddressFromLatLng(Position position) async {
+    try {
+      final String address =
+          await LocationHandler().getAddressFromLatLng(position);
+      widget.coordinates['address'] = address;
+
+      widget.updateAddress(address);
+    } catch (error) {
+      SnakeBarCommon.show(context, 'Failed to get location');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
