@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
-import 'package:touristy_frontend/utilities/utilities.dart';
-
+import '../screens.dart';
+import '../../utilities/utilities.dart';
 import '../../models/models.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
@@ -24,7 +25,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
   //cation controller
   final captionController = TextEditingController();
 
-  late PlaceLocation _coordinates;
+  late Map<String, dynamic> _coordinates;
 
   bool _isLoading = false;
   bool _isInit = true;
@@ -37,8 +38,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
     imageFileList = [];
     imagePicker = ImagePicker();
-    _coordinates =
-        PlaceLocation(latitude: null, longitude: null, address: null);
+    _coordinates = {
+      'latitude': null,
+      'longitude': null,
+      'address': null,
+    };
   }
 
   @override
@@ -59,7 +63,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
         //     .map((e) => XFile(e['media_path']))
         //     .toList(); //convert string to XFile
 
-        _coordinates.address = post.address;
+        _coordinates['address'] = post.address;
       }
     }
     _isInit = false;
@@ -109,8 +113,11 @@ class _NewPostScreenState extends State<NewPostScreen> {
     try {
       //add post
       if (postId == null || postId == 0) {
+        print(_coordinates['address']);
         await Provider.of<Posts>(context, listen: false).addPost(
-            captionController.text, imageFileListConverted, _coordinates);
+            captionController.text,
+            imageFileListConverted,
+            PlaceLocation.fromMap(_coordinates));
         //update post
       } else {
         // await Provider.of<Posts>(context, listen: false).editPost(
@@ -267,7 +274,7 @@ class _BottomActionBar extends StatefulWidget {
   const _BottomActionBar(
       {required this.selectImages, required this.coordinates});
   final Function() selectImages;
-  final PlaceLocation coordinates;
+  final Map<String, dynamic> coordinates;
 
   @override
   State<_BottomActionBar> createState() => _BottomActionBarState();
@@ -280,7 +287,7 @@ class _BottomActionBarState extends State<_BottomActionBar> {
   void initState() {
     super.initState();
 
-    address = widget.coordinates.address;
+    address = widget.coordinates['address'];
   }
 
   void updateAddress(String newValue) {
@@ -333,7 +340,7 @@ class _BottomActionBarState extends State<_BottomActionBar> {
                     _LocationChoicesList(
                         coordinates: widget.coordinates,
                         updateAddress: updateAddress),
-                    height: 300);
+                    height: 240);
               },
               icon: Icon(
                 Icons.location_on,
@@ -351,7 +358,7 @@ class _LocationChoicesList extends StatefulWidget {
     required this.coordinates,
     required this.updateAddress,
   }) : super(key: key);
-  final PlaceLocation coordinates;
+  final Map<String, dynamic> coordinates;
   final Function(String) updateAddress;
 
   @override
@@ -361,20 +368,58 @@ class _LocationChoicesList extends StatefulWidget {
 class _LocationChoicesListState extends State<_LocationChoicesList> {
   Future<void> _getCurrentPosition() async {
     await LocationHandler.getCurrentPosition(context).then((Position position) {
-      widget.coordinates.latitude = position.latitude;
-      widget.coordinates.longitude = position.longitude;
-      _getAddressFromLatLng(position);
+      widget.coordinates['latitude'] = position.latitude;
+      widget.coordinates['longitude'] = position.longitude;
+
+      _getAddressFromLatLng(position.latitude, position.longitude);
       Navigator.pop(context);
     }).catchError((e) {
       SnakeBarCommon.show(context, 'Failed to get location');
     });
   }
 
-  Future<void> _getAddressFromLatLng(Position position) async {
-    final String address =
-        await LocationHandler.getAddressFromLatLng(context, position);
-    widget.coordinates.address = address;
+  Future<void> _getAddressFromLatLng(double latitude, double longitude) async {
+    final String address = await LocationHandler.getAddressFromLatLng(
+        context, latitude, longitude);
+    widget.coordinates['address'] = address;
     widget.updateAddress(address);
+  }
+
+  Future<void> _selectOnMap() async {
+    final PlaceLocation? initialLocation;
+    if (widget.coordinates['latitude'] != null &&
+        widget.coordinates['longitude'] != null) {
+      initialLocation = PlaceLocation(
+          latitude: widget.coordinates['latitude'],
+          longitude: widget.coordinates['longitude']);
+    } else {
+      initialLocation = null;
+    }
+
+    final LatLng? selectedLocation = await Navigator.of(context).push(
+      MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (ctx) => initialLocation != null
+            ? MapPage(
+                initialLocation: initialLocation,
+                isSelecting: true,
+              )
+            : const MapPage(
+                isSelecting: true,
+              ),
+      ),
+    );
+
+    if (selectedLocation == null) {
+      return;
+    }
+
+    // print(selectedLocation);
+    widget.coordinates['latitude'] = selectedLocation.latitude;
+    widget.coordinates['longitude'] = selectedLocation.longitude;
+
+    _getAddressFromLatLng(selectedLocation.latitude, selectedLocation.longitude)
+        .then((_) => Navigator.pop(context));
   }
 
   @override
@@ -390,18 +435,11 @@ class _LocationChoicesListState extends State<_LocationChoicesList> {
               label: 'Current Location',
               onTap: _getCurrentPosition),
           const Divider(),
-          //search location
-          LocationOption(
-            icon: Icons.search,
-            label: 'Search Location',
-            onTap: () {},
-          ),
-          const Divider(),
           //choose from map
           LocationOption(
             icon: Icons.map_outlined,
             label: 'Choose from Map',
-            onTap: () {},
+            onTap: _selectOnMap,
           ),
           const Divider(),
           //cancel
@@ -428,13 +466,13 @@ class LocationOption extends StatelessWidget {
   }) : super(key: key);
   final String label;
   final IconData icon;
-  final Function onTap;
+  final VoidCallback onTap;
   @override
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(icon),
       title: Text(label),
-      onTap: () => onTap(),
+      onTap: onTap,
     );
   }
 }
@@ -442,7 +480,7 @@ class LocationOption extends StatelessWidget {
 class _RemoveLocation extends StatefulWidget {
   const _RemoveLocation(
       {required this.coordinates, required this.updateAddress});
-  final PlaceLocation coordinates;
+  final Map<String, dynamic> coordinates;
   final Function(String) updateAddress;
 
   @override
@@ -462,9 +500,9 @@ class _RemoveLocationState extends State<_RemoveLocation> {
             icon: Icons.remove_circle_outline,
             label: 'Remove Location',
             onTap: () {
-              widget.coordinates.latitude = null;
-              widget.coordinates.longitude = null;
-              widget.coordinates.address = null;
+              widget.coordinates['latitude'] = null;
+              widget.coordinates['longitude'] = null;
+              widget.coordinates['address'] = null;
 
               widget.updateAddress('');
 
