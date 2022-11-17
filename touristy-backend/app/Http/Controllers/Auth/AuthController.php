@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserType;
+use App\Traits\LocationTrait;
 use App\Traits\MediaTrait;
 use App\Traits\NationalityTrait;
 use App\Traits\ResponseJson;
@@ -17,7 +18,7 @@ use JWTAuth;
 
 class AuthController extends Controller
 {
-    use ResponseJson, MediaTrait, NationalityTrait;
+    use ResponseJson, MediaTrait, NationalityTrait, LocationTrait;
     public function register(Request $request)
     {
         //Validate data
@@ -30,7 +31,8 @@ class AuthController extends Controller
             'date_of_birth' => 'required|date',
             'nationality' => 'string',
             'country_code' => 'string',
-            'profile_picture' => 'nullable|base64image',
+            // 'profile_picture' => 'nullable|base64image',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
             'role' => 'required|string',
         ]);
 
@@ -60,10 +62,15 @@ class AuthController extends Controller
             $user->nationality_id = $this->saveNationality($request->nationality, $request->country_code);
         }
 
+        if ($request->has('latitude') && $request->has('longitude') && $request->has('address')) {
+            $user->location_id = $this->saveLocation($request->latitude, $request->longitude, $request->address);
+        }
+
         $user->save();
 
         if ($request->has('profile_picture')) {
-            $path = $this->saveBase64Image($request->profile_picture, 'profile_pictures/' . $user->id);
+            // $path = $this->saveBase64Image($request->profile_picture, 'profile_pictures/' . $user->id);
+            $path = $this->uploadMedia($request->profile_picture, 'profile_pictures/' . $user->id);
             $user->profile_picture = $path;
             $user->save();
         }
