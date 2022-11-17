@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import '../../utilities/utilities.dart';
 
 class MessageInput extends StatelessWidget {
-  MessageInput({super.key, required this.sendMessage});
+  MessageInput(
+      {super.key,
+      required this.sendMessage,
+      this.placeHolder = 'Type a message...'});
   final Function(String message) sendMessage;
   final TextEditingController _messageController = TextEditingController();
+  final String placeHolder;
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +37,8 @@ class MessageInput extends StatelessWidget {
           Expanded(
             child: TextField(
               style: const TextStyle(fontSize: 14.0),
-              decoration: const InputDecoration(
-                hintText: 'Type a message',
+              decoration: InputDecoration(
+                hintText: placeHolder,
                 border: InputBorder.none,
               ),
               controller: _messageController,
