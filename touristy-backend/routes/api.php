@@ -70,6 +70,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::put('/{id}', [CommentController::class, 'update']);
             Route::delete('/{id}', [CommentController::class, 'delete']);
             Route::get('/post/{id}', [CommentController::class, 'getCommentsByPost']);
+            Route::get('/like/{id}', [CommentController::class, 'like'])->where('id', '[0-9]+');
         });
 
         //events
