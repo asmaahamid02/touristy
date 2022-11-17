@@ -4,8 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
-
-import '../../screens/screens.dart';
+import 'package:provider/provider.dart';
+import 'package:touristy_frontend/providers/auth.dart';
+import 'package:touristy_frontend/screens/auth/signup_location_screen.dart';
+import 'package:touristy_frontend/utilities/location_handler.dart';
+import 'package:touristy_frontend/utilities/modal_bottom_sheet.dart';
+import 'package:touristy_frontend/utilities/snakebar.dart';
+import 'package:touristy_frontend/utilities/theme.dart';
 
 import '../../widgets/widgets.dart';
 
@@ -23,6 +28,7 @@ class _SignupProfileScreenState extends State<SignupProfileScreen> {
 
   File? _image;
   final ImagePicker _picker = ImagePicker();
+  bool _isLoading = false;
 
   Future _pickImage(ImageSource source) async {
     try {
@@ -44,26 +50,56 @@ class _SignupProfileScreenState extends State<SignupProfileScreen> {
 
   void _showBottomSheet() async {
     if (_image == null) {
-      showModalBottomSheet(
-        context: context,
-        builder: (_) {
-          return ImageOtionsBottomSheet(onTap: _pickImage);
-        },
+      ModalBottomSheetCommon.show(
+        context,
+        ImageOtionsBottomSheet(onTap: _pickImage),
+        height: 215,
       );
     }
   }
 
-  void _saveForm() async {
+  Future<void> _saveForm() async {
     if (_image != null) {
       _user['profile_picture'] = _image as File;
     }
 
     PermissionStatus locationPermissionStatus =
-        await Location().hasPermission();
+        await Location().requestPermission();
+    //ask for permission if not granted
+
     if (locationPermissionStatus == PermissionStatus.granted) {
+      try {
+        setState(() {
+          _isLoading = true;
+        });
+        final location = Location();
+        final currentLocation = await location.getLocation();
+        _user['latitude'] = currentLocation.latitude as double;
+        _user['longitude'] = currentLocation.longitude as double;
+        if (!mounted) return;
+        _user['address'] = await LocationHandler.getAddressFromLatLng(
+            context,
+            currentLocation.latitude as double,
+            currentLocation.longitude as double);
+        if (!mounted) return;
+
+        await Provider.of<Auth>(context, listen: false).signup(_user);
+
+        if (!mounted) return;
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.of(context).pushReplacementNamed('/');
+      } on HttpException catch (error) {
+        final errorMessage = error.toString();
+        if (!mounted) return;
+        SnakeBarCommon.show(context, errorMessage);
+      } catch (error) {
+        if (!mounted) return;
+        SnakeBarCommon.show(context, error.toString());
+      }
       if (!mounted) return;
-      Navigator.of(context)
-          .pushReplacementNamed(Tabs.routeName, arguments: _user);
+      setState(() {
+        _isLoading = false;
+      });
     } else {
       if (!mounted) return;
       Navigator.of(context)
@@ -74,13 +110,19 @@ class _SignupProfileScreenState extends State<SignupProfileScreen> {
   @override
   Widget build(BuildContext context) {
     _user = ModalRoute.of(context)!.settings.arguments as Map<String, Object>;
+    final brightness = Theme.of(context).brightness;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          brightness == Brightness.light ? Theme.of(context).cardColor : null,
       appBar: AppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          const LogoHorizontal('assets/images/logo_horizontal.png', 100),
+          LogoHorizontal(
+              brightness == Brightness.light
+                  ? 'assets/images/logo_horizontal.png'
+                  : 'assets/images/login_dark.png',
+              100),
           Expanded(
             child: Column(
               children: [
@@ -93,11 +135,9 @@ class _SignupProfileScreenState extends State<SignupProfileScreen> {
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(width: 10),
-                    Text('SELFIE',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall!.copyWith(
-                                  color: Theme.of(context).primaryColor,
-                                )),
+                    const Text('SELFIE',
+                        style: TextStyle(
+                            color: AppColors.secondary, fontSize: 20.0)),
                   ],
                 ),
                 const SizedBox(height: 10),
@@ -108,25 +148,27 @@ class _SignupProfileScreenState extends State<SignupProfileScreen> {
               ],
             ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              PrimaryButton(
-                onTap: _image == null ? _showBottomSheet : _saveForm,
-                textLabel: _buttonText,
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: TextButton(
-                  onPressed: _saveForm,
-                  child: const Text(
-                    'SET UP LATER',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    PrimaryButton(
+                      onTap: _image == null ? _showBottomSheet : _saveForm,
+                      textLabel: _buttonText,
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: TextButton(
+                        onPressed: _image == null ? _saveForm : null,
+                        child: const Text(
+                          'SET UP LATER',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -151,7 +193,7 @@ class ProfileImageContainer extends StatelessWidget {
                 width: 150.0,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.grey.shade200,
+                  color: Theme.of(context).cardColor,
                 ),
                 child: Stack(children: [
                   CircleAvatar(
