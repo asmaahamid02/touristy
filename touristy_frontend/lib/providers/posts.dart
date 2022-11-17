@@ -47,6 +47,24 @@ class Posts with ChangeNotifier {
     return _posts.firstWhere((post) => post.id == id);
   }
 
+//update comment count
+  void updateCommentCount(int postId, int commentCount) {
+    final postIndex = _posts.indexWhere((post) => post.id == postId);
+
+    if (postIndex >= 0) {
+      _posts[postIndex].comments = commentCount;
+      notifyListeners();
+    }
+
+    final followingPostIndex =
+        _followingPosts.indexWhere((post) => post.id == postId);
+
+    if (followingPostIndex >= 0) {
+      _followingPosts[followingPostIndex].comments = commentCount;
+      notifyListeners();
+    }
+  }
+
   //get posts
   Future<List<Post>> fetchAndSetPosts() async {
     try {
