@@ -32,8 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Image.asset(
-            'assets/images/main_logo.png',
+            fit: BoxFit.cover,
+            height: 40,
+            Theme.of(context).brightness == Brightness.dark
+                ? 'assets/images/main_dark.png'
+                : 'assets/images/main_logo.png',
           ),
+          centerTitle: false,
           actions: [
             IconButton(
               icon: const Icon(Icons.add_box_outlined),
@@ -66,10 +71,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: [
-            const ForYouPage(),
-            const FollowingPage(),
+            ForYouPage(),
+            FollowingPage(),
             MapPage(),
           ],
         ),
