@@ -4,9 +4,7 @@ import '../providers/providers.dart';
 import '../services/services.dart';
 
 class Comments with ChangeNotifier {
-  final List<Comment> _comments = [];
-
-  int _currentPage = 1;
+  List<Comment> _comments = [];
 
   String? authToken;
 
@@ -25,26 +23,37 @@ class Comments with ChangeNotifier {
     return [..._comments];
   }
 
+  //reset comments
   void resetComments() {
-    _currentPage = 1;
     _comments.clear();
   }
 
   //get comments by post
   Future<List<Comment>> fetchAndSetCommentsByPost(int postId) async {
     try {
-      final comments = await CommentService.getCommentsByPost(
-          authToken as String, postId, _currentPage);
+      final comments =
+          await CommentService.getCommentsByPost(authToken as String, postId);
 
-      _currentPage++;
-      //add comments that are not already in the list
-      for (var comment in comments) {
-        if (!_comments.any((element) => element.id == comment.id)) {
-          _comments.add(comment);
-        }
+      if (comments.isNotEmpty) {
+        _comments = comments;
+      } else {
+        resetComments();
       }
       notifyListeners();
       return comments;
+    } catch (error) {
+      resetComments();
+      rethrow;
+    }
+  }
+
+  //add comment
+  Future<void> addComment(int postId, String comment) async {
+    try {
+      final newComment =
+          await CommentService.addComment(authToken as String, postId, comment);
+      _comments.add(newComment);
+      notifyListeners();
     } catch (error) {
       rethrow;
     }
