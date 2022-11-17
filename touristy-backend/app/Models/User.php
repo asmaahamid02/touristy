@@ -22,6 +22,9 @@ class User extends Authenticatable implements JWTSubject
         'cover_picture',
         'bio',
         'is_deleted',
+        'nationality_id',
+        'user_type_id',
+        'location_id',
     ];
 
     protected $hidden = [
@@ -46,6 +49,11 @@ class User extends Authenticatable implements JWTSubject
     public function nationality()
     {
         return $this->belongsTo(Nationality::class);
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
     }
 
     public function posts()
