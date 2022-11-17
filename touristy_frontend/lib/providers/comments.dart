@@ -58,4 +58,27 @@ class Comments with ChangeNotifier {
       rethrow;
     }
   }
+
+  Future<void> toggleLikeStatus(int commentId) async {
+    final int commentIndex =
+        _comments.indexWhere((comment) => comment.id == commentId);
+
+    if (commentIndex >= 0) {
+      _comments[commentIndex].isLiked = !_comments[commentIndex].isLiked!;
+      _comments[commentIndex].likesCount = _comments[commentIndex].isLiked!
+          ? _comments[commentIndex].likesCount! + 1
+          : _comments[commentIndex].likesCount! - 1;
+      notifyListeners();
+
+      try {
+        await CommentService.toggleLikeComment(authToken as String, commentId);
+      } catch (error) {
+        _comments[commentIndex].isLiked = !_comments[commentIndex].isLiked!;
+        _comments[commentIndex].likesCount = _comments[commentIndex].isLiked!
+            ? _comments[commentIndex].likesCount! + 1
+            : _comments[commentIndex].likesCount! - 1;
+        notifyListeners();
+      }
+    }
+  }
 }
