@@ -50,7 +50,7 @@ class PostController extends Controller
 
         //add isLikedByUser to each post
         foreach ($posts as $post) {
-            $post->isLikedByUser = $post->likes->count() > 0 ? true : false;
+            $post->isLikedByUser = $post->likes->contains('user_id', Auth::id());
         }
 
         //add isFollowedByUser to each post
@@ -296,9 +296,11 @@ class PostController extends Controller
         }
 
         //add isLikedByUser to each post
+
         foreach ($posts as $post) {
-            $post->isLikedByUser = $post->likes->count() > 0 ? true : false;
+            $post->isLikedByUser = $post->likes->contains('user_id', Auth::id());
         }
+
 
         //add isFollowedByUser to each post
         foreach ($posts as $post) {
