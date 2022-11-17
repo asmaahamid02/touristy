@@ -162,10 +162,13 @@ class _PostHeader extends StatelessWidget {
                         Icon(Icons.location_on,
                             color: Colors.red[600], size: 12.0),
                         const SizedBox(width: 5.0),
-                        Text(
-                          post.address as String,
-                          style: const TextStyle(
-                              color: AppColors.textFaded, fontSize: 12.0),
+                        Expanded(
+                          child: Text(
+                            post.address as String,
+                            style: const TextStyle(
+                                color: AppColors.textFaded, fontSize: 12.0),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ]),
                     )
