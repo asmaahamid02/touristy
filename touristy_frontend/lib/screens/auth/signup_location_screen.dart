@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart' as permissions;
-import '../../screens/screens.dart';
+import 'package:provider/provider.dart';
+import 'package:touristy_frontend/exceptions/http_exception.dart';
+import 'package:touristy_frontend/providers/auth.dart';
+import 'package:touristy_frontend/utilities/location_handler.dart';
+import 'package:touristy_frontend/utilities/snakebar.dart';
+import 'package:touristy_frontend/utilities/theme.dart';
 import '../../widgets/widgets.dart';
 
 class SignupLocationScreen extends StatefulWidget {
@@ -15,9 +20,10 @@ class SignupLocationScreen extends StatefulWidget {
 class _SignupLocationScreenState extends State<SignupLocationScreen> {
   final Location location = Location();
   Map<String, Object> _user = {};
-  final String _token = 'token';
 
   PermissionStatus? _permissionStatus;
+
+  bool _isLoading = false;
 
 //check if the user has granted the location permission
   Future<void> _checkPermission() async {
@@ -41,6 +47,51 @@ class _SignupLocationScreenState extends State<SignupLocationScreen> {
     }
   }
 
+  Future<void> _saveForm() async {
+    setState(() {
+      _isLoading = true;
+    });
+    PermissionStatus locationPermissionStatus =
+        await Location().hasPermission();
+    //ask for permission if not granted
+
+    if (locationPermissionStatus == PermissionStatus.granted) {
+      try {
+        final location = Location();
+        final currentLocation = await location.getLocation();
+        _user['latitude'] = currentLocation.latitude as double;
+        _user['longitude'] = currentLocation.longitude as double;
+        if (!mounted) return;
+        _user['address'] = await LocationHandler.getAddressFromLatLng(
+            context,
+            currentLocation.latitude as double,
+            currentLocation.longitude as double);
+      } catch (error) {
+        debugPrint(error.toString());
+      }
+    }
+
+    try {
+      await Provider.of<Auth>(context, listen: false).signup(_user);
+
+      if (!mounted) return;
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.of(context).pushReplacementNamed('/');
+    } on HttpException catch (error) {
+      final errorMessage = error.toString();
+      if (!mounted) return;
+      SnakeBarCommon.show(context, errorMessage);
+    } catch (error) {
+      if (!mounted) return;
+      SnakeBarCommon.show(context, error.toString());
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   @override
   void initState() {
     _checkPermission();
@@ -50,70 +101,64 @@ class _SignupLocationScreenState extends State<SignupLocationScreen> {
   @override
   Widget build(BuildContext context) {
     _user = ModalRoute.of(context)!.settings.arguments as Map<String, Object>;
+    final brightness = Theme.of(context).brightness;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          brightness == Brightness.light ? Theme.of(context).cardColor : null,
       appBar: AppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          const LogoHorizontal('assets/images/logo_horizontal.png', 100),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-            margin: const EdgeInsets.only(left: 20, right: 20),
-            decoration: BoxDecoration(
-              color: Colors.grey[200],
+          LogoHorizontal(
+              brightness == Brightness.light
+                  ? 'assets/images/logo_horizontal.png'
+                  : 'assets/images/login_dark.png',
+              100),
+          Card(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 5,
-                  blurRadius: 7,
-                  offset: const Offset(0, 3), // changes position of shadow
-                ),
-              ],
             ),
-            child: Column(
-              children: [
-                _buildListItem('Check places', context),
-                const SizedBox(height: 20),
-                _buildListItem('Find places to visit', context),
-                const SizedBox(height: 20),
-                _buildListItem('Connect with travelers', context),
-                const SizedBox(height: 20),
-                _buildListItem('Share your experiences', context),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              child: Column(
+                children: [
+                  _buildListItem('Check places', context),
+                  const SizedBox(height: 20),
+                  _buildListItem('Find places to visit', context),
+                  const SizedBox(height: 20),
+                  _buildListItem('Connect with travelers', context),
+                  const SizedBox(height: 20),
+                  _buildListItem('Share your experiences', context),
+                ],
+              ),
             ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              PrimaryButton(
-                onTap: _permissionStatus == PermissionStatus.granted
-                    ? () {
-                        Navigator.of(context)
-                            .pushNamed(Tabs.routeName, arguments: _user);
-                      }
-                    : _requestPermission,
-                textLabel: _permissionStatus == PermissionStatus.granted
-                    ? 'NEXT'
-                    : 'ENABLE LOCATION',
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: TextButton(
-                  onPressed: _permissionStatus == PermissionStatus.granted
-                      ? null
-                      : () {
-                          Navigator.of(context).pushReplacementNamed(
-                              Tabs.routeName,
-                              arguments: _token);
-                        },
-                  child: const Text('SET UP LATER',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+          _isLoading
+              ? const CircularProgressIndicator()
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    PrimaryButton(
+                      onTap: _permissionStatus == PermissionStatus.granted
+                          ? _saveForm
+                          : _requestPermission,
+                      textLabel: _permissionStatus == PermissionStatus.granted
+                          ? 'NEXT'
+                          : 'ENABLE LOCATION',
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: TextButton(
+                        onPressed: _permissionStatus == PermissionStatus.granted
+                            ? null
+                            : _saveForm,
+                        child: const Text('SET UP LATER',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -122,7 +167,7 @@ class _SignupLocationScreenState extends State<SignupLocationScreen> {
   Widget _buildListItem(String title, BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.check_circle_outline, color: Theme.of(context).primaryColor),
+        const Icon(Icons.check_circle_outline, color: AppColors.secondary),
         const SizedBox(width: 10),
         Text(title),
       ],
