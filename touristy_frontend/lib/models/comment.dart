@@ -26,7 +26,7 @@ class Comment {
         profilePicture: json["user"]["profile_picture"],
         createdAt:
             timeago.format(DateTime.parse(json['created_at']), locale: 'en'),
-        isLiked: json["isLiked"],
-        likesCount: json["likes"],
+        isLiked: json["isLiked"] ?? false,
+        likesCount: json["likes"] ?? 0,
       );
 }
