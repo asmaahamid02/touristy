@@ -52,4 +52,22 @@ class CommentService {
       rethrow;
     }
   }
+
+  //toggleLikeComment
+  static Future<void> toggleLikeComment(String token, int commentId) async {
+    try {
+      final response = await http.get(
+          Uri.parse('$baseUrl/comments/like/$commentId'),
+          headers: getHeaders(token));
+
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      //check if response is has error, throw exception
+      if (response.statusCode != 200) {
+        throw HttpException(getResponseError(responseData));
+      }
+    } catch (error) {
+      rethrow;
+    }
+  }
 }
