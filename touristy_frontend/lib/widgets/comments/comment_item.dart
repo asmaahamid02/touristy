@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../utilities/utilities.dart';
 import '../../widgets/widgets.dart';
 import '../../models/models.dart';
+import '../../providers/providers.dart';
 
 class CommentItem extends StatelessWidget {
   const CommentItem({super.key, required this.comment});
@@ -100,7 +102,14 @@ class CommentItem extends StatelessWidget {
                               ? AppColors.secondary
                               : AppColors.textFaded,
                           label: 'Like',
-                          onTap: () {},
+                          onTap: () {
+                            try {
+                              Provider.of<Comments>(context, listen: false)
+                                  .toggleLikeStatus(comment.id!);
+                            } catch (e) {
+                              print(e);
+                            }
+                          },
                         ),
                       ],
                     ),
