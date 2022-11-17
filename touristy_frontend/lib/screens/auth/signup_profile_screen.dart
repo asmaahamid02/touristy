@@ -5,12 +5,9 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
-import 'package:touristy_frontend/providers/auth.dart';
-import 'package:touristy_frontend/screens/auth/signup_location_screen.dart';
-import 'package:touristy_frontend/utilities/location_handler.dart';
-import 'package:touristy_frontend/utilities/modal_bottom_sheet.dart';
-import 'package:touristy_frontend/utilities/snakebar.dart';
-import 'package:touristy_frontend/utilities/theme.dart';
+import '../../providers/providers.dart';
+import '../../utilities/utilities.dart';
+import '../../screens/screens.dart';
 
 import '../../widgets/widgets.dart';
 

@@ -3,10 +3,8 @@ import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart' as permissions;
 import 'package:provider/provider.dart';
 import 'package:touristy_frontend/exceptions/http_exception.dart';
-import 'package:touristy_frontend/providers/auth.dart';
-import 'package:touristy_frontend/utilities/location_handler.dart';
-import 'package:touristy_frontend/utilities/snakebar.dart';
-import 'package:touristy_frontend/utilities/theme.dart';
+import '../../providers/auth.dart';
+import '../../utilities/utilities.dart';
 import '../../widgets/widgets.dart';
 
 class SignupLocationScreen extends StatefulWidget {
