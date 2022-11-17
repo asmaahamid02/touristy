@@ -46,6 +46,7 @@ class _MessagingScreenState extends State<MessagingScreen> {
                 child: CircularProgressIndicator(),
               );
             }
+
             return GestureDetector(
               onTap: () => FocusScope.of(context).unfocus(),
               child: CustomScrollView(
@@ -71,38 +72,45 @@ class _MessagingScreenState extends State<MessagingScreen> {
                           .toList(),
                     ),
                   ),
-
-                  SliverPadding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10.0, vertical: 4.0),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate((context, index) {
-                        final data = snapshot.data!.docs[index].data()
-                            as Map<String, dynamic>;
-                        final User user = users.firstWhere((user) =>
-                            user.id ==
-                            data['chatUsers'].firstWhere(
-                                (element) => element != currentUserId));
-                        return _buildMessageTile(
-                          MessageData(
-                            isRead: data['latestMessage']['isRead'],
-                            senderId: user.id,
-                            lastMessageSenderId: data['latestMessage']
-                                ['sentBy'],
-                            profilePicture: user.profilePictureUrl ?? '',
-                            message: data['latestMessage']['text'],
-                            messageDate:
-                                data['latestMessage']['sentAt'].toDate(),
-                            dateMessage: timeago.format(
-                                data['latestMessage']['sentAt'].toDate()),
-                            senderName: '${user.firstName} ${user.lastName}',
+                  snapshot.data!.docs.isEmpty
+                      ? const SliverToBoxAdapter(
+                          child: Center(
+                            child: Text('No chats yet'),
                           ),
-                        );
+                        )
+                      : SliverPadding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10.0, vertical: 4.0),
+                          sliver: SliverList(
+                            delegate:
+                                SliverChildBuilderDelegate((context, index) {
+                              final data = snapshot.data!.docs[index].data()
+                                  as Map<String, dynamic>;
+                              final User user = users.firstWhere((user) =>
+                                  user.id ==
+                                  data['chatUsers'].firstWhere(
+                                      (element) => element != currentUserId));
+                              return _buildMessageTile(
+                                MessageData(
+                                  isRead: data['latestMessage']['isRead'],
+                                  senderId: user.id,
+                                  lastMessageSenderId: data['latestMessage']
+                                      ['sentBy'],
+                                  profilePicture: user.profilePictureUrl ?? '',
+                                  message: data['latestMessage']['text'],
+                                  messageDate:
+                                      data['latestMessage']['sentAt'].toDate(),
+                                  dateMessage: timeago.format(
+                                      data['latestMessage']['sentAt'].toDate()),
+                                  senderName:
+                                      '${user.firstName} ${user.lastName}',
+                                ),
+                              );
 
-                        // }).toList();
-                      }, childCount: snapshot.data!.docs.length),
-                    ),
-                  )
+                              // }).toList();
+                            }, childCount: snapshot.data!.docs.length),
+                          ),
+                        )
                 ],
               ),
             );
