@@ -39,7 +39,8 @@ class CommentController extends Controller
 
         $comment = Comment::create($commentData);
 
-        return $this->jsonResponse($comment, 'data', Response::HTTP_CREATED, 'Comment created');
+        $comment->user = $comment->user;
+        return $this->jsonResponse(new CommentResource($comment), 'data', Response::HTTP_OK, 'Comment created');
     }
 
     public function update(Request $request, $id)
@@ -87,7 +88,7 @@ class CommentController extends Controller
 
     public function getCommentsByPost($post_id)
     {
-        $comments = Comment::where('post_id', $post_id)->with('user')->with('replies')->withCount('likes')->orderBy('created_at', 'DESC')->paginate(10);
+        $comments = Comment::where('post_id', $post_id)->with('user')->with('replies')->withCount('likes')->orderBy('created_at', 'DESC')->get();
 
         if ($comments->count() == 0) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Comments not found');
@@ -98,5 +99,19 @@ class CommentController extends Controller
         }
 
         return $this->jsonResponse(CommentResource::collection($comments), 'data', Response::HTTP_OK, 'Comments');
+    }
+
+    //like comment or unlike comment
+    public function like($id)
+    {
+        $comment = Comment::find($id);
+
+        if (!$comment) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Comment not found');
+        }
+
+        $comment->likes()->toggle(Auth::id());
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Success');
     }
 }
