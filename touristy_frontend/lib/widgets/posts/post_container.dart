@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:touristy_frontend/utilities/utilities.dart';
-
+import '../../utilities/utilities.dart';
 import '../../screens/screens.dart';
 import '../../widgets/widgets.dart';
 import '../../models/models.dart';
@@ -303,7 +302,12 @@ class _PostStats extends StatelessWidget {
                 _PostButton(
                     icon: const Icon(Icons.message_outlined, size: 20.0),
                     label: 'Comment',
-                    onTap: () {}),
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        CommentsScreen.routeName,
+                        arguments: post.id,
+                      );
+                    }),
               ],
             )),
             _PostButton(
