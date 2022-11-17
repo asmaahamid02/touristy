@@ -16,80 +16,77 @@ class CommentsScreen extends StatefulWidget {
 
 class _CommentsScreenState extends State<CommentsScreen> {
   late int postId;
-  late ScrollController _scrollController;
-  final int maxLength = 10;
-
   bool _isLoading = false;
-  bool _isInit = true;
-  bool _hasMore = true;
+  late bool _isInit;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
-    _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-              _scrollController.position.maxScrollExtent * 0.95 &&
-          !_isLoading) {
-        if (_hasMore) {
-          _loadMore();
-        }
-      }
-    });
+    _isInit = true;
   }
 
   @override
-  didChangeDependencies() {
+  didChangeDependencies() async {
     super.didChangeDependencies();
     if (_isInit) {
       postId = ModalRoute.of(context)!.settings.arguments as int;
+      setState(() {
+        _isLoading = true;
+      });
 
-      Provider.of<Comments>(context, listen: false).resetComments();
-      _loadMore();
+      try {
+        //get comments
+        await Provider.of<Comments>(context).fetchAndSetCommentsByPost(postId);
+
+        setState(() {
+          _isLoading = false;
+        });
+      } on HttpException catch (error) {
+        setState(() {
+          _isLoading = false;
+        });
+        SnakeBarCommon.show(context, error.toString());
+      } catch (error) {
+        if (!mounted) return;
+        setState(() {
+          _isLoading = false;
+        });
+        SnakeBarCommon.show(context, error.toString());
+      }
       _isInit = false;
     }
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _scrollController.dispose();
-  }
-
-  void _loadMore() async {
+  Future<void> _addComment(String comment) async {
     setState(() {
       _isLoading = true;
     });
-
     try {
-      postId = ModalRoute.of(context)!.settings.arguments as int;
+      //add comment
+      await Provider.of<Comments>(context, listen: false)
+          .addComment(postId, comment);
 
-      //get comments
-      final comments = await Provider.of<Comments>(context, listen: false)
-          .fetchAndSetCommentsByPost(postId);
+//update comments count
+      final post = Provider.of<Posts>(context, listen: false).findById(postId);
 
-      print(comments.length);
+      Provider.of<Posts>(context, listen: false)
+          .updateCommentCount(postId, post!.comments! + 1);
 
       setState(() {
         _isLoading = false;
-        if (comments.length < maxLength) {
-          _hasMore = false;
-        }
       });
+      SnakeBarCommon.show(context, 'Comment added successfully');
     } on HttpException catch (error) {
-      setState(() {
-        _isLoading = false;
-        _hasMore = false;
-      });
       SnakeBarCommon.show(context, error.toString());
     } catch (error) {
       if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-        _hasMore = false;
-      });
+
       SnakeBarCommon.show(context, error.toString());
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -104,24 +101,67 @@ class _CommentsScreenState extends State<CommentsScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          _hasMore = true;
-          Provider.of<Comments>(context, listen: false).resetComments();
-          _loadMore();
+          Provider.of<Comments>(context, listen: false)
+              .fetchAndSetCommentsByPost(postId);
         },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-          child: CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    const SizedBox(height: 16),
-                    Consumer<Comments>(
-                      builder: (context, comments, child) {
-                        return ListView.builder(
-                          shrinkWrap: true,
+        child: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Column(
+            children: [
+              Expanded(
+                child: CustomScrollView(
+                  slivers: [
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12.0, vertical: 4.0),
+                      sliver: CommentsList(isLoading: _isLoading),
+                    )
+                  ],
+                ),
+              ),
+              MessageInput(
+                sendMessage: _addComment,
+                placeHolder: 'Add a comment',
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class CommentsList extends StatelessWidget {
+  const CommentsList({
+    Key? key,
+    required bool isLoading,
+  })  : _isLoading = isLoading,
+        super(key: key);
+
+  final bool _isLoading;
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverList(
+      delegate: SliverChildListDelegate(
+        [
+          const SizedBox(height: 16),
+          Consumer<Comments>(
+            builder: (context, comments, child) {
+              return _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : comments.comments.isEmpty
+                      ? const Center(
+                          child: Text('No comments yet'),
+                        )
+                      : ListView.builder(
+                          reverse: true,
                           physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
                           itemCount: comments.comments.length,
                           itemBuilder: (context, index) {
                             return CommentItem(
@@ -129,23 +169,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                             );
                           },
                         );
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    if (_isLoading)
-                      const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    if (!_hasMore)
-                      const Center(
-                        child: Text('No more comments'),
-                      ),
-                  ],
-                ),
-              ),
-            ],
+            },
           ),
-        ),
+        ],
       ),
     );
   }
