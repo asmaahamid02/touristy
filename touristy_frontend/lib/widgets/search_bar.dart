@@ -12,7 +12,7 @@ class SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Theme.of(context).cardColor,
+      // color: Theme.of(context).cardColor,
       padding: const EdgeInsets.all(10.0),
       child: SizedBox(
         width: double.infinity,
