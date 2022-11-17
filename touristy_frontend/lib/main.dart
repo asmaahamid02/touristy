@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:touristy_frontend/providers/travelers_users.dart';
 import './utilities/utilities.dart';
 import './screens/screens.dart';
 import './providers/providers.dart';
@@ -38,18 +37,18 @@ class MyApp extends StatelessWidget {
           create: (_) => Posts(),
           update: (_, auth, previousPosts) => previousPosts!..update(auth),
         ),
-        ChangeNotifierProxyProvider<Auth, TravelersUsers>(
-          create: (_) => TravelersUsers(),
-          update: (_, auth, previousTravelersUsers) =>
-              previousTravelersUsers!..update(auth),
-        )
+        ChangeNotifierProxyProvider<Auth, Comments>(
+          create: (_) => Comments(),
+          update: (_, auth, previousComments) =>
+              previousComments!..update(auth),
+        ),
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
           title: 'Touristy',
           theme: appTheme.light,
           darkTheme: appTheme.dark,
-          themeMode: ThemeMode.light,
+          themeMode: ThemeMode.dark,
           home: auth.isAuth
               ? const Tabs()
               : FutureBuilder(
@@ -71,8 +70,10 @@ class MyApp extends StatelessWidget {
             HomeScreen.routeName: (ctx) => const HomeScreen(),
             Tabs.routeName: (ctx) => const Tabs(),
             NewPostScreen.routeName: (ctx) => const NewPostScreen(),
-            MessagingScreen.routeName: (ctx) => MessagingScreen(),
+            MessagingScreen.routeName: (ctx) => const MessagingScreen(),
             ChatScreen.routeName: (ctx) => const ChatScreen(),
+            MapPage.routeName: (ctx) => const MapPage(),
+            CommentsScreen.routeName: (ctx) => const CommentsScreen(),
           },
         ),
       ),
