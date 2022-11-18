@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 class SearchTextField extends StatelessWidget {
-  const SearchTextField({
+  SearchTextField({
     Key? key,
     required this.focusNode,
     required this.controller,
     required this.labelText,
     required this.onTap,
     required this.readOnly,
+    this.validator,
     this.autoFocus = false,
   }) : super(key: key);
 
@@ -15,6 +16,7 @@ class SearchTextField extends StatelessWidget {
   final TextEditingController controller;
   final String labelText;
   final Function()? onTap;
+  String? Function(String?)? validator;
   final bool readOnly;
   final bool autoFocus;
 
@@ -31,6 +33,7 @@ class SearchTextField extends StatelessWidget {
       controller: controller,
       onTap: onTap,
       focusNode: focusNode,
+      validator: validator,
     );
   }
 }
