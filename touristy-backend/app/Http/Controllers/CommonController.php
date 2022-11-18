@@ -169,4 +169,30 @@ class CommonController extends Controller
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Trips not found');
     }
+
+    //search in posts
+    public function searchPosts($search)
+    {
+        //search in posts
+        $posts = $this->search('Post', $search, ['content']);
+        $posts = $posts ? $posts->where('is_deleted', 0)->whereHas('user', function ($query) {
+            $this->applyUserFilters($query);
+        })->with('location')->orderBy('created_at', 'desc')->get() : null;
+
+        if ($posts != null) {
+            $posts->map(function ($post) {
+                $post->isLikedByUser = $post->likes->contains(Auth::id());
+                $post->user->isFollowedByUser = $post->user->followers->contains(Auth::id());
+                //followings count
+                $post->user->followings_count = $post->user->followings->count();
+                //followers count
+                $post->user->followers_count = $post->user->followers->count();
+            });
+        }
+
+        if ($posts != null)
+            return $this->jsonResponse(PostResource::collection($posts), 'data', Response::HTTP_OK, 'Posts found');
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Posts not found');
+    }
 }
