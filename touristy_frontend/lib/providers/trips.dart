@@ -34,7 +34,7 @@ class Trips with ChangeNotifier {
   Future<void> addTrip(Trip trip) async {
     try {
       final Trip newTrip = await TripService.addTrip(authToken!, trip);
-      _trips.add(newTrip);
+      _trips.insert(0, newTrip);
       notifyListeners();
     } catch (error) {
       rethrow;
