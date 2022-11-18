@@ -86,7 +86,10 @@ class _SearchPlaceBoxState extends State<SearchPlaceBox> {
                   children: [
                     ListTile(
                       title: Text(_placeList[index]["description"]),
-                      leading: const Icon(Icons.location_on_outlined),
+                      leading: const Icon(
+                        Icons.location_on_outlined,
+                        color: Colors.red,
+                      ),
                       onTap: () {
                         _destinationController.text =
                             _placeList[index]["description"];
