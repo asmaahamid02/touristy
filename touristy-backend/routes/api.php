@@ -109,6 +109,8 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/search/users/{search}', [CommonController::class, 'searchUsers'])->where('search', '.*');
             //search trips
             Route::get('/search/trips/{search}', [CommonController::class, 'searchTrips'])->where('search', '.*');
+            //search posts
+            Route::get('/search/posts/{search}', [CommonController::class, 'searchPosts'])->where('search', '.*');
             //get file route
             Route::get('/file/{path}', [CommonController::class, 'getFile'])->where('path', '.*');
         });
