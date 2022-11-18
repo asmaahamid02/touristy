@@ -1,10 +1,44 @@
-import 'package:flag/flag.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../utilities/utilities.dart';
 import '../widgets.dart';
+import '../../screens/screens.dart';
+import '../../providers/providers.dart';
 
-class ProfileTripsList extends StatelessWidget {
+class ProfileTripsList extends StatefulWidget {
   const ProfileTripsList({super.key});
+
+  @override
+  State<ProfileTripsList> createState() => _ProfileTripsListState();
+}
+
+class _ProfileTripsListState extends State<ProfileTripsList> {
+  int? userId;
+  bool _isLoading = false;
+  bool _isInit = true;
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+
+    if (_isInit) {
+      ModalRoute.of(context)!.settings.arguments != null
+          ? userId = ModalRoute.of(context)!.settings.arguments as int
+          : userId = Provider.of<Auth>(context, listen: false).userId;
+
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        await Provider.of<Trips>(context, listen: false).fetchTrips(userId!);
+      } catch (error) {
+        ToastCommon.show(error.toString());
+      }
+      setState(() {
+        _isLoading = false;
+      });
+      _isInit = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,91 +54,36 @@ class ProfileTripsList extends StatelessWidget {
               icon: Icons.airplanemode_active,
               color: AppColors.secondary,
               textColor: Colors.white,
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    fullscreenDialog: true,
+                    builder: (_) => const NewTripScreen()));
+              },
             ),
           ),
         ),
         Expanded(
-          child: ListView.builder(
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Card(
-                      elevation: 0,
-                      margin: const EdgeInsets.all(0),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12.0, vertical: 10),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: const [
-                                      //flag
-                                      SizedBox(
-                                        width: 20,
-                                        height: 17,
-                                        child: ClipRRect(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(2)),
-                                          child: Flag.fromString(
-                                            'mm',
-                                            fit: BoxFit.fill,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 8.0,
-                                      ),
-                                      //country
-                                      Text(
-                                        'Myanmar',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Row(
-                                    children: const [
-                                      Icon(
-                                        Icons.calendar_month_outlined,
-                                        size: 16,
-                                      ),
-                                      SizedBox(
-                                        width: 8.0,
-                                      ),
-                                      //date
-                                      Text(
-                                        'Aug 16 - Aug 20 2020',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            const Icon(Icons.arrow_forward),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const Divider(
-                      height: 0,
-                    ),
-                  ],
-                );
-              },
-              itemCount: 20),
+          child: Consumer<Trips>(
+            builder: (context, tripsSnapshot, child) {
+              return _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : tripsSnapshot.trips.isEmpty
+                      ? const Center(
+                          child: Text('No trips yet'),
+                        )
+                      : ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: tripsSnapshot.trips.length,
+                          itemBuilder: (context, index) {
+                            return TripCard(
+                              trip: tripsSnapshot.trips[index],
+                            );
+                          },
+                        );
+            },
+          ),
         ),
       ],
     );
