@@ -26,6 +26,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
     }
   }
 
+  Future<void> _searchTrips(String query) async {
+    try {
+      await Provider.of<SearchProvider>(context, listen: false)
+          .searchTrips(query);
+    } catch (error) {
+      ToastCommon.show(error.toString());
+    }
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -57,6 +66,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                   icon: const Icon(Icons.search),
                   onPressed: () {
                     _searchUsers(_controller.text);
+                    _searchTrips(_controller.text);
                   },
                 ),
               ],
@@ -71,9 +81,21 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       child: _usersList(),
                     ),
                   ),
-                  const SliverPadding(
-                    padding: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
-                    sliver: SliverToBoxAdapter(child: TripsList()),
+                  SliverPadding(
+                    padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
+                    sliver: SliverToBoxAdapter(
+                      child: Consumer<SearchProvider>(
+                        builder: (context, searchProvider, child) {
+                          if (searchProvider.trips.isEmpty) {
+                            //add text for 2 seconds
+                            return const SizedBox.shrink();
+                          }
+                          return TripsList(
+                            trips: searchProvider.trips,
+                          );
+                        },
+                      ),
+                    ),
                   ),
                   SliverList(
                       delegate: SliverChildBuilderDelegate(
@@ -134,7 +156,6 @@ class _usersList extends StatelessWidget {
             ),
           );
         } else {
-          ToastCommon.show('No users found');
           return const SizedBox.shrink();
         }
       },
