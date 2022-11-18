@@ -42,12 +42,20 @@ class MyApp extends StatelessWidget {
           update: (_, auth, previousComments) =>
               previousComments!..update(auth),
         ),
+        ChangeNotifierProxyProvider<Auth, Trips>(
+          create: (_) => Trips(),
+          update: (_, auth, previousTrips) => previousTrips!..update(auth),
+        ),
+        ChangeNotifierProxyProvider<Auth, SearchProvider>(
+          create: (_) => SearchProvider(),
+          update: (_, auth, previousResults) => previousResults!..update(auth),
+        ),
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
           title: 'Touristy',
           theme: appTheme.light,
-          darkTheme: appTheme.dark,
+          darkTheme: appTheme.light,
           themeMode: ThemeMode.dark,
           home: auth.isAuth
               ? const Tabs()
@@ -74,6 +82,8 @@ class MyApp extends StatelessWidget {
             ChatScreen.routeName: (ctx) => const ChatScreen(),
             MapPage.routeName: (ctx) => const MapPage(),
             CommentsScreen.routeName: (ctx) => const CommentsScreen(),
+            ProfileScreen.routeName: (ctx) => const ProfileScreen(),
+            NewTripScreen.routeName: (ctx) => const NewTripScreen(),
           },
         ),
       ),
