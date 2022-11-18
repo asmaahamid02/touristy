@@ -154,4 +154,19 @@ class CommonController extends Controller
 
         return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Users not found');
     }
+
+    //search in trips
+    public function searchTrips($search)
+    {
+        //search in trips
+        $trips = $this->search('Trip', $search, ['title', 'description']);
+        $trips = $trips ? $trips->whereHas('user', function ($query) {
+            $this->applyUserFilters($query);
+        })->with('location')->orderBy('created_at', 'desc')->get() : null;
+
+        if ($trips != null)
+            return $this->jsonResponse($trips, 'data', Response::HTTP_OK, 'Trips found');
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Trips not found');
+    }
 }
