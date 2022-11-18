@@ -1,6 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import '../../utilities/utilities.dart';
 import '../../screens/screens.dart';
 import '../../widgets/widgets.dart';
 import '../../models/models.dart';
@@ -20,7 +21,7 @@ class _PostContainerState extends State<PostContainer> {
   bool _loading = true;
   Future<void> _loadImage() async {
     final token = Provider.of<Posts>(context, listen: false).authToken;
-    final url = widget.post.mediaUrls![0]['path'];
+    final url = widget.post.mediaUrls?[0]['path'];
     if (url != null) {
       //get image from url
       _image = Image.network(
@@ -58,7 +59,8 @@ class _PostContainerState extends State<PostContainer> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 5.0),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -86,17 +88,14 @@ class _PostContainerState extends State<PostContainer> {
               ? Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: _loading
-                      ? Center(
-                          child: Text(
-                          'Loading...',
-                          style:
-                              Theme.of(context).textTheme.bodyText2!.copyWith(
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                        ))
-                      : _image,
-                  // _getImage(widget.post.mediaUrls![0]['media_path'], token),
+                  child: CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    imageUrl: widget.post.mediaUrls?[0]['path'],
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
                 )
               : const SizedBox.shrink(),
           Padding(
@@ -120,108 +119,59 @@ class _PostHeader extends StatelessWidget {
   const _PostHeader({required this.post});
   final Post post;
 
-  Future<dynamic> _showDialog(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Are you sure?'),
-        content: const Text(
-            'Do you want to delete this post? This action cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: Theme.of(context).textButtonTheme.style!.copyWith(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                    Theme.of(context).errorColor,
-                  ),
-                  foregroundColor: MaterialStateProperty.all<Color>(
-                    Colors.white,
-                  ),
-                ),
-            child: const Text('No'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              try {
-                Provider.of<Posts>(context, listen: false).deletePost(post.id);
-              } catch (e) {
-                //show error message
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(e.toString()),
-                  ),
-                );
-              }
-            },
-            style: Theme.of(context).textButtonTheme.style!.copyWith(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                    Theme.of(context).primaryColor,
-                  ),
-                  foregroundColor: MaterialStateProperty.all<Color>(
-                    Colors.white,
-                  ),
-                ),
-            child: const Text('Yes'),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final currentUserId =
         Provider.of<Users>(context, listen: false).currentUserId;
-    final Avatar avatar = Avatar(
+    final StoryData avatar = StoryData(
+      id: post.user!.id,
       url: post.user!.profilePictureUrl,
       isOnline: true,
     );
-
     return Row(
       children: [
-        ProfileAvatar(
-          avatar: avatar,
-          radius: 20,
-          onTap: (context) => null,
-        ),
+        Avatar(radius: 20.0, imageUrl: post.user!.profilePictureUrl),
         const SizedBox(width: 8.0),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 8.0),
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
                   '${post.user!.firstName} ${post.user!.lastName}',
-                  style: Theme.of(context).textTheme.headline6,
+                  style: const TextStyle(
+                      fontSize: 16.0, fontWeight: FontWeight.w700),
                 ),
               ),
-              post.location != null
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: Row(children: [
-                        Icon(Icons.location_on,
-                            color: Colors.red[600], size: 12.0),
-                        const SizedBox(width: 5.0),
-                        Text(
-                          post.location as String,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ]),
-                    )
-                  : const SizedBox.shrink(),
               Row(
                 children: [
                   Text(
                     '${post.timeAgo} • ',
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: const TextStyle(
+                        color: AppColors.textFaded, fontSize: 12.0),
                   ),
                   Icon(Icons.public, size: 12.0, color: Colors.grey[600]),
                 ],
-              )
+              ),
+              post.address != null && post.address != ''
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4.0),
+                      child: Row(children: [
+                        Icon(Icons.location_on,
+                            color: Colors.red[600], size: 12.0),
+                        const SizedBox(width: 5.0),
+                        Expanded(
+                          child: Text(
+                            post.address as String,
+                            style: const TextStyle(
+                                color: AppColors.textFaded, fontSize: 12.0),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ]),
+                    )
+                  : const SizedBox.shrink(),
             ],
           ),
         ),
@@ -230,20 +180,21 @@ class _PostHeader extends StatelessWidget {
             post.user!.id != currentUserId
                 ? Consumer<Users>(
                     builder: (_, value, __) => TextButton(
-                        onPressed: () {
-                          value.followUser(post.user!.id);
-                        },
-                        child: Text(
-                          value.isFollowed(post.user!.id)
-                              ? 'Following'
-                              : 'Follow',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium!
-                              .copyWith(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.bold),
-                        )),
+                      onPressed: () {
+                        value
+                            .followUser(post.user!.id)
+                            .then((response) => ToastCommon.show(response));
+                      },
+                      child: Text(
+                        value.isFollowed(post.user!.id)
+                            ? 'Following'
+                            : 'Follow',
+                        style: const TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   )
                 : const SizedBox.shrink(),
             PopupMenuButton(
@@ -264,10 +215,7 @@ class _PostHeader extends StatelessWidget {
                         child: Text(PostOptions.delete.name),
                       ),
                     ],
-              icon: Icon(
-                Icons.more_horiz,
-                color: Theme.of(context).primaryColor,
-              ),
+              icon: const Icon(Icons.more_horiz, color: AppColors.secondary),
               onSelected: (PostOptions value) {
                 switch (value) {
                   case PostOptions.edit:
@@ -280,7 +228,21 @@ class _PostHeader extends StatelessWidget {
                     break;
                   case PostOptions.delete:
                     {
-                      _showDialog(context);
+                      AlertDialogCommon.show(
+                          context: context,
+                          title: 'Are you sure?',
+                          content:
+                              'Do you want to delete this post? This action cannot be undone.',
+                          actionText: 'Yes',
+                          action: () {
+                            try {
+                              Provider.of<Posts>(context, listen: false)
+                                  .deletePost(post.id);
+                            } catch (e) {
+                              //show error message
+                              SnakeBarCommon.show(context, e.toString());
+                            }
+                          });
                     }
                     break;
                   case PostOptions.block:
@@ -313,9 +275,11 @@ class _PostStats extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('${post.likes} Likes',
-                style: Theme.of(context).textTheme.bodySmall),
+                style: const TextStyle(
+                    color: AppColors.textFaded, fontSize: 12.0)),
             Text('${post.comments} Comments',
-                style: Theme.of(context).textTheme.bodySmall),
+                style: const TextStyle(
+                    color: AppColors.textFaded, fontSize: 12.0)),
           ],
         ),
         const Divider(),
@@ -329,8 +293,8 @@ class _PostStats extends StatelessWidget {
                       post.isLiked! ? Icons.favorite : Icons.favorite_border,
                       size: 20.0,
                       color: post.isLiked!
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey[600],
+                          ? AppColors.secondary
+                          : Theme.of(context).iconTheme.color,
                     ),
                     label: 'Like',
                     isActive: post.isLiked!,
@@ -338,15 +302,18 @@ class _PostStats extends StatelessWidget {
                       posts.toggleLikeStatus(post.id);
                     }),
                 _PostButton(
-                    icon: Icon(Icons.message_outlined,
-                        size: 20.0, color: Colors.grey[600]),
+                    icon: const Icon(Icons.message_outlined, size: 20.0),
                     label: 'Comment',
-                    onTap: () {}),
+                    onTap: () {
+                      Navigator.of(context).pushNamed(
+                        CommentsScreen.routeName,
+                        arguments: post.id,
+                      );
+                    }),
               ],
             )),
             _PostButton(
-                icon: Icon(Icons.near_me_outlined,
-                    size: 20.0, color: Colors.grey[600]),
+                icon: const Icon(Icons.near_me_outlined, size: 20.0),
                 label: 'Share',
                 onTap: () {}),
           ],
@@ -377,16 +344,18 @@ class _PostButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12.0),
           height: 50.0,
+          color: Theme.of(context).cardColor,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               icon,
               const SizedBox(width: 4.0),
               Text(label,
-                  style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  style: TextStyle(
                       color: isActive != null && isActive!
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey[600])),
+                          ? AppColors.secondary
+                          : null,
+                      fontSize: 12.0)),
             ],
           ),
         ),

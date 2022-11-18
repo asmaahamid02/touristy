@@ -15,6 +15,7 @@ class GenderRadioButton extends StatelessWidget {
   final Function(Gender?)? onChanged;
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
     return Expanded(
       child: RadioListTile(
         value: value,
@@ -22,11 +23,13 @@ class GenderRadioButton extends StatelessWidget {
         title: Text(value.name),
         contentPadding: const EdgeInsets.all(0.0),
         visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
-        tileColor: gender == value ? Colors.lightBlue[50] : Colors.grey[200],
+        tileColor:
+            brightness != Brightness.light ? Theme.of(context).cardColor : null,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50),
         ),
         onChanged: onChanged,
+        dense: true,
       ),
     );
   }

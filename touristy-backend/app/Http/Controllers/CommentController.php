@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CommentResource;
 use App\Models\Comment;
 use App\Traits\ResponseJson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
+
+use function PHPSTORM_META\map;
 
 class CommentController extends Controller
 {
@@ -36,7 +39,8 @@ class CommentController extends Controller
 
         $comment = Comment::create($commentData);
 
-        return $this->jsonResponse($comment, 'data', Response::HTTP_CREATED, 'Comment created');
+        $comment->user = $comment->user;
+        return $this->jsonResponse(new CommentResource($comment), 'data', Response::HTTP_OK, 'Comment created');
     }
 
     public function update(Request $request, $id)
@@ -84,12 +88,30 @@ class CommentController extends Controller
 
     public function getCommentsByPost($post_id)
     {
-        $comments = Comment::where('post_id', $post_id)->with('user')->with('replies')->get();
+        $comments = Comment::where('post_id', $post_id)->with('user')->with('replies')->withCount('likes')->orderBy('created_at', 'DESC')->get();
 
         if ($comments->count() == 0) {
             return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Comments not found');
         }
 
-        return $this->jsonResponse($comments, 'data', Response::HTTP_OK, 'Comments');
+        foreach ($comments as $comment) {
+            $comment->isLiked = $comment->likes->contains('user_id', Auth::id());
+        }
+
+        return $this->jsonResponse(CommentResource::collection($comments), 'data', Response::HTTP_OK, 'Comments');
+    }
+
+    //like comment or unlike comment
+    public function like($id)
+    {
+        $comment = Comment::find($id);
+
+        if (!$comment) {
+            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Comment not found');
+        }
+
+        $comment->likes()->toggle(Auth::id());
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Success');
     }
 }

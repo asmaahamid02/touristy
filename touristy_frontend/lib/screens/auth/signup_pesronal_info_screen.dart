@@ -51,13 +51,12 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
     }
     _form.currentState!.save();
     _user['nationality'] = countrySelected!.name as String;
+    _user['country_code'] = countrySelected!.code as String;
     _user['gender'] = _gender!.name;
     _user['date_of_birth'] = dateInputController.text;
 
     Navigator.of(context)
         .pushNamed(SignupProfileScreen.routeName, arguments: _user);
-
-    print(_user);
   }
 
   CountryCode _selectedCountry(CountryCode country) {
@@ -84,72 +83,89 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
     _user = ModalRoute.of(context)!.settings.arguments as Map<String, Object>;
     final appBar = AppBar();
 
+    final brightness = Theme.of(context).brightness;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor:
+          brightness == Brightness.light ? Theme.of(context).cardColor : null,
       appBar: appBar,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const LogoHorizontal('assets/images/logo_horizontal.png', 100),
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.only(top: 10, bottom: 10),
-              child: Text('Personal Information',
-                  style: Theme.of(context).textTheme.headline5),
-            ),
-            Container(
-              padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
-              child: Form(
-                key: _form,
-                child: Column(
-                  children: [
-                    _buildTextFieldLabel('Nationality'),
-                    const SizedBox(height: 10),
-                    CountryList(
-                        _selectedCountry, countrySelected!.code as String),
-                    const SizedBox(height: 30),
-                    Column(
-                      children: [
-                        _buildTextFieldLabel('Gender'),
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            GenderRadioButton(
-                                value: Gender.male,
-                                gender: _gender as Gender,
-                                onChanged: (value) => _onChangeGender(value)),
-                            const SizedBox(width: 8.0),
-                            GenderRadioButton(
-                                value: Gender.female,
-                                gender: _gender as Gender,
-                                onChanged: (value) => _onChangeGender(value)),
-                            const SizedBox(width: 8.0),
-                            GenderRadioButton(
-                                value: Gender.other,
-                                gender: _gender as Gender,
-                                onChanged: (value) => _onChangeGender(value)),
-                          ],
-                        ),
-                        const SizedBox(height: 30),
-                        _buildTextFieldLabel('Date of Birth'),
-                        const SizedBox(height: 10),
-                        _buildDateTextField(
-                          'Date of Birth',
-                          dateInputController,
-                          _onSavedDateOfBirth,
-                        ),
-                      ],
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  LogoHorizontal(
+                      brightness == Brightness.light
+                          ? 'assets/images/logo_horizontal.png'
+                          : 'assets/images/login_dark.png',
+                      100),
+                  const SizedBox(height: 10),
+                  Container(
+                    padding: const EdgeInsets.only(top: 10, bottom: 10),
+                    child: Text('Personal Information',
+                        style: Theme.of(context).textTheme.headline5),
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.only(top: 50, left: 20, right: 20),
+                    child: Form(
+                      key: _form,
+                      child: Column(
+                        children: [
+                          _buildTextFieldLabel('Nationality'),
+                          const SizedBox(height: 10),
+                          CountryList(_selectedCountry,
+                              countrySelected!.code as String),
+                          const SizedBox(height: 30),
+                          Column(
+                            children: [
+                              _buildTextFieldLabel('Gender'),
+                              const SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  GenderRadioButton(
+                                      value: Gender.male,
+                                      gender: _gender as Gender,
+                                      onChanged: (value) =>
+                                          _onChangeGender(value)),
+                                  const SizedBox(width: 8.0),
+                                  GenderRadioButton(
+                                      value: Gender.female,
+                                      gender: _gender as Gender,
+                                      onChanged: (value) =>
+                                          _onChangeGender(value)),
+                                  const SizedBox(width: 8.0),
+                                  GenderRadioButton(
+                                      value: Gender.other,
+                                      gender: _gender as Gender,
+                                      onChanged: (value) =>
+                                          _onChangeGender(value)),
+                                ],
+                              ),
+                              const SizedBox(height: 30),
+                              _buildTextFieldLabel('Date of Birth'),
+                              const SizedBox(height: 10),
+                              _buildDateTextField(
+                                'Date of Birth',
+                                dateInputController,
+                                _onSavedDateOfBirth,
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            PrimaryButton(
-              onTap: _saveForm,
-              textLabel: 'NEXT',
-            ),
-          ],
-        ),
+          ),
+          PrimaryButton(
+            onTap: _saveForm,
+            textLabel: 'NEXT',
+          )
+        ],
       ),
     );
   }
@@ -192,29 +208,3 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
     );
   }
 }
-
-// TextFormField(
-//                           decoration: InputDecoration(
-//                             border: const UnderlineInputBorder(),
-//                             labelText: 'Date of Birth',
-//                             prefixIcon: const Icon(Icons.cake_outlined),
-//                             suffixIcon: IconButton(
-//                               icon: Icon(
-//                                 Icons.calendar_month_outlined,
-//                                 color: Theme.of(context).primaryColor,
-//                               ),
-//                               onPressed: _presentDatePicker,
-//                             ),
-//                           ),
-//                           validator: (value) {
-//                             if (value!.isEmpty) {
-//                               return 'Please select your date of birth';
-//                             }
-//                             return null;
-//                           },
-//                           onTap: _presentDatePicker,
-//                           readOnly: true,
-//                           controller: dateInputController,
-//                           onSaved: ((newValue) =>
-//                               _user['date_of birth'] = newValue as String),
-//                         )

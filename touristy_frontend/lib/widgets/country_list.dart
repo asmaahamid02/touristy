@@ -13,12 +13,14 @@ class CountryList extends StatelessWidget {
       width: double.infinity,
       decoration: const BoxDecoration(
         border: Border(
-            bottom: BorderSide(color: Color.fromRGBO(124, 124, 124, 0.3))),
+          bottom: BorderSide(
+            color: Color.fromRGBO(124, 124, 124, 0.3),
+          ),
+        ),
       ),
       child: CountryListPick(
         appBar: AppBar(
           title: const Text('Choose your Nationality'),
-          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         ),
         pickerBuilder: (context, countryCode) {
           return Row(
@@ -51,6 +53,7 @@ class CountryList extends StatelessWidget {
         },
         initialSelection: initialSelection,
         onChanged: (CountryCode? code) => onChanged(code!),
+        useSafeArea: true,
       ),
     );
   }

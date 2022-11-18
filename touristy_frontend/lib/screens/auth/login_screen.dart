@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../widgets/widgets.dart';
 import '../../providers/providers.dart';
 import '../../exceptions/http_exception.dart';
+import '../../utilities/utilities.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,8 +16,6 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final String _token = 'token';
-
   final _emailFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
 
@@ -27,30 +26,14 @@ class _LoginScreenState extends State<LoginScreen> {
   var _isLoading = false;
 
   void _showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text('An error occurred!',
-            style: Theme.of(context).textTheme.headline5),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-            },
-            style: Theme.of(context).textButtonTheme.style?.copyWith(
-                  backgroundColor: MaterialStateProperty.all(
-                    Theme.of(context).errorColor,
-                  ),
-                  foregroundColor: MaterialStateProperty.all(
-                    Colors.white,
-                  ),
-                ),
-            child: const Text('Okay'),
-          ),
-        ],
-      ),
-    );
+    AlertDialogCommon.show(
+        context: context,
+        title: 'An error occurred!',
+        content: message,
+        actionText: 'Ok',
+        action: () {
+          Navigator.of(context).pop();
+        });
   }
 
   Future<void> _saveForm() async {
@@ -78,11 +61,11 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (error) {
       const errorMessage = 'Authentication failed';
       _showErrorDialog(errorMessage);
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
     }
+    if (!mounted) return;
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -94,37 +77,58 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
     final appBar = AppBar();
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: appBar,
-      body: SingleChildScrollView(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const LogoHorizontal('assets/images/logo_horizontal.png', 100),
-              Padding(
-                padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
-                child: Form(
-                  key: _form,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildEmailTextField(),
-                      const SizedBox(height: 10),
-                      _buildPasswordTextField(),
-                    ],
-                  ),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: Scaffold(
+        backgroundColor:
+            brightness == Brightness.light ? Theme.of(context).cardColor : null,
+        appBar: appBar,
+        body: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    LogoHorizontal(
+                        brightness == Brightness.light
+                            ? 'assets/images/logo_horizontal.png'
+                            : 'assets/images/login_dark.png',
+                        100),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 50, left: 20, right: 20),
+                      child: Form(
+                        key: _form,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildEmailTextField(),
+                            const SizedBox(height: 10),
+                            _buildPasswordTextField(),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                  ],
                 ),
               ),
-              const SizedBox(height: 10),
-              _isLoading
+            ),
+            Container(
+              child: _isLoading
                   ? const CircularProgressIndicator()
                   : PrimaryButton(
                       textLabel: 'Login',
                       onTap: _saveForm,
                     ),
-            ]),
+            )
+          ],
+        ),
       ),
     );
   }

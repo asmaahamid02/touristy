@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import './theme.dart';
-
+import './utilities/utilities.dart';
 import './screens/screens.dart';
-
 import './providers/providers.dart';
 
 void main() async {
@@ -38,14 +36,27 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProxyProvider<Auth, Posts>(
           create: (_) => Posts(),
           update: (_, auth, previousPosts) => previousPosts!..update(auth),
-        )
+        ),
+        ChangeNotifierProxyProvider<Auth, Comments>(
+          create: (_) => Comments(),
+          update: (_, auth, previousComments) =>
+              previousComments!..update(auth),
+        ),
+        ChangeNotifierProxyProvider<Auth, Trips>(
+          create: (_) => Trips(),
+          update: (_, auth, previousTrips) => previousTrips!..update(auth),
+        ),
+        ChangeNotifierProxyProvider<Auth, SearchProvider>(
+          create: (_) => SearchProvider(),
+          update: (_, auth, previousResults) => previousResults!..update(auth),
+        ),
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
           title: 'Touristy',
           theme: appTheme.light,
-          darkTheme: appTheme.dark,
-          themeMode: ThemeMode.light,
+          darkTheme: appTheme.light,
+          themeMode: ThemeMode.dark,
           home: auth.isAuth
               ? const Tabs()
               : FutureBuilder(
@@ -67,6 +78,12 @@ class MyApp extends StatelessWidget {
             HomeScreen.routeName: (ctx) => const HomeScreen(),
             Tabs.routeName: (ctx) => const Tabs(),
             NewPostScreen.routeName: (ctx) => const NewPostScreen(),
+            MessagingScreen.routeName: (ctx) => const MessagingScreen(),
+            ChatScreen.routeName: (ctx) => const ChatScreen(),
+            MapPage.routeName: (ctx) => const MapPage(),
+            CommentsScreen.routeName: (ctx) => const CommentsScreen(),
+            ProfileScreen.routeName: (ctx) => const ProfileScreen(),
+            NewTripScreen.routeName: (ctx) => const NewTripScreen(),
           },
         ),
       ),

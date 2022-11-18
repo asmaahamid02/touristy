@@ -7,9 +7,10 @@ import '../utilities/constants.dart';
 import '../models/models.dart';
 
 class PostsService {
-  Future<List<Post>> getPosts(String token) async {
+  Future<List<Post>> getPosts(String token, int currentPage) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/posts'),
+      final response = await http.get(
+          Uri.parse('$baseUrl/posts?page=$currentPage'),
           headers: getHeaders(token));
       final responseData = json.decode(response.body) as Map<String, dynamic>;
 
@@ -44,7 +45,8 @@ class PostsService {
   }
 
   //add post
-  Future<Post> addPost(String token, String? content, List<File>? media) async {
+  Future<Post> addPost(String token, String? content, List<File>? media,
+      PlaceLocation coordinates) async {
     try {
       http.MultipartRequest request =
           http.MultipartRequest('POST', Uri.parse('$baseUrl/posts'));
@@ -57,6 +59,17 @@ class PostsService {
 
       request.fields['publicity'] = 'public';
 
+      if (coordinates.latitude != null &&
+          coordinates.longitude != null &&
+          coordinates.address != null &&
+          coordinates.latitude != 0.0 &&
+          coordinates.longitude != 0.0 &&
+          coordinates.address != '') {
+        request.fields['latitude'] = coordinates.latitude.toString();
+        request.fields['longitude'] = coordinates.longitude.toString();
+        request.fields['address'] = coordinates.address.toString();
+      }
+
       if (media != null && media.isNotEmpty) {
         for (var i = 0; i < media.length; i++) {
           request.files.add(http.MultipartFile('media[]',
@@ -66,6 +79,7 @@ class PostsService {
       }
 
       final response = await request.send();
+
       final responseData = await response.stream.bytesToString();
 
       final decodedResponse = json.decode(responseData) as Map<String, dynamic>;
@@ -128,6 +142,32 @@ class PostsService {
       }
 
       return Post.fromJson(decodedResponse['data']);
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  //get posts of following users
+  Future<List<Post>> getFollowingPosts(String token, int currentPage) async {
+    try {
+      final response = await http.get(
+          Uri.parse('$baseUrl/posts/following?page=$currentPage'),
+          headers: getHeaders(token));
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      //check if response is has error, throw exception
+      if (response.statusCode != 200) {
+        throw HttpException(getResponseError(responseData));
+      } else {
+        if (responseData['data'] != null &&
+            responseData['data'] != '' &&
+            responseData['data'].length > 0) {
+          final List<dynamic> postsList = responseData['data'];
+          return postsList.map((post) => Post.fromJson(post)).toList();
+        } else {
+          return [];
+        }
+      }
     } catch (error) {
       rethrow;
     }

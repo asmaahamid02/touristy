@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Location;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -24,6 +25,9 @@ class UserResource extends JsonResource
             'profile_picture' => $this->profile_picture != null ? asset('storage/uploads/' . $this->profile_picture) : null,
             'cover_picture' => $this->cover_picture != null ? asset('storage/uploads/' . $this->cover_picture) : null,
             'bio' => $this->bio,
+            'followers' => $this->followers_count,
+            'followings' => $this->followings_count,
+            'location' => new LocationResource($this->whenLoaded('location')),
         ];
     }
 }

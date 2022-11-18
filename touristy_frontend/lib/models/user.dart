@@ -10,8 +10,6 @@ class User {
   String? profilePictureUrl;
   String? coverPictureUrl;
   String? bio;
-
-  String? token;
   bool? isFollowedByUser;
 
   User({
@@ -26,7 +24,6 @@ class User {
     this.profilePictureUrl,
     this.coverPictureUrl,
     this.bio,
-    this.token,
     this.isFollowedByUser,
   });
 

@@ -12,8 +12,7 @@ class Location extends Model
     protected $fillable = [
         'latitude',
         'longitude',
-        'city',
-        'country',
+        'address'
     ];
 
     public function posts()

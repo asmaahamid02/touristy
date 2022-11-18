@@ -38,7 +38,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::get('/followings/{id?}', [UserController::class, 'getFollowings'])->where('id', '[0-9]+');
             Route::get('/blocked/{id?}', [UserController::class, 'getBlockedUsers'])->where('id', '[0-9]+');
             Route::get('/unfollowed', [UserController::class, 'getUnfollowedUsers']);
-            Route::get('/random/{count?}', [UserController::class, 'getRandomUsers'])->where('count', '[0-9]+');
+            Route::get('/suggested/{limit?}', [UserController::class, 'getSuggestedUsers'])->where('count', '[0-9]+');
         });
 
         //posts
@@ -49,6 +49,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::put('/{id}', [PostController::class, 'update'])->where('id', '[0-9]+');
             Route::delete('/{id}', [PostController::class, 'delete'])->where('id', '[0-9]+');
             Route::get('/like/{id}', [PostController::class, 'like'])->where('id', '[0-9]+');
+            Route::get('/following', [PostController::class, 'getFollowingPosts']);
         });
 
         //trips
@@ -69,6 +70,7 @@ Route::group(['prefix' => 'v0.1'], function () {
             Route::put('/{id}', [CommentController::class, 'update']);
             Route::delete('/{id}', [CommentController::class, 'delete']);
             Route::get('/post/{id}', [CommentController::class, 'getCommentsByPost']);
+            Route::get('/like/{id}', [CommentController::class, 'like'])->where('id', '[0-9]+');
         });
 
         //events
@@ -102,7 +104,13 @@ Route::group(['prefix' => 'v0.1'], function () {
         //common
         Route::group(['prefix' => 'common'], function () {
             //search
-            Route::get('/search/{search}', [CommonController::class, 'searchAll'])->where('search', '.*');
+            Route::get('/search/all/{search}', [CommonController::class, 'searchAll'])->where('search', '.*');
+            //search users
+            Route::get('/search/users/{search}', [CommonController::class, 'searchUsers'])->where('search', '.*');
+            //search trips
+            Route::get('/search/trips/{search}', [CommonController::class, 'searchTrips'])->where('search', '.*');
+            //search posts
+            Route::get('/search/posts/{search}', [CommonController::class, 'searchPosts'])->where('search', '.*');
             //get file route
             Route::get('/file/{path}', [CommonController::class, 'getFile'])->where('path', '.*');
         });
