@@ -5,7 +5,7 @@ import './providers.dart';
 
 class SearchProvider with ChangeNotifier {
   List<User> _users = [];
-  final List<Post> _posts = [];
+  List<Post> _posts = [];
   List<Trip> _trips = [];
 
   //get users
@@ -31,6 +31,11 @@ class SearchProvider with ChangeNotifier {
 
   //search users
   Future<void> searchUsers(String query) async {
+    if (query.isEmpty) {
+      _users.clear();
+      notifyListeners();
+      return;
+    }
     try {
       final List<User> users =
           await SearchService.searchUsers(authToken!, query);
@@ -43,10 +48,32 @@ class SearchProvider with ChangeNotifier {
 
   //search trips
   Future<void> searchTrips(String query) async {
+    if (query.isEmpty) {
+      _trips.clear();
+      notifyListeners();
+      return;
+    }
     try {
       final List<Trip> trips =
           await SearchService.searchTrips(authToken!, query);
       _trips = trips;
+      notifyListeners();
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  //search posts
+  Future<void> searchPosts(String query) async {
+    if (query.isEmpty) {
+      _posts.clear();
+      notifyListeners();
+      return;
+    }
+    try {
+      final List<Post> posts =
+          await SearchService.searchPosts(authToken!, query);
+      _posts = posts;
       notifyListeners();
     } catch (error) {
       rethrow;
