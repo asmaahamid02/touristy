@@ -4,7 +4,7 @@ class Trip {
   final String? title;
   final String? description;
   final String destination;
-  final DateTime arrivalDate;
+  final DateTime? arrivalDate;
   final DateTime? departureDate;
   double? latitude;
   double? longitude;
@@ -29,7 +29,9 @@ class Trip {
       description: json['description'],
       destination:
           json['location'] != null ? json['location']['address'] : null,
-      arrivalDate: DateTime.parse(json['arrival_date']),
+      arrivalDate: json['arrival_date'] != null
+          ? DateTime.parse(json['arrival_date'])
+          : null,
       departureDate: json['departure_date'] != null
           ? DateTime.parse(json['departure_date'])
           : null,
