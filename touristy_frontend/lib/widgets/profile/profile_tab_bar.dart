@@ -29,7 +29,7 @@ class ProfileTabBar extends StatelessWidget {
               height: MediaQuery.of(context).size.height,
               child: const TabBarView(children: [
                 PostsGrid(),
-                TripsList(),
+                ProfileTripsList(),
               ]),
             ),
           ],
