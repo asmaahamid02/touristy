@@ -28,6 +28,11 @@ class Users with ChangeNotifier {
     return _users.firstWhere((user) => user.id == currentUserId);
   }
 
+//find user by id
+  User findUserById(int id) {
+    return _users.firstWhere((user) => user.id == id);
+  }
+
   //get users
   Future<void> fetchAndSetUsers() async {
     try {
