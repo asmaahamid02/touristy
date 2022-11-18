@@ -177,7 +177,7 @@ class CommonController extends Controller
         $posts = $this->search('Post', $search, ['content']);
         $posts = $posts ? $posts->where('is_deleted', 0)->whereHas('user', function ($query) {
             $this->applyUserFilters($query);
-        })->with('location')->orderBy('created_at', 'desc')->get() : null;
+        })->with('location')->with('media')->withCount('comments')->withCount('likes')->orderBy('created_at', 'desc')->get() : null;
 
         if ($posts != null) {
             $posts->map(function ($post) {
