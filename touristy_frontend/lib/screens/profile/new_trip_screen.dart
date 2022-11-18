@@ -138,6 +138,9 @@ class _NewTripScreenState extends State<NewTripScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+          backgroundColor: Theme.of(context).brightness == Brightness.light
+              ? Theme.of(context).cardColor
+              : null,
           appBar: AppBar(
             title: const Text('New Trip'),
           ),
