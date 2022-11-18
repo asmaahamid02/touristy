@@ -28,9 +28,11 @@ class _SearchPlaceBoxState extends State<SearchPlaceBox> {
 
   void _onChangedDestination() {
     if (_sessionToken == null) {
-      setState(() {
-        _sessionToken = uuid.v4();
-      });
+      if (mounted) {
+        setState(() {
+          _sessionToken = uuid.v4();
+        });
+      }
     }
     getLocationResults(_destinationController.text);
   }
@@ -40,9 +42,11 @@ class _SearchPlaceBoxState extends State<SearchPlaceBox> {
       final response =
           await LocationHandler.getLocationResults(input, _sessionToken!);
 
-      setState(() {
-        _placeList = response;
-      });
+      if (mounted) {
+        setState(() {
+          _placeList = response;
+        });
+      }
     } catch (error) {
       ToastCommon.show('Error: ${error.toString()}');
     }
