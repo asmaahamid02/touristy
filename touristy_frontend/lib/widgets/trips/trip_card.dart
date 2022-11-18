@@ -45,7 +45,9 @@ class TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String date = DateFormat.yMMMd().format(trip.arrivalDate);
+    String date = trip.arrivalDate != null
+        ? DateFormat.yMMMd().format(trip.arrivalDate!)
+        : '';
     if (trip.departureDate != null) {
       date += ' - ${DateFormat.yMMMd().format(trip.departureDate!)}';
     }
