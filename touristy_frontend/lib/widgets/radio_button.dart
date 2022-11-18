@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:touristy_frontend/utilities/theme.dart';
 
 enum Gender { female, male, other }
 
@@ -24,9 +23,8 @@ class GenderRadioButton extends StatelessWidget {
         title: Text(value.name),
         contentPadding: const EdgeInsets.all(0.0),
         visualDensity: const VisualDensity(horizontal: 0, vertical: -4),
-        tileColor: brightness != Brightness.light
-            ? Theme.of(context).cardColor
-            : AppColors.textFaded,
+        tileColor:
+            brightness != Brightness.light ? Theme.of(context).cardColor : null,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(50),
         ),
