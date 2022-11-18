@@ -5,9 +5,11 @@ class SearchBar extends StatelessWidget {
   const SearchBar({
     Key? key,
     required this.searchController,
+    this.onChanged,
   }) : super(key: key);
 
   final TextEditingController searchController;
+  final Function(String)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,9 @@ class SearchBar extends StatelessWidget {
       padding: const EdgeInsets.all(10.0),
       child: SizedBox(
         width: double.infinity,
-        child: TextField(
+        child: TextFormField(
+          // onFieldSubmitted: _onFieldSubmitted,
+          onChanged: onChanged,
           controller: searchController,
           decoration: InputDecoration(
             hintText: 'Search',
