@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../widgets/widgets.dart';
-import '../models/models.dart';
+import '../widgets.dart';
+import '../../models/models.dart';
 
 class TripsList extends StatelessWidget {
   const TripsList({

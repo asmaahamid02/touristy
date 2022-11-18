@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../widgets/widgets.dart';
-import '../models/models.dart';
-import '../providers/providers.dart';
+import '../widgets.dart';
+import '../../models/models.dart';
+import '../../providers/providers.dart';
 
 class TripItem extends StatelessWidget {
   final Trip trip;
