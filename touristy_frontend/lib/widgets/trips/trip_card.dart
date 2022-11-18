@@ -27,23 +27,11 @@ class TripCard extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          //flag
-                          // const SizedBox(
-                          //   width: 20,
-                          //   height: 17,
-                          //   child: ClipRRect(
-                          //     borderRadius:
-                          //         BorderRadius.all(Radius.circular(2)),
-                          //     child: Flag.fromString(
-                          //       'Indonesia',
-                          //       fit: BoxFit.fill,
-                          //     ),
-                          //   ),
-                          // ),
-                          // const SizedBox(
-                          //   width: 8.0,
-                          // ),
-                          //country
+                          const Icon(
+                            Icons.location_on,
+                            size: 16,
+                            color: Colors.red,
+                          ),
                           Text(
                             trip.destination,
                             style: const TextStyle(
