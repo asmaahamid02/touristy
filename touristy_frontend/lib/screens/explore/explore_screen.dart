@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:touristy_frontend/utilities/toast.dart';
 
 import '../../widgets/widgets.dart';
 import '../../providers/providers.dart';
 import '../../models/models.dart';
-import '../../utilities/utilities.dart';
 
 class ExploreScreen extends StatefulWidget {
   const ExploreScreen({super.key});
@@ -22,7 +20,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       await Provider.of<SearchProvider>(context, listen: false)
           .searchUsers(query);
     } catch (error) {
-      ToastCommon.show(error.toString());
+      debugPrint('Users: $error');
     }
   }
 
@@ -31,8 +29,26 @@ class _ExploreScreenState extends State<ExploreScreen> {
       await Provider.of<SearchProvider>(context, listen: false)
           .searchTrips(query);
     } catch (error) {
-      ToastCommon.show(error.toString());
+      debugPrint('Trips: $error');
     }
+  }
+
+  Future<void> _searchPosts(String query) async {
+    try {
+      await Provider.of<SearchProvider>(context, listen: false)
+          .searchPosts(query);
+    } catch (error) {
+      debugPrint('Posts: $error');
+    }
+  }
+
+  void _onChanged(value) {
+    //delay search
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      _searchUsers(value);
+      _searchTrips(value);
+      _searchPosts(value);
+    });
   }
 
   @override
@@ -53,23 +69,11 @@ class _ExploreScreenState extends State<ExploreScreen> {
         ),
         body: Column(
           children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Card(
-                    elevation: 0,
-                    margin: const EdgeInsets.all(0),
-                    child: SearchBar(searchController: _controller),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.search),
-                  onPressed: () {
-                    _searchUsers(_controller.text);
-                    _searchTrips(_controller.text);
-                  },
-                ),
-              ],
+            Card(
+              elevation: 0,
+              margin: const EdgeInsets.all(0),
+              child: SearchBar(
+                  searchController: _controller, onChanged: _onChanged),
             ),
             const SizedBox(height: 10.0),
             Expanded(
@@ -87,7 +91,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       child: Consumer<SearchProvider>(
                         builder: (context, searchProvider, child) {
                           if (searchProvider.trips.isEmpty) {
-                            //add text for 2 seconds
                             return const SizedBox.shrink();
                           }
                           return TripsList(
@@ -97,23 +100,23 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       ),
                     ),
                   ),
-                  SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                    (context, index) => PostContainer(
-                        post: Post(
-                            id: 1,
-                            comments: 1,
-                            likes: 2,
-                            isLiked: true,
-                            content: 'hello',
-                            timeAgo: '1 hour ago',
-                            user: User(
-                              id: 1,
-                              firstName: 'Asmaa',
-                              lastName: 'Asmaa',
-                              isFollowedByUser: false,
-                            ))),
-                  ))
+                  Consumer<SearchProvider>(
+                    builder: (context, searchProvider, child) {
+                      if (searchProvider.posts.isEmpty) {
+                        return const SliverToBoxAdapter(
+                            child: SizedBox.shrink());
+                      }
+                      return SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return PostContainer(
+                            post: searchProvider.posts[index],
+                          );
+                        },
+                        childCount: searchProvider.posts.length,
+                      ));
+                    },
+                  )
                 ],
               ),
             ),
