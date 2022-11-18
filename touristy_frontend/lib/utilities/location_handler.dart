@@ -97,4 +97,19 @@ class LocationHandler {
       throw Exception('Failed to load predictions');
     }
   }
+
+  //get place details from place id
+  static Future<dynamic> getPlaceDetails(String placeId) async {
+    String kPLACESAPIKEY = LocationHandler.GOOGLE_API_KEY;
+    String baseURL = 'https://maps.googleapis.com/maps/api/place/details/json';
+    String request =
+        '$baseURL?place_id=$placeId&fields=geometry,formatted_address&key=$kPLACESAPIKEY';
+    var response = await http.get(Uri.parse(request));
+    if (response.statusCode == 200) {
+      final res = json.decode(response.body)['result'];
+      return res;
+    } else {
+      throw Exception('Failed to load predictions');
+    }
+  }
 }
