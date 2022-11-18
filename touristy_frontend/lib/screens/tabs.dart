@@ -27,20 +27,21 @@ class _TabsState extends State<Tabs> {
     _pages = [
       {'page': const HomeScreen(), 'title': 'Home', 'icon': Icons.home},
       {'page': const ExploreScreen(), 'title': 'Explore', 'icon': Icons.search},
-      {
-        'page': const ProfileScreen(),
-        'title': 'Profile',
-        'icon': Icons.account_circle
-      },
-      {
-        'page': const NotificationScreen(),
-        'title': 'Notifications',
-        'icon': Icons.notifications_active
-      },
+
+      // {
+      //   'page': const NotificationScreen(),
+      //   'title': 'Notifications',
+      //   'icon': Icons.notifications_active
+      // },
       {
         'page': const MessagingScreen(),
         'title': 'Messages',
         'icon': Icons.message_rounded
+      },
+      {
+        'page': const ProfileScreen(),
+        'title': 'Profile',
+        'icon': Icons.account_circle
       },
     ];
   }
