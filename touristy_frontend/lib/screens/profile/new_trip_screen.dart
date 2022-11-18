@@ -51,17 +51,6 @@ class _NewTripScreenState extends State<NewTripScreen> {
     lastDepDate = DateTime.now().add(const Duration(days: 366));
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _titleFocusNode.dispose();
-    _descriptionFocusNode.dispose();
-    _openDestinationFocusNode.dispose();
-    _arrivalDateController.dispose();
-    _departureDateController.dispose();
-    _openDestinationController.dispose();
-  }
-
   void changeDate(String value, TextEditingController controller) {
     setState(() {
       controller.text = value;
@@ -108,10 +97,13 @@ class _NewTripScreenState extends State<NewTripScreen> {
         Trip(
           title: _titleController.text,
           description: _descriptionController.text,
-          arrivalDate: DateTime.parse(_arrivalDateController.text),
-          departureDate: _departureDateController.text.isEmpty
+          arrivalDate:
+              _isPastTrip ? null : DateTime.parse(_arrivalDateController.text),
+          departureDate: _isPastTrip
               ? null
-              : DateTime.parse(_departureDateController.text),
+              : _departureDateController.text.isEmpty
+                  ? null
+                  : DateTime.parse(_departureDateController.text),
           destination: _openDestinationController.text,
           longitude: _longitude,
           latitude: _latitude,
@@ -126,6 +118,17 @@ class _NewTripScreenState extends State<NewTripScreen> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _titleFocusNode.dispose();
+    _descriptionFocusNode.dispose();
+    _openDestinationFocusNode.dispose();
+    _arrivalDateController.dispose();
+    _departureDateController.dispose();
+    _openDestinationController.dispose();
   }
 
   @override
