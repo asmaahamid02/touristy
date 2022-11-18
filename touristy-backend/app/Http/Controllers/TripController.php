@@ -29,36 +29,31 @@ class TripController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string',
             'description' => 'required|string',
-            'arrival_date' => 'required_without:is_past|date|after_or_equal:' . date('Y-m-d'),
-            'departure_date' => 'required_without:is_past|date|after:arrival_date',
-            'is_past' => 'required_without_all:arrival_date,departure_date|date|before:' . date('Y-m-d'),
+            'arrival_date' => 'nullable|date|after_or_equal:' . date('Y-m-d'),
+            'departure_date' => 'nullable|date|after:arrival_date',
+            // 'is_past' => 'required_without_all:arrival_date,departure_date|date|before:' . date('Y-m-d'),
             'longitude' => 'required|numeric',
             'latitude' => 'required|numeric',
-            'city' => 'required|string',
-            'country' => 'required|string',
+            'address' => 'required|string',
         ]);
 
         if ($validator->fails()) {
             return $this->jsonResponse($validator->errors(), 'data', Response::HTTP_BAD_REQUEST, 'Validation error');
         }
 
-        $location_id = $this->saveLocation($request->latitude, $request->longitude, $request->city, $request->country);
-
-        $tripData = array();
-
-        $tripData['user_id '] = Auth::id();
-        $tripData['location_id'] = $location_id;
-        $tripData['title'] = $request->title;
-        $tripData['description'] = $request->description;
-
-        if ($request->has('is_past')) {
-            $tripData['is_past'] = $request->is_past;
-        } else {
-            $tripData['arrival_date'] = $request->arrival_date;
+        $tripData['location_id'] = $this->saveLocation($request->latitude, $request->longitude, $request->address);
+        if ($request->has('departure_date')) {
             $tripData['departure_date'] = $request->departure_date;
         }
 
-        $trip = Trip::create($tripData);
+        $trip = Trip::create([
+            'user_id' =>  Auth::user()->id,
+            'location_id' => $tripData['location_id'],
+            'title' => $request->title,
+            'description' => $request->description,
+            'arrival_date' => $request->arrival_date,
+            'departure_date' => $tripData['departure_date'] ?? null,
+        ]);
 
         return $this->jsonResponse($trip->load(['location']), 'data', Response::HTTP_CREATED, 'Trip created');
     }
@@ -109,7 +104,7 @@ class TripController extends Controller
         return $this->jsonResponse($trip->load(['location']), 'data', Response::HTTP_OK, 'Trip updated');
     }
 
-    public function destroy($id)
+    public function delete($id)
     {
         $trip = Trip::where('id', $id)->first();
 
