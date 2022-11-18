@@ -29,4 +29,35 @@ class Trips with ChangeNotifier {
       rethrow;
     }
   }
+
+  //add trip
+  Future<void> addTrip(Trip trip) async {
+    try {
+      final Trip newTrip = await TripService.addTrip(authToken!, trip);
+      _trips.add(newTrip);
+      notifyListeners();
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  //delete trip
+  Future<void> deleteTrip(int tripId) async {
+    final deletedTripIndex = _trips.indexWhere((trip) => trip.id == tripId);
+
+    if (deletedTripIndex < 0) throw Exception('Trip not found');
+
+    var deletedTrip = _trips[deletedTripIndex];
+    _trips.removeAt(deletedTripIndex);
+    notifyListeners();
+
+    try {
+      await TripService.deleteTrip(authToken!, tripId);
+      _trips.removeWhere((trip) => trip.id == tripId);
+    } catch (error) {
+      _trips.insert(deletedTripIndex, deletedTrip);
+      notifyListeners();
+      rethrow;
+    }
+  }
 }
