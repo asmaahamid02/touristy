@@ -153,7 +153,6 @@ class Posts with ChangeNotifier {
         _posts[postIndex] = updatedPost;
         notifyListeners();
       } catch (error) {
-        print(error);
         rethrow;
       }
     }
