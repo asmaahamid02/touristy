@@ -40,7 +40,7 @@ class TripService {
             'longitude': trip.longitude,
             'latitude': trip.latitude,
             'address': trip.destination,
-            'arrival_date': trip.arrivalDate.toIso8601String(),
+            'arrival_date': trip.arrivalDate?.toIso8601String(),
             'departure_date': trip.departureDate?.toIso8601String(),
           }));
       final responseData = json.decode(response.body) as Map<String, dynamic>;
