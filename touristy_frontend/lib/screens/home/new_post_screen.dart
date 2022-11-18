@@ -59,10 +59,6 @@ class _NewPostScreenState extends State<NewPostScreen> {
 
         captionController.text = post!.content != null ? post.content! : '';
 
-        // imageFileList = post.mediaUrls!
-        //     .map((e) => XFile(e['media_path']))
-        //     .toList(); //convert string to XFile
-
         _coordinates['address'] = post.address;
       }
     }
@@ -113,18 +109,14 @@ class _NewPostScreenState extends State<NewPostScreen> {
     try {
       //add post
       if (postId == null || postId == 0) {
-        print(_coordinates['address']);
         await Provider.of<Posts>(context, listen: false).addPost(
             captionController.text,
             imageFileListConverted,
             PlaceLocation.fromMap(_coordinates));
         //update post
       } else {
-        // await Provider.of<Posts>(context, listen: false).editPost(
-        //   postId as int,
-        //   captionController.text,
-        //   imageFileListConverted,
-        // );
+        await Provider.of<Posts>(context, listen: false)
+            .editPost(postId as int, captionController.text, null);
       }
     } on HttpException catch (error) {
       SnakeBarCommon.show(context, error.toString());
@@ -147,7 +139,7 @@ class _NewPostScreenState extends State<NewPostScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-          // backgroundColor: Theme.of(context).cardColor,
+          backgroundColor: Theme.of(context).cardColor,
           appBar: _postModalAppBar(context),
           body: SingleChildScrollView(
             child: _isLoading
@@ -396,7 +388,7 @@ class _LocationChoicesListState extends State<_LocationChoicesList> {
       initialLocation = null;
     }
 
-    final LatLng? selectedLocation = await Navigator.of(context).push(
+    final selectedLocation = await Navigator.of(context).push<LatLng>(
       MaterialPageRoute(
         fullscreenDialog: true,
         builder: (ctx) => initialLocation != null
