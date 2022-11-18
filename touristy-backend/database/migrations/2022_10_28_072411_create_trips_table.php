@@ -21,7 +21,7 @@ class CreateTripsTable extends Migration
             $table->text('description');
             $table->datetime('arrival_date')->nullable();
             $table->datetime('departure_date')->nullable();
-            $table->datetime('is_past')->nullable();
+            $table->tinyInteger('is_past')->default(0);
             $table->timestamps();
         });
     }
