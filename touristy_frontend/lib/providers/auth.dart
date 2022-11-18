@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../utilities/constants.dart';
+import '../utilities/utilities.dart';
 import '../exceptions/http_exception.dart';
 
 class Auth with ChangeNotifier {
