@@ -57,8 +57,6 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
 
     Navigator.of(context)
         .pushNamed(SignupProfileScreen.routeName, arguments: _user);
-
-    print(_user);
   }
 
   CountryCode _selectedCountry(CountryCode country) {

@@ -73,6 +73,7 @@ class _ForYouPageState extends State<ForYouPage> {
       });
       SnakeBarCommon.show(context, error.toString());
     } catch (error) {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
         _hasMore = false;
@@ -101,17 +102,6 @@ class _ForYouPageState extends State<ForYouPage> {
               child: TravelersAvatarsList(),
             ),
           ),
-          // SliverPadding(
-          //   padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
-          //   sliver: SliverToBoxAdapter(
-          //     child: TripsList(),
-          //   ),
-          // ),
-          // SliverPadding(
-          //     padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
-          //     sliver: SliverToBoxAdapter(
-          //       child: EventsList(),
-          //     )),
           _PostsList(_hasMore),
         ],
       ),
