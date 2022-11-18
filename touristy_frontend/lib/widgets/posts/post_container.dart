@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../utilities/utilities.dart';
@@ -87,16 +88,14 @@ class _PostContainerState extends State<PostContainer> {
               ? Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: _loading
-                      ? Center(
-                          child: Text(
-                          'Loading...',
-                          style:
-                              Theme.of(context).textTheme.bodyText2!.copyWith(
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                        ))
-                      : _image,
+                  child: CachedNetworkImage(
+                    fit: BoxFit.cover,
+                    imageUrl: widget.post.mediaUrls?[0]['path'],
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
                 )
               : const SizedBox.shrink(),
           Padding(
