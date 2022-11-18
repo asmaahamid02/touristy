@@ -6,26 +6,6 @@ import '../utilities/constants.dart';
 import '../models/models.dart';
 
 class SearchService {
-  static Future<List<dynamic>> getSearchResults(
-      String token, String searchValue) async {
-    try {
-      final response = await http.get(
-          Uri.parse('$baseUrl/common/search/$searchValue'),
-          headers: getHeaders(token));
-      final responseData = json.decode(response.body) as Map<String, dynamic>;
-
-      //check if response is has error, throw exception
-      if (response.statusCode != 200) {
-        throw HttpException(getResponseError(responseData));
-      } else {
-        print(responseData);
-        return [];
-      }
-    } catch (error) {
-      rethrow;
-    }
-  }
-
   //search users
   static Future<List<User>> searchUsers(String token, String query) async {
     try {
@@ -70,7 +50,34 @@ class SearchService {
             responseData['data'] != '' &&
             responseData['data'].length > 0) {
           final List<dynamic> tripsList = responseData['data'];
-          return tripsList.map((trip) => Trip.fromJson(trip)).toList();
+          return tripsList.map((trip) {
+            return Trip.fromJson(trip);
+          }).toList();
+        } else {
+          return [];
+        }
+      }
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  //search posts
+  static Future<List<Post>> searchPosts(String token, String query) async {
+    try {
+      final response = await http.get(
+          Uri.parse('$baseUrl/common/search/posts/$query'),
+          headers: getHeaders(token));
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+      //check if response is has error, throw exception
+      if (response.statusCode != 200) {
+        throw HttpException(getResponseError(responseData));
+      } else {
+        if (responseData['data'] != null &&
+            responseData['data'] != '' &&
+            responseData['data'].length > 0) {
+          final List<dynamic> postsList = responseData['data'];
+          return postsList.map((post) => Post.fromJson(post)).toList();
         } else {
           return [];
         }
