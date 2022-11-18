@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\PostResource;
+use App\Http\Resources\UserResource;
 use App\Traits\ResponseJson;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -75,37 +77,81 @@ class CommonController extends Controller
     {
         //search in users
         $users = $this->search('User', $search, ['first_name', 'last_name']);
-        $users = $users ? $this->applyUserFilters($users)->orderBy('first_name')->orderBy('last_name')->get() : null;
+        $users = $users ? $this->applyUserFilters($users)
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->with('location')
+            ->withCount('followers')
+            ->withCount('followings')
+            ->get() : null;
+
+        if ($users != null) {
+            $users->map(function ($user) {
+                if ($user == Auth::user())
+                    $user->isFollowedByUser = false;
+                else
+                    $user->isFollowedByUser = $user->followers->contains(Auth::id());
+            });
+        }
 
         //search in posts
         $posts = $this->search('Post', $search, ['content']);
         $posts = $posts ? $posts->where('is_deleted', 0)->whereHas('user', function ($query) {
             $this->applyUserFilters($query);
-        })->orderBy('created_at', 'desc')->get() : null;
+        })->with('location')->orderBy('created_at', 'desc')->get() : null;
+
+
+        if ($posts != null) {
+            $posts->map(function ($post) {
+                $post->isLikedByUser = $post->likes->contains(Auth::id());
+                $post->user->isFollowedByUser = $post->user->followers->contains(Auth::id());
+                //followings count
+                $post->user->followings_count = $post->user->followings->count();
+                //followers count
+                $post->user->followers_count = $post->user->followers->count();
+            });
+        }
 
         //search in trips
         $trips = $this->search('Trip', $search, ['title', 'description']);
         $trips = $trips ? $trips->whereHas('user', function ($query) {
             $this->applyUserFilters($query);
-        })->orderBy('created_at', 'desc')->get() : null;
+        })->with('location')->orderBy('created_at', 'desc')->get() : null;
 
-        //search in events
-        $events = $this->search('Event', $search, ['name', 'description']);
-        $events = $events ? $events->whereHas('user', function ($query) {
-            $this->applyUserFilters($query);
-        })->orderBy('created_at', 'desc')->get() : null;
-
-        //search in groups
-        $groups = $this->search('Group', $search, ['name', 'description']);
-        $groups = $groups ? $groups->get() : null;
 
         //return search results
         return [
-            'users' => $users,
-            'posts' => $posts,
+            'users' => $users ? UserResource::collection($users) : null,
+            'posts' => $posts ? PostResource::collection($posts) : null,
             'trips' => $trips,
-            'events' => $events,
-            'groups' => $groups,
         ];
+    }
+
+    //search in users
+    public function searchUsers($search)
+    {
+        //search in users
+        $users = $this->search('User', $search, ['first_name', 'last_name']);
+        $users = $users ? $this->applyUserFilters($users)
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->with('location')
+            ->withCount('followers')
+            ->withCount('followings')
+            ->get() : null;
+
+        if ($users != null) {
+            $users->map(function ($user) {
+                if ($user == Auth::user())
+                    $user->isFollowedByUser = false;
+                else
+                    $user->isFollowedByUser = $user->followers->contains(Auth::id());
+            });
+        }
+
+        if ($users != null)
+            return $this->jsonResponse(UserResource::collection($users), 'data', Response::HTTP_OK, 'Users found');
+
+        return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Users not found');
     }
 }
