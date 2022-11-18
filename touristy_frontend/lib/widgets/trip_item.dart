@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../widgets/widgets.dart';
 import '../models/models.dart';
+import '../providers/providers.dart';
 
 class TripItem extends StatelessWidget {
-  final bool withIcon;
-  final String coverImageUrl;
-  const TripItem(
-      {super.key, this.withIcon = false, required this.coverImageUrl});
+  final Trip trip;
+  const TripItem({super.key, required this.trip});
 
   static double get _coverTripImageHeight => 70;
   static double get _userProfileTripImageHeight => 40;
@@ -16,8 +16,11 @@ class TripItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final user =
+        Provider.of<Users>(context, listen: false).findUserById(trip.userId!);
     return Card(
       elevation: 3.5,
+      color: Theme.of(context).primaryColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
@@ -38,12 +41,7 @@ class TripItem extends StatelessWidget {
                         topLeft: Radius.circular(10),
                         topRight: Radius.circular(10),
                       ),
-                      child: Image.network(
-                        coverImageUrl,
-                        width: double.infinity,
-                        height: _coverTripImageHeight,
-                        fit: BoxFit.cover,
-                      ),
+                      child: Image.asset('assets/images/map.png'),
                     ),
                   ),
                   Positioned(
@@ -67,57 +65,47 @@ class TripItem extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(50),
-                        color: Colors.white,
                       ),
                       padding: const EdgeInsets.all(3),
-                      child: ProfileAvatar(
-                          avatar: Avatar(
-                            url: 'https://picsum.photos/200',
-                          ),
-                          onTap: (context) => print('tapped'),
+                      child: Avatar(
+                          imageUrl: user.profilePictureUrl!,
                           radius: _userProfileTripImageHeight / 2),
                     ),
                   )
                 ]),
-            withIcon
-                ? TextButton(
-                    onPressed: null,
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.airplanemode_active,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          'Add Trip',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(
-                                  color: Theme.of(context).primaryColor,
-                                  fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  )
-                : Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          'User name',
-                          style: Theme.of(context).textTheme.headline6,
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          'Trip Location',
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                      ],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      '${user.firstName} ${user.lastName}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                     ),
                   ),
+                  const SizedBox(height: 5),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      trip.destination,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
