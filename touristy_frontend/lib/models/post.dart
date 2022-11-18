@@ -28,7 +28,7 @@ class Post {
   factory Post.fromJson(Map<String, dynamic> json) {
     Post post = Post(
       id: json['id'] as int,
-      mediaUrls: json['media'].length > 0
+      mediaUrls: json['media'] != null && json['media'].length > 0
           ? (json['media'] as List<dynamic>).map((e) {
               return {
                 'path': e['path'],
