@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../utilities/utilities.dart';
 import '../../widgets/widgets.dart';
+import '../../providers/providers.dart';
+import '../../models/models.dart';
 
 class NewTripScreen extends StatefulWidget {
   const NewTripScreen({super.key});
@@ -11,13 +14,15 @@ class NewTripScreen extends StatefulWidget {
 
 class _NewTripScreenState extends State<NewTripScreen> {
   final _formKey = GlobalKey<FormState>();
-  final FocusNode _arrivalDateFocusNode = FocusNode();
-  final FocusNode _departureDateFocusNode = FocusNode();
+  final FocusNode _titleFocusNode = FocusNode();
+  final FocusNode _descriptionFocusNode = FocusNode();
   final FocusNode _openDestinationFocusNode = FocusNode();
 
   final TextEditingController _arrivalDateController = TextEditingController();
   final TextEditingController _departureDateController =
       TextEditingController();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
 
   DateTime? firstArriDate;
   DateTime? lastArriDate;
@@ -33,6 +38,8 @@ class _NewTripScreenState extends State<NewTripScreen> {
   double? _longitude;
   double? _latitude;
 
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -47,8 +54,8 @@ class _NewTripScreenState extends State<NewTripScreen> {
   @override
   void dispose() {
     super.dispose();
-    _arrivalDateFocusNode.dispose();
-    _departureDateFocusNode.dispose();
+    _titleFocusNode.dispose();
+    _descriptionFocusNode.dispose();
     _openDestinationFocusNode.dispose();
     _arrivalDateController.dispose();
     _departureDateController.dispose();
@@ -75,7 +82,7 @@ class _NewTripScreenState extends State<NewTripScreen> {
         _openDestinationController.text = result['description'];
       });
 
-//get the latitude and longitude of the place
+      //get the latitude and longitude of the place
       try {
         final place = await LocationHandler.getPlaceDetails(result['place_id']);
         _latitude = place['geometry']['location']['lat'];
@@ -92,6 +99,33 @@ class _NewTripScreenState extends State<NewTripScreen> {
       return;
     }
     _formKey.currentState!.save();
+
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+      await Provider.of<Trips>(context, listen: false).addTrip(
+        Trip(
+          title: _titleController.text,
+          description: _descriptionController.text,
+          arrivalDate: DateTime.parse(_arrivalDateController.text),
+          departureDate: _departureDateController.text.isEmpty
+              ? null
+              : DateTime.parse(_departureDateController.text),
+          destination: _openDestinationController.text,
+          longitude: _longitude,
+          latitude: _latitude,
+        ),
+      );
+
+      Navigator.of(context).pop();
+    } catch (error) {
+      ToastCommon.show(error.toString());
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -119,12 +153,57 @@ class _NewTripScreenState extends State<NewTripScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
+              //title
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  prefixIcon: Icon(Icons.title),
+                ),
+                autofocus: true,
+                textInputAction: TextInputAction.next,
+                focusNode: _titleFocusNode,
+                onFieldSubmitted: (_) {
+                  FocusScope.of(context).requestFocus(_descriptionFocusNode);
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
+                controller: _titleController,
+              ),
+              const SizedBox(height: 16),
+              //description
+              TextFormField(
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  prefixIcon: Icon(Icons.description),
+                ),
+                maxLines: 3,
+                textInputAction: TextInputAction.next,
+                focusNode: _descriptionFocusNode,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a description';
+                  }
+                  return null;
+                },
+                controller: _descriptionController,
+              ),
+              const SizedBox(height: 16),
               SearchTextField(
                 focusNode: _openDestinationFocusNode,
                 controller: _openDestinationController,
                 labelText: 'Search for destination',
                 onTap: _openDestinationSearchDialog,
                 readOnly: true,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please choose a destination';
+                  }
+                  return null;
+                },
               ),
               _isPastTrip
                   ? const SizedBox.shrink()
@@ -166,7 +245,9 @@ class _NewTripScreenState extends State<NewTripScreen> {
             ],
           ),
         ),
-        PrimaryButton(textLabel: 'ADD TRIP', onTap: () {})
+        _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : PrimaryButton(textLabel: 'ADD TRIP', onTap: _saveTrip),
       ],
     );
   }
