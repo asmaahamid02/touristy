@@ -7,6 +7,8 @@ import './providers.dart';
 class Trips with ChangeNotifier {
   List<Trip> _trips = [];
   String? authToken;
+  DateTime? _lastUpdated;
+  int? lastUpdatedUserId;
 
   void update(
     Auth auth,
@@ -21,9 +23,16 @@ class Trips with ChangeNotifier {
   List<Trip> get trips => _trips;
 
   Future<void> fetchTrips(int userId) async {
+    if (lastUpdatedUserId == userId &&
+        _lastUpdated != null &&
+        DateTime.now().difference(_lastUpdated!).inMinutes < 1) {
+      return;
+    }
     try {
       final List<Trip> trips = await TripService.getTrips(authToken!, userId);
       _trips = trips;
+      _lastUpdated = DateTime.now();
+      lastUpdatedUserId = userId;
       notifyListeners();
     } catch (error) {
       rethrow;
