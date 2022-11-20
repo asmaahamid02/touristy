@@ -79,6 +79,9 @@ class ProfileScreen extends StatelessWidget {
                   const SliverToBoxAdapter(
                     child: ProfileInfo(),
                   ),
+                  const SliverToBoxAdapter(
+                    child: ProfileFollowers(),
+                  ),
                   SliverPersistentHeader(
                     delegate: _SliverAppBarDelegate(
                       _buildTabBar(brightness),
