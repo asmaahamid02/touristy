@@ -1,71 +1,75 @@
 import 'package:flag/flag.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:touristy_frontend/providers/providers.dart';
 
 class ProfileInfo extends StatelessWidget {
-  const ProfileInfo();
+  const ProfileInfo({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final profile =
+        Provider.of<UserProfileProvider>(context, listen: false).userProfile;
+
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Han Mlo',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Text(
+              profile.name!,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            if (profile.address != null) const SizedBox(height: 10),
+            if (profile.address != null)
+              Row(
+                children: [
+                  const Icon(
+                    Icons.location_on,
+                    color: Colors.grey,
+                  ),
+                  Text(
+                    profile.address!,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            const SizedBox(height: 10),
             Row(
-              children: const [
-                Icon(
-                  Icons.location_on,
-                  color: Colors.grey,
-                ),
-                Text(
-                  'Flutter Developer',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                ),
-              ],
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            Row(
-              children: const [
+              children: [
                 SizedBox(
                   width: 20,
-                  height: 17,
+                  height: 20,
                   child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(2)),
+                    borderRadius: const BorderRadius.all(Radius.circular(50)),
                     child: Flag.fromString(
-                      'mm',
+                      profile.countryCode!,
                       fit: BoxFit.fill,
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 Text(
-                  'Female',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  profile.gender!,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc vel tincidunt lacinia, nunc nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl. Sed euismod, nunc vel tincidunt lacinia, nunc nisl aliquam nisl, eget aliquam nisl nisl sit amet nisl.',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            if (profile.bio != null) const SizedBox(height: 10),
+            if (profile.bio != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  profile.bio!,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
+                ),
               ),
-            ),
           ],
         ),
       ),
