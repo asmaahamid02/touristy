@@ -42,14 +42,35 @@ class UserController extends Controller
         if ($id == null)
             $id = Auth::id();
 
-
-        $user = User::where('id', $id)->where('is_deleted', 0)->with(['nationality'])->first();
+        $user = User::where('id', $id)
+        ->where('is_deleted', 0)
+        ->with('nationality')
+        ->with('location')        
+        ->withCount('followers')
+        ->withCount('followings')                    
+        ->first();        
 
         if (!$user) {
             return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'User not found');
         }
 
-        return $this->jsonResponse($user, 'data', Response::HTTP_OK, 'User');
+        if($id != Auth::id()){
+            //check if user is followed by auth user
+            $user->isFollowedByUser = $user->followers->contains(Auth::id());
+            //check if user is following auth user
+            $user->isFollowingUser = $user->followings->contains(Auth::id());
+            //check if user is blocked by auth user
+            $user->isBlockedByUser = $user->blockers->contains(Auth::id());
+            //check if user is blocking auth user
+            $user->isBlockingUser = $user->blockings->contains(Auth::id());
+        }else{
+            $user->isFollowedByUser = false;
+            $user->isFollowingUser = false;
+            $user->isBlockedByUser = false;
+            $user->isBlockingUser = false;
+        }
+
+        return $this->jsonResponse(new UserResource($user), 'data', Response::HTTP_OK, 'User');
     }
 
     public function update(Request $request, $id = null)
