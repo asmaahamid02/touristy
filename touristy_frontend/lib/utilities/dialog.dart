@@ -6,7 +6,8 @@ class AlertDialogCommon {
     required String title,
     required String content,
     required String actionText,
-    required Function action,
+    required Function? action,
+    includeCancel = true,
   }) {
     showDialog(
       context: context,
@@ -14,13 +15,16 @@ class AlertDialogCommon {
         title: Text(title),
         content: Text(content),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
+          if (includeCancel)
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
           TextButton(
             onPressed: () {
-              action();
+              action != null ? action() : null;
               Navigator.of(context).pop();
             },
             child: Text(actionText),
