@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:touristy_frontend/screens/profile/profile_screen.dart';
 import './widgets.dart';
 import '../models/models.dart';
 
@@ -22,7 +23,15 @@ class Stories extends StatelessWidget {
           scrollDirection: Axis.horizontal,
           itemCount: storiesData.length,
           itemBuilder: (context, index) {
-            return StoryCard(storyData: storiesData[index]);
+            return InkWell(
+                onTap: () {
+                  Navigator.of(context)
+                      .pushNamed(ProfileScreen.routeName, arguments: {
+                    'userId': storiesData[index].id,
+                    'username': storiesData[index].name,
+                  });
+                },
+                child: StoryCard(storyData: storiesData[index]));
           },
         ),
       ),
