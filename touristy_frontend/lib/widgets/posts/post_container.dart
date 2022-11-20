@@ -86,18 +86,26 @@ class _PostHeader extends StatelessWidget {
         Provider.of<Users>(context, listen: false).currentUserId;
     return Row(
       children: [
-        Avatar(radius: 20.0, imageUrl: post.user!.profilePictureUrl),
+        InkWell(
+            onTap: () {
+              _navigateToProfileScreen(context);
+            },
+            child:
+                Avatar(radius: 20.0, imageUrl: post.user!.profilePictureUrl)),
         const SizedBox(width: 8.0),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Text(
-                  '${post.user!.firstName} ${post.user!.lastName}',
-                  style: const TextStyle(
-                      fontSize: 16.0, fontWeight: FontWeight.w700),
+              InkWell(
+                onTap: () => _navigateToProfileScreen(context),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    '${post.user!.firstName} ${post.user!.lastName}',
+                    style: const TextStyle(
+                        fontSize: 16.0, fontWeight: FontWeight.w700),
+                  ),
                 ),
               ),
               Row(
@@ -213,6 +221,19 @@ class _PostHeader extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void _navigateToProfileScreen(BuildContext context) {
+    final currentRoute = ModalRoute.of(context)?.settings.name;
+    if (currentRoute != ProfileScreen.routeName) {
+      Navigator.of(context).pushNamed(
+        ProfileScreen.routeName,
+        arguments: {
+          'userId': post.user!.id,
+          'username': '${post.user!.firstName} ${post.user!.lastName}',
+        },
+      );
+    }
   }
 }
 
