@@ -88,24 +88,35 @@ class Posts with ChangeNotifier {
 
   Future<void> toggleLikeStatus(int postId) async {
     final int postIndex = _posts.indexWhere((post) => post.id == postId);
+    final int followingPostIndex =
+        _followingPosts.indexWhere((post) => post.id == postId);
 
     if (postIndex >= 0) {
-      _posts[postIndex].isLiked = !_posts[postIndex].isLiked!;
-      _posts[postIndex].likes = _posts[postIndex].isLiked!
-          ? _posts[postIndex].likes! + 1
-          : _posts[postIndex].likes! - 1;
-      notifyListeners();
+      _updateLikeStatus(postIndex, _posts);
+
+      if (followingPostIndex >= 0) {
+        _updateLikeStatus(followingPostIndex, _followingPosts);
+        notifyListeners();
+      }
 
       try {
         await PostsService().toggleLikePost(authToken as String, postId);
       } catch (error) {
-        _posts[postIndex].isLiked = !_posts[postIndex].isLiked!;
-        _posts[postIndex].likes = _posts[postIndex].isLiked!
-            ? _posts[postIndex].likes! + 1
-            : _posts[postIndex].likes! - 1;
-        notifyListeners();
+        _updateLikeStatus(postIndex, _posts);
+
+        if (followingPostIndex >= 0) {
+          _updateLikeStatus(followingPostIndex, _followingPosts);
+          notifyListeners();
+        }
       }
     }
+  }
+
+  void _updateLikeStatus(int postIndex, List<Post> posts) {
+    posts[postIndex].isLiked = !posts[postIndex].isLiked!;
+    posts[postIndex].likes = posts[postIndex].isLiked!
+        ? posts[postIndex].likes! + 1
+        : posts[postIndex].likes! - 1;
   }
 
 //add post
