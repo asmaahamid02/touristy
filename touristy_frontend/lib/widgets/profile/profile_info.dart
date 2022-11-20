@@ -11,7 +11,11 @@ class ProfileInfo extends StatelessWidget {
     final profile =
         Provider.of<UserProfileProvider>(context, listen: false).userProfile;
 
-    return SliverToBoxAdapter(
+    return Container(
+      color: Theme.of(context).brightness == Brightness.light
+          ? Theme.of(context).cardColor
+          : null,
+      margin: const EdgeInsets.only(bottom: 16),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Column(
@@ -53,11 +57,12 @@ class ProfileInfo extends StatelessWidget {
                 const SizedBox(
                   width: 10,
                 ),
-                Text(
-                  profile.gender!,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w500),
-                ),
+                if (profile.gender!.toLowerCase() != 'other')
+                  Text(
+                    profile.gender!,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
               ],
             ),
             if (profile.bio != null) const SizedBox(height: 10),
