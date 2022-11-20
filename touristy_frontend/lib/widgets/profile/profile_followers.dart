@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../utilities/utilities.dart';
+import '../../providers/providers.dart';
 
 class ProfileFollowers extends StatelessWidget {
   const ProfileFollowers({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final profile =
+        Provider.of<UserProfileProvider>(context, listen: false).userProfile;
     final textColor = Theme.of(context).brightness == Brightness.light
         ? Theme.of(context).cardColor
         : null;
@@ -24,7 +28,8 @@ class ProfileFollowers extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildTextLabel(textColor, '100', 20),
+                    _buildTextLabel(
+                        textColor, profile.followers.toString(), 20),
                     _buildTextLabel(textColor, 'Followers', 16),
                   ],
                 ),
@@ -33,7 +38,8 @@ class ProfileFollowers extends StatelessWidget {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildTextLabel(textColor, '100', 20),
+                    _buildTextLabel(
+                        textColor, profile.followers.toString(), 20),
                     _buildTextLabel(textColor, 'Following', 16),
                   ],
                 ),
