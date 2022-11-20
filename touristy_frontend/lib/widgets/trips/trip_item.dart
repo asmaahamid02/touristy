@@ -20,7 +20,9 @@ class TripItem extends StatelessWidget {
         Provider.of<Users>(context, listen: false).findUserById(trip.userId!);
     return Card(
       elevation: 3.5,
-      color: Theme.of(context).primaryColor,
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Theme.of(context).scaffoldBackgroundColor
+          : Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
       ),
