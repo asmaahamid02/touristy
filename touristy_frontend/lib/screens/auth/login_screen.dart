@@ -31,9 +31,8 @@ class _LoginScreenState extends State<LoginScreen> {
         title: 'An error occurred!',
         content: message,
         actionText: 'Ok',
-        action: () {
-          Navigator.of(context).pop();
-        });
+        includeCancel: false,
+        action: null);
   }
 
   Future<void> _saveForm() async {
@@ -59,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final errorMessage = error.toString();
       _showErrorDialog(errorMessage);
     } catch (error) {
-      const errorMessage = 'Authentication failed';
+      final errorMessage = 'Authentication failed ${error.toString()}';
       _showErrorDialog(errorMessage);
     }
     if (!mounted) return;
