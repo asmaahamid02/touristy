@@ -20,99 +20,108 @@ class ProfileHeader extends StatelessWidget {
     final profile =
         Provider.of<UserProfileProvider>(context, listen: false).userProfile;
 
-    return SliverToBoxAdapter(
-      child: Card(
-        elevation: 0,
-        color: Theme.of(context).brightness == Brightness.light
-            ? Theme.of(context).cardColor
-            : Theme.of(context).scaffoldBackgroundColor,
-        margin: const EdgeInsets.all(0),
-        child: Stack(clipBehavior: Clip.none, children: [
-          Container(
-            margin: EdgeInsets.only(bottom: _topPositionForUserProfile / 2),
+    return Card(
+      elevation: 0,
+      color: Theme.of(context).brightness == Brightness.light
+          ? Theme.of(context).cardColor
+          : Theme.of(context).scaffoldBackgroundColor,
+      margin: const EdgeInsets.all(0),
+      child: Stack(clipBehavior: Clip.none, children: [
+        Container(
+          margin: EdgeInsets.only(bottom: _topPositionForUserProfile / 2),
+          height: _coverTripImageHeight,
+          child: ClipRRect(
+            child: profile.coverPictureUrl != null
+                ? CachedNetworkImage(
+                    imageUrl: 'https://picsum.photos/200/800',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  )
+                : Image.asset(
+                    'assets/images/map.png',
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                  ),
+          ),
+        ),
+        //add overlay
+        Positioned(
+          child: Container(
             height: _coverTripImageHeight,
-            child: ClipRRect(
-              child: profile.coverPictureUrl != null
-                  ? CachedNetworkImage(
-                      imageUrl: 'https://picsum.photos/200/800',
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    )
-                  : Image.asset(
-                      'assets/images/map.png',
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                    ),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
             ),
           ),
-          //add overlay
-          Positioned(
-            child: Container(
-              height: _coverTripImageHeight,
-              decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.3),
+        ),
+        //added user profile image
+        Positioned(
+          top: _topPositionForUserProfile,
+          left: 16,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(50),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.light
+                    ? AppColors.textFaded
+                    : AppColors.backgroundLightGrey,
+                width: 1,
               ),
             ),
-          ),
-          //added user profile image
-          Positioned(
-            top: _topPositionForUserProfile,
-            left: 16,
             child: Avatar(
                 radius: _userProfileImageHeight / 2,
                 imageUrl: profile.profilePictureUrl),
           ),
+        ),
 
-          Positioned(
-            top: _topPositionForUserProfile + 20,
-            right: 0,
-            child: Row(
-              children: [
-                if (currentUser.id != profile.id)
-                  ProfileButton(
-                    icon: profile.isFollowedByUser!
-                        ? Icons.person
-                        : Icons.person_add,
-                    label: profile.isFollowedByUser! ? 'UNFOLLOW' : 'FOLLOW',
-                    textColor: Colors.white,
-                    color: AppColors.secondary,
-                    onPressed: () {},
-                  ),
-                const SizedBox(
-                  width: 10,
+        Positioned(
+          top: _topPositionForUserProfile + 20,
+          right: 0,
+          child: Row(
+            children: [
+              if (currentUser.id != profile.id)
+                ProfileButton(
+                  icon: profile.isFollowedByUser!
+                      ? Icons.person
+                      : Icons.person_add,
+                  label: profile.isFollowedByUser! ? 'UNFOLLOW' : 'FOLLOW',
+                  textColor: Colors.white,
+                  color: AppColors.secondary,
+                  onPressed: () {},
                 ),
-                currentUser.id == profile.id
-                    ? ProfileButton(
-                        icon: Icons.edit,
-                        label: 'EDIT Profile',
-                        textColor: AppColors.secondary,
-                        color: Colors.white,
-                        onPressed: () {},
-                      )
-                    : ProfileButton(
-                        icon: Icons.message,
-                        label: 'MESSAGE',
-                        textColor: AppColors.secondary,
-                        color: Colors.white,
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(
-                            ChatScreen.routeName,
-                            arguments: MessageData(
-                              senderId: profile.id!,
-                              senderName: profile.name!,
-                              profilePicture: profile.profilePictureUrl,
-                            ),
-                          );
-                        },
-                      ),
-                const SizedBox(
-                  width: 10,
-                ),
-              ],
-            ),
+              const SizedBox(
+                width: 10,
+              ),
+              currentUser.id == profile.id
+                  ? ProfileButton(
+                      icon: Icons.edit,
+                      label: 'EDIT Profile',
+                      textColor: AppColors.secondary,
+                      color: Colors.white,
+                      onPressed: () {},
+                    )
+                  : ProfileButton(
+                      icon: Icons.message,
+                      label: 'MESSAGE',
+                      textColor: AppColors.secondary,
+                      color: Colors.white,
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(
+                          ChatScreen.routeName,
+                          arguments: MessageData(
+                            senderId: profile.id!,
+                            senderName: profile.name!,
+                            profilePicture: profile.profilePictureUrl,
+                          ),
+                        );
+                      },
+                    ),
+              const SizedBox(
+                width: 10,
+              ),
+            ],
           ),
-        ]),
-      ),
+        ),
+      ]),
     );
   }
 }
