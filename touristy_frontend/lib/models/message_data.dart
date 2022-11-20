@@ -1,21 +1,21 @@
 class MessageData {
   final int senderId;
-  final int lastMessageSenderId;
-  final String message;
+  int? lastMessageSenderId;
+  String? message;
   final String senderName;
-  final DateTime messageDate;
-  final String dateMessage;
-  final String profilePicture;
-  final bool isRead;
+  DateTime? messageDate;
+  String? dateMessage;
+  String? profilePicture;
+  bool? isRead;
 
   MessageData({
     required this.senderId,
-    required this.lastMessageSenderId,
-    required this.message,
+    this.lastMessageSenderId,
+    this.message,
     required this.senderName,
-    required this.messageDate,
-    required this.dateMessage,
-    required this.profilePicture,
-    required this.isRead,
+    this.messageDate,
+    this.dateMessage,
+    this.profilePicture,
+    this.isRead,
   });
 }

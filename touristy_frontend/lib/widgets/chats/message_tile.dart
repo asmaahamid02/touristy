@@ -24,14 +24,16 @@ class MessageTile extends StatelessWidget {
         children: [
           Row(
             children: [
-              _buildAvatar(context, messageData.profilePicture),
+              _buildAvatar(messageData.profilePicture),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _buildUsername(messageData.senderName),
-                    _buildLastMessage(messageData.message, messageData.isRead,
+                    _buildLastMessage(
+                        messageData.message!,
+                        messageData.isRead ?? false,
                         messageData.lastMessageSenderId == userId),
                   ],
                 ),
@@ -45,9 +47,9 @@ class MessageTile extends StatelessWidget {
                     const SizedBox(
                       height: 4.0,
                     ),
-                    _buildMessageDate(messageData.dateMessage),
+                    _buildMessageDate(messageData.dateMessage!),
                     const SizedBox(height: 5.0),
-                    _buildIcons(messageData.isRead,
+                    _buildIcons(messageData.isRead ?? false,
                         messageData.lastMessageSenderId == userId),
                   ],
                 ),
@@ -132,7 +134,7 @@ class MessageTile extends StatelessWidget {
     );
   }
 
-  Padding _buildAvatar(BuildContext context, String profilePicture) {
+  Padding _buildAvatar(String? profilePicture) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Avatar.medium(imageUrl: profilePicture),

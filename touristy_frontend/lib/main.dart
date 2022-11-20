@@ -50,13 +50,22 @@ class MyApp extends StatelessWidget {
           create: (_) => SearchProvider(),
           update: (_, auth, previousResults) => previousResults!..update(auth),
         ),
+        ChangeNotifierProxyProvider<Auth, UserProfileProvider>(
+          create: (_) => UserProfileProvider(),
+          update: (_, auth, previousProfile) => previousProfile!..update(auth),
+        ),
+        ChangeNotifierProxyProvider<Auth, UserPosts>(
+          create: (_) => UserPosts(),
+          update: (_, auth, previousUserPosts) =>
+              previousUserPosts!..update(auth),
+        ),
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
           title: 'Touristy',
-          theme: appTheme.light,
+          theme: appTheme.dark,
           darkTheme: appTheme.light,
-          themeMode: ThemeMode.dark,
+          themeMode: ThemeMode.light,
           home: auth.isAuth
               ? const Tabs()
               : FutureBuilder(

@@ -37,10 +37,7 @@ class PostController extends Controller
             ->with('tags', function ($query) {
                 return $query->select('tags.id', 'tag');
             })
-            ->withCount('comments', 'likes')
-            ->with('likes', function ($query) {
-                return $query->where('user_id', Auth::id())->select('user_id', 'post_id')->get();
-            })
+            ->withCount('comments', 'likes')            
             ->with('media')
             ->orderBy('created_at', 'desc')->paginate(10);
 
@@ -285,9 +282,7 @@ class PostController extends Controller
                 return $query->select('tags.id', 'tag');
             })
             ->withCount('comments', 'likes')
-            ->with('likes', function ($query) {
-                return $query->where('user_id', Auth::id())->select('user_id', 'post_id')->get();
-            })
+        
             ->with('media')
             ->orderBy('created_at', 'desc')->paginate(10);
 
@@ -363,5 +358,33 @@ class PostController extends Controller
             ],
             'publicity' => 'required|string|in:public,followers',
         ]);
+    }
+
+    //get user posts
+    public function getUserPosts($id)
+    {
+        $posts = Post::where('user_id', $id)
+        ->where('is_deleted', 0)
+        ->with('user.nationality')
+        ->with('user.location')
+        ->with('location')
+        ->withCount('comments', 'likes')
+        ->with('media')
+        ->orderBy('created_at', 'desc')->get();
+
+        if ($posts->isEmpty()) {
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'No posts found');
+        }
+
+        $posts->map(function($post){
+            $post->isLikedByUser = $post->likes->contains(Auth::id());
+            $post->user->isFollowedByUser = $post->user->followers->contains(Auth::id());
+          
+        });   
+        
+
+
+        return $this->jsonResponse(PostResource::collection($posts), 'data', Response::HTTP_OK, 'Posts found');
+
     }
 }

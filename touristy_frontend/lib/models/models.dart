@@ -5,3 +5,4 @@ export './post.dart';
 export './story_data.dart';
 export './user.dart';
 export './trip.dart';
+export './user_profile.dart';

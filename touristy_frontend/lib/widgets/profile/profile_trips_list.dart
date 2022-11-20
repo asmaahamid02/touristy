@@ -4,6 +4,7 @@ import '../../utilities/utilities.dart';
 import '../widgets.dart';
 import '../../screens/screens.dart';
 import '../../providers/providers.dart';
+import '../../models/models.dart';
 
 class ProfileTripsList extends StatefulWidget {
   const ProfileTripsList({super.key});
@@ -13,23 +14,25 @@ class ProfileTripsList extends StatefulWidget {
 }
 
 class _ProfileTripsListState extends State<ProfileTripsList> {
-  int? userId;
   bool _isLoading = false;
   bool _isInit = true;
+  UserProfile? userProfile;
+  int? currentUserId;
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
 
     if (_isInit) {
-      ModalRoute.of(context)!.settings.arguments != null
-          ? userId = ModalRoute.of(context)!.settings.arguments as int
-          : userId = Provider.of<Auth>(context, listen: false).userId;
+      currentUserId = Provider.of<Auth>(context, listen: false).userId;
+      userProfile =
+          Provider.of<UserProfileProvider>(context, listen: false).userProfile;
 
       setState(() {
         _isLoading = true;
       });
       try {
-        await Provider.of<Trips>(context, listen: false).fetchTrips(userId!);
+        await Provider.of<Trips>(context, listen: false)
+            .fetchTrips(userProfile!.id!);
       } catch (error) {
         ToastCommon.show(error.toString());
       }
@@ -44,24 +47,25 @@ class _ProfileTripsListState extends State<ProfileTripsList> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Align(
-          alignment: Alignment.centerRight,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            width: 150,
-            child: ProfileButton(
-              label: 'ADD TRIP',
-              icon: Icons.airplanemode_active,
-              color: AppColors.secondary,
-              textColor: Colors.white,
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    fullscreenDialog: true,
-                    builder: (_) => const NewTripScreen()));
-              },
+        if (currentUserId == userProfile!.id)
+          Align(
+            alignment: Alignment.centerRight,
+            child: Container(
+              padding: const EdgeInsets.all(8),
+              width: 150,
+              child: ProfileButton(
+                label: 'ADD TRIP',
+                icon: Icons.airplanemode_active,
+                color: AppColors.secondary,
+                textColor: Colors.white,
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      fullscreenDialog: true,
+                      builder: (_) => const NewTripScreen()));
+                },
+              ),
             ),
           ),
-        ),
         Expanded(
           child: Consumer<Trips>(
             builder: (context, tripsSnapshot, child) {

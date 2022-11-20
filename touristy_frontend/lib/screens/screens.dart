@@ -13,7 +13,6 @@ export './home/home_screen.dart';
 export './home/map_page.dart';
 export './home/new_post_screen.dart';
 export './landing/landing_screen.dart';
-export './notifications/notification_screen.dart';
 export './profile/profile_screen.dart';
 export './tabs.dart';
 export '../utilities/splash_screen.dart';
