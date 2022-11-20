@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:touristy_frontend/exceptions/http_exception.dart';
 import '../../utilities/utilities.dart';
 import '../../models/models.dart';
 import '../../providers/providers.dart';
@@ -16,8 +17,10 @@ class TripCard extends StatelessWidget {
     try {
       await trips.deleteTrip(tripId!);
       ToastCommon.show('Trip deleted');
-    } catch (error) {
+    } on HttpException catch (error) {
       ToastCommon.show('Error: ${error.toString()}');
+    } catch (error) {
+      debugPrint(error.toString());
     }
   }
 
@@ -51,11 +54,15 @@ class TripCard extends StatelessWidget {
     if (trip.departureDate != null) {
       date += ' - ${DateFormat.yMMMd().format(trip.departureDate!)}';
     }
-    return trip.userId == Provider.of<Auth>(context, listen: false).userId
+
+    int currentUserId = Provider.of<Auth>(context, listen: false).userId!;
+    return trip.userId == currentUserId
         ? Dismissible(
             key: ValueKey(trip.id),
-            background:
-                Container(color: Colors.red, child: const Icon(Icons.delete)),
+            background: Container(
+              color: Theme.of(context).errorColor,
+              child: const Icon(Icons.delete, size: 40, color: Colors.white),
+            ),
             direction: DismissDirection.endToStart,
             confirmDismiss: (direction) => _showDeleteDialog(context),
             onDismissed: ((direction) {
