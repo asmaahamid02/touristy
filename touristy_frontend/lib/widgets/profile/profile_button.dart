@@ -28,6 +28,7 @@ class ProfileButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(icon, size: 18, color: textColor),
+              const SizedBox(width: 4.0),
               Text(label,
                   style: TextStyle(
                       fontSize: 14,
