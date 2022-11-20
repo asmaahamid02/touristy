@@ -7,48 +7,9 @@ import '../../widgets/widgets.dart';
 import '../../models/models.dart';
 import '../../providers/providers.dart';
 
-class PostContainer extends StatefulWidget {
+class PostContainer extends StatelessWidget {
   const PostContainer({super.key, required this.post});
   final Post post;
-
-  @override
-  State<PostContainer> createState() => _PostContainerState();
-}
-
-class _PostContainerState extends State<PostContainer> {
-  Image? _image;
-
-  bool _loading = true;
-  Future<void> _loadImage() async {
-    final token = Provider.of<Posts>(context, listen: false).authToken;
-    final url = widget.post.mediaUrls?[0]['path'];
-    if (url != null) {
-      //get image from url
-      _image = Image.network(
-        url,
-        fit: BoxFit.cover,
-      );
-
-      //resolve image to get image stream and add listener to it
-      _image!.image.resolve(const ImageConfiguration()).addListener(
-        ImageStreamListener(
-          (ImageInfo info, bool _) {
-            if (mounted) {
-              setState(() {
-                _loading = false;
-              });
-            }
-          },
-        ),
-      );
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadImage();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,32 +26,32 @@ class _PostContainerState extends State<PostContainer> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   _PostHeader(
-                    post: widget.post,
+                    post: post,
                   ),
                   const SizedBox(height: 6.0),
-                  widget.post.content != null
+                  post.content != null
                       ? Text(
-                          widget.post.content!,
+                          post.content!,
                           style: const TextStyle(
                             fontSize: 16.0,
                           ),
                         )
                       : const SizedBox.shrink(),
                   const SizedBox(height: 6.0),
-                  widget.post.mediaUrls != null
+                  post.mediaUrls != null
                       ? const SizedBox.shrink()
                       : const SizedBox(
                           height: 6.0,
                         ),
                 ]),
           ),
-          widget.post.mediaUrls != null && widget.post.mediaUrls!.isNotEmpty
+          post.mediaUrls != null && post.mediaUrls!.isNotEmpty
               ? Container(
                   width: double.infinity,
                   padding: const EdgeInsets.symmetric(vertical: 8.0),
                   child: CachedNetworkImage(
                     fit: BoxFit.cover,
-                    imageUrl: widget.post.mediaUrls?[0]['path'],
+                    imageUrl: post.mediaUrls?[0]['path'],
                     placeholder: (context, url) =>
                         const Center(child: CircularProgressIndicator()),
                     errorWidget: (context, url, error) =>
@@ -100,7 +61,7 @@ class _PostContainerState extends State<PostContainer> {
               : const SizedBox.shrink(),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: _PostStats(post: widget.post),
+            child: _PostStats(post: post),
           )
         ],
       ),
@@ -123,11 +84,6 @@ class _PostHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final currentUserId =
         Provider.of<Users>(context, listen: false).currentUserId;
-    final StoryData avatar = StoryData(
-      id: post.user!.id,
-      url: post.user!.profilePictureUrl,
-      isOnline: true,
-    );
     return Row(
       children: [
         Avatar(radius: 20.0, imageUrl: post.user!.profilePictureUrl),
