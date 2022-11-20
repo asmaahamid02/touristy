@@ -22,6 +22,17 @@ class UserProfileProvider with ChangeNotifier {
 
   UserProfile get userProfile => _userProfile;
 
+  //update followers count
+  void followUser(bool isFollowing) {
+    _userProfile.isFollowedByUser = isFollowing;
+    if (isFollowing) {
+      _userProfile.followers = _userProfile.followers! + 1;
+    } else {
+      _userProfile.followers = _userProfile.followers! - 1;
+    }
+    notifyListeners();
+  }
+
   Future<void> setUserProfile(int userId) async {
     if (lastUpdatedUserId == userId &&
         _lastUpdated != null &&
