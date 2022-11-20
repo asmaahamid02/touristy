@@ -18,7 +18,7 @@ class TripController extends Controller
         $trips = Trip::orderBy('created_at', 'desc')->with('user')->with('location')->get();
 
         if ($trips->count() == 0) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Trips not found');
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Trips not found');
         }
 
         return $this->jsonResponse($trips, 'data', Response::HTTP_OK, 'Trips');
@@ -122,7 +122,7 @@ class TripController extends Controller
         $trips = Trip::where('user_id', $id)->orderBy('created_at', 'desc')->with('user')->with('location')->get();
 
         if ($trips->count() == 0) {
-            return $this->jsonResponse('', 'data', Response::HTTP_NOT_FOUND, 'Trips not found');
+            return $this->jsonResponse('', 'data', Response::HTTP_OK, 'Trips not found');
         }
 
         return $this->jsonResponse($trips, 'data', Response::HTTP_OK, 'Trips');
