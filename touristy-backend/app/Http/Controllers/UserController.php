@@ -4,15 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Models\UserType;
 use App\Traits\MediaTrait;
 use App\Traits\NationalityTrait;
 use App\Traits\ResponseJson;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
@@ -78,7 +75,13 @@ class UserController extends Controller
         if ($id == null)
             $id = Auth::id();
 
-        $user = User::where('id', $id)->where('is_deleted', 0)->first();
+            $user = User::where('id', $id)
+            ->where('is_deleted', 0)
+            ->with('nationality')
+            ->with('location')        
+            ->withCount('followers')
+            ->withCount('followings')                    
+            ->first();    
 
         if ($user == null) {
             return $this->jsonResponse('', 'errors', Response::HTTP_NOT_FOUND, 'User not found');
@@ -90,10 +93,10 @@ class UserController extends Controller
 
         //Validate data
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string',
-            'last_name' => 'required|string',
-            'gender' => 'required|string|in:male,female,other',
-            'date_of_birth' => 'required|date',
+            'first_name' => 'string',
+            'last_name' => 'string',
+            'gender' => 'string|in:male,female,other',
+            'date_of_birth' => 'date',
             'profile_picture' => 'nullable|base64image',
             'cover_picture' => 'nullable|base64image',
             'bio' => 'string|max:150',
@@ -106,10 +109,20 @@ class UserController extends Controller
             return $this->jsonResponse($validator->errors(), 'errors', Response::HTTP_UNPROCESSABLE_ENTITY, 'Validation Error');
         }
 
-        $user->first_name = $request->first_name;
-        $user->last_name = $request->last_name;
-        $user->gender = $request->gender;
-        $user->date_of_birth = $request->date_of_birth;
+
+        if($request->has('first_name'))
+            $user->first_name = $request->first_name;
+
+        if($request->has('last_name'))
+            $user->last_name = $request->last_name;
+
+        if($request->has('gender')){
+
+            $user->gender = $request->gender;
+        }
+
+        if($request->has('date_of_birth'))
+            $user->date_of_birth = $request->date_of_birth;
 
 
         if ($request->has('bio')) {
@@ -121,19 +134,34 @@ class UserController extends Controller
         }
 
         if ($request->has('profile_picture')) {
-            $path = $this->saveBase64Image($request->profile_picture, 'profile_pictures' . $user->id);
+            $path = $this->saveBase64String($request->profile_picture, 'profile_pictures/' . $user->id);
             $user->profile_picture = $path;
         }
 
         if ($request->has('cover_picture')) {
-            $path = $this->saveBase64Image($request->cover_picture, 'cover_pictures' . $user->id);
+            $path = $this->saveBase64String($request->cover_picture, 'cover_pictures/' . $user->id);
             $user->cover_picture = $path;
         }
 
         $user->save();
 
-        $user->nationality = $user->nationality;
-        return $this->jsonResponse($user, 'data', Response::HTTP_OK, 'Profile updated successfully');
+        if($id != Auth::id()){
+            //check if user is followed by auth user
+            $user->isFollowedByUser = $user->followers->contains(Auth::id());
+            //check if user is following auth user
+            $user->isFollowingUser = $user->followings->contains(Auth::id());
+            //check if user is blocked by auth user
+            $user->isBlockedByUser = $user->blockers->contains(Auth::id());
+            //check if user is blocking auth user
+            $user->isBlockingUser = $user->blockings->contains(Auth::id());
+        }else{
+            $user->isFollowedByUser = false;
+            $user->isFollowingUser = false;
+            $user->isBlockedByUser = false;
+            $user->isBlockingUser = false;
+        }
+
+        return $this->jsonResponse(new UserResource($user), 'data', Response::HTTP_OK, 'Profile updated successfully');
     }
 
     public function deleteAccount($id = null)
@@ -330,5 +358,5 @@ class UserController extends Controller
         }
 
         return $this->jsonResponse($suggestedUsers, 'data', Response::HTTP_OK, 'Suggested users');
-    }
+    }         
 }
