@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:touristy_frontend/exceptions/http_exception.dart';
 import '../screens/screens.dart';
 import '../providers/providers.dart';
 import '../utilities/utilities.dart';
@@ -55,9 +56,11 @@ class _TabsState extends State<Tabs> {
       });
       try {
         await Provider.of<Users>(context, listen: false).fetchAndSetUsers();
-      } catch (error) {
+      } on HttpException catch (error) {
         //show error snackbar
         SnakeBarCommon.show(context, error.toString());
+      } catch (error) {
+        debugPrint(error.toString());
       }
       if (!mounted) return;
       setState(() {
