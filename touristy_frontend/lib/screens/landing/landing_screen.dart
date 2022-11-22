@@ -41,7 +41,7 @@ class _LandingScreenState extends State<LandingScreen> {
         fit: StackFit.expand,
         alignment: Alignment.center,
         children: [
-          // _videoView(),
+          _videoView(),
           const Logo('assets/images/logo_vertical.png'),
           Padding(
             padding: const EdgeInsets.only(bottom: 50, left: 20, right: 20),
