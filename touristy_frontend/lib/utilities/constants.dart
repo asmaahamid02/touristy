@@ -1,12 +1,14 @@
 //---- STRINGS ------
 
 import 'dart:io';
-import 'dart:math';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-const String baseUrl = 'http://10.0.2.2:8000/api/v0.1';
-const String fileBaseUrl = 'http://10.0.2.2:8000/storage/uploads/';
-const String loginUrl = '$baseUrl/auth/login';
-const String registerUrl = '$baseUrl/auth/register';
+//needed ip address of the WIFI network
+//it is preferrable to connect the desktop to the same network as the mobile device
+final String baseUrl =
+    '${dotenv.env['APP_HOST']!}:${dotenv.env['APP_PORT']!}/api/v0.1';
+final String loginUrl = '$baseUrl/auth/login';
+final String registerUrl = '$baseUrl/auth/register';
 
 //---- ERRORS ------
 const String serverError = 'Server Error';
@@ -15,16 +17,6 @@ const String unauthorizedError = 'Unauthorized';
 const String somethingWentWrongError = 'Something went wrong';
 
 //----METHODS-----
-//randomly select number of distinct items from a list
-List<T> randomItems<T>(List<T> items, int count) {
-  var random = Random();
-  var result = <T>[];
-  for (var i = 0; i < count; i++) {
-    result.add(items[random.nextInt(items.length)]);
-  }
-  return result;
-}
-
 //get response error
 String getResponseError(dynamic responseData) {
   String error = '';
@@ -45,3 +37,6 @@ getHeaders(String token) {
     HttpHeaders.connectionHeader: 'keep-alive'
   };
 }
+
+//----UTILITIES-----
+enum Gender { female, male, other }
