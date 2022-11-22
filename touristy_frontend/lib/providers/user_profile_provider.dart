@@ -50,4 +50,31 @@ class UserProfileProvider with ChangeNotifier {
       rethrow;
     }
   }
+
+  //refresh user profile
+  Future<void> refreshUserProfile() async {
+    try {
+      final userProfileResults =
+          await UsersService.getUserProfile(authToken!, _userProfile.id!);
+      _userProfile = userProfileResults;
+      _lastUpdated = DateTime.now();
+      notifyListeners();
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  //update user profile
+  Future<void> updateUserProfile(Map<String, dynamic> updatedData) async {
+    try {
+      final userProfileResults =
+          await UsersService.updateUserProfile(authToken!, updatedData);
+      _userProfile = userProfileResults;
+      _lastUpdated = DateTime.now();
+
+      notifyListeners();
+    } catch (error) {
+      rethrow;
+    }
+  }
 }
