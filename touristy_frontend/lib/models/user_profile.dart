@@ -1,6 +1,9 @@
+import 'package:intl/intl.dart';
+
 class UserProfile {
   int? id;
-  String? name;
+  String? firstName;
+  String? lastName;
   String? email;
   String? nationality;
   String? countryCode;
@@ -15,11 +18,13 @@ class UserProfile {
   bool? isFollowedByUser;
   bool? isBlockedByUser;
   bool? isBlockingUser;
+  String? birthDate;
   String? joinedAt;
 
   UserProfile({
     this.id,
-    this.name,
+    this.firstName,
+    this.lastName,
     this.email,
     this.nationality,
     this.countryCode,
@@ -34,13 +39,15 @@ class UserProfile {
     this.isFollowedByUser,
     this.isBlockedByUser,
     this.isBlockingUser,
+    this.birthDate,
     this.joinedAt,
   });
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
       id: json['id'],
-      name: '${json['first_name']} ${json['last_name']} ',
+      firstName: json['first_name'],
+      lastName: json['last_name'],
       email: json['email'],
       nationality: json['nationality'] != null
           ? json['nationality']['nationality']
@@ -59,6 +66,8 @@ class UserProfile {
       isFollowedByUser: json['isFollowedByUser'] ?? false,
       isBlockedByUser: json['isBlockedByUser'] ?? false,
       isBlockingUser: json['isBlockingUser'] ?? false,
+      birthDate:
+          DateFormat.yMMMd().format(DateTime.parse(json['date_of_birth'])),
       joinedAt: json['joinedAt'],
     );
   }
