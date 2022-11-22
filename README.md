@@ -12,9 +12,8 @@
 
 <img src="./readme/title2.svg"/>
 
-> The Well app is a mental health and mindfulness app built on top of the science of positive psychology. The Well app is more than just another meditation or journaling app; it encourages you to enhance and reflect on your day with structured, guided activities.
->
-> There are 5 daily tasks that the Well app asks you to complete each day: record 3 gratitudes, write a journal entry, perform 3 acts of kindness, exercise for 20 minutes, and meditate for 15 minutes.
+>Touristy app is a social media application made for travelers to share their memories in different countries, and their trips.
+>It is a social network that connects different people with different nationalities to meet, post, talk, and share interesting experiences.
 
 ### User Stories
 
@@ -38,14 +37,16 @@
 
 | Landing | Signup | Home Page | Chat | Profile |
 | -----------------------------------------| -----------------------------------------| -----------------------------------------|  -----------------------------------------| -----------------------------------------| 
-| <img src='./readme/mockups/Landing.svg' /> | <img src='./readme/mockups/signup.svg' /> | <img src='./readme/mockups/homepage.svg' /> | <img src='./readme/mockups/signup2.svg' /> | <img src='./readme/mockups/profile.svg' /> |
+| <img src='./readme/mockups/landing.svg' /> | <img src='./readme/mockups/signup.svg' /> | <img src='./readme/mockups/homepage.svg' /> | <img src='./readme/mockups/signup2.svg' /> | <img src='./readme/mockups/profile.svg' /> |
 
 <br><br>
 
 <img src="./readme/title4.svg"/>
 
-Here's a brief high-level overview of the tech stack the Well app uses:
 
+**IMPORTANT** - This application runs on **ANDROID** devices **ONLY** and was **NEVER** tested on IOS devices
+
+Here's a brief high-level overview of the tech stack the Well app uses:
 - This project uses the [Flutter app development framework](https://flutter.dev/). Flutter is a cross-platform hybrid app development platform which allows us to use a single codebase for apps on mobile, desktop, and the web.
 - For database, the app uses the [MySQL](https://www.mysql.com/) database.
 - For the live chat, the app uses [cloud_firestore](https://pub.dev/packages/cloud_firestore) plugin to use [Cloud Firestore API](https://firebase.google.com/docs/firestore/) which is a flexible, scalable database for mobile, web, and server development from Firebase and Google Cloud.
@@ -73,7 +74,7 @@ Here's a brief high-level overview of the tech stack the Well app uses:
 <br><br>
 <img src="./readme/title5.svg"/>
 
-> Uing the above mentioned tech stacks and the wireframes build with figma from the user sotries we have, the implementation of the app is shown as below, these are screenshots from the real app
+> Using the above mentioned tech stacks and the wireframes build with figma from the user sotries we have, the implementation of the app is shown as below, these are screenshots from the real app
 
 | Landing                                                                                | Home/Search                                                                               |
 | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
@@ -92,7 +93,14 @@ Here's a brief high-level overview of the tech stack the Well app uses:
 2. PHP v7+   
 2. Intall XAMPP for installing PHP and creating the database from here - [XAMPP isnatall](https://www.apachefriends.org/download.html)   
 3. Install Composer for PHP dependencies from here - [Composer Install](https://getcomposer.org/)
-
+4. Determine your ip address for running the server
+   - Open command line
+   - type this command
+     ```sh
+     ipconfig
+     ``` 
+   - copy the ipv4 address and save it 😉
+   - If you are using a real device, get more info from the accepted answer here: [Access localhost from android device](https://stackoverflow.com/questions/4779963/how-can-i-access-my-localhost-from-my-android-device) 
 
 ### Installation
 
@@ -101,6 +109,8 @@ Here's a brief high-level overview of the tech stack the Well app uses:
    git clone https://github.com/asmaahamid02/touristy.git
    ```
 2. Create database in **phpmyadmin** named **touristydb**
+   - You need to Start Apache and MySQL in XAMPP Control panel
+   - Then go to http://localhost/phpmyadmin
 
 3. Navigate to server folder   
    ```sh
@@ -123,17 +133,26 @@ Here's a brief high-level overview of the tech stack the Well app uses:
    ```
 8. Run server
    ```sh
-   php artisan serve
+   php artisan serve --host=YOUR_IP_ADDRESS
    ```
-9. Navigate to app folder   
-   ```sh
-   cd touristy_frontend
-   ```
-10. Get packages
+9. Open touristy_frontend folder
+10. Rename **.env-example** to **.env**
+11. Add your **Google Api Key** inside .env file
+    - You can get the key from here: [Get API Key](https://developers.google.com/maps/documentation/javascript/get-api-key)
+12. Replace the *GOOGLE_API_KEY* inside **touristy_frontend/android/app/src/main/AndroidManifest.xml** file with your key 
+    - At this line: *android:value="GOOGLE_API_KEY"*
+13. Add your host_url and port number inside .env file
+14. Back to the cmd, navigate to app folder   
+    ```sh
+    cd touristy_frontend
+    ```    
+15. Get packages
     ```sh
     flutter pub get
     ```
-11. Run the app
+16. Run the app
      ```sh
      flutter run
      ```
+17. Gongratulations 🎉 You are now using **TOURISTY** ✈️
+    - Start the journey by creating a new account ...
