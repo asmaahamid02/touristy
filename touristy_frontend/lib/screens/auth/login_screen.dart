@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final errorMessage = error.toString();
       _showErrorDialog(errorMessage);
     } catch (error) {
-      final errorMessage = 'Authentication failed ${error.toString()}';
+      const errorMessage = 'Incorrect email or password.';
       _showErrorDialog(errorMessage);
     }
     if (!mounted) return;
