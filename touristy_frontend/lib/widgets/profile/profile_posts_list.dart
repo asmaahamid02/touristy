@@ -32,6 +32,11 @@ class ProfilePostsList extends StatelessWidget {
               child: Text('An error occurred!}'),
             );
           } else {
+            if (snapshot.data!.isEmpty) {
+              return const Center(
+                child: Text('No posts yet!'),
+              );
+            }
             return Consumer<UserPosts>(
               builder: (ctx, userPosts, child) {
                 return ListView.builder(
