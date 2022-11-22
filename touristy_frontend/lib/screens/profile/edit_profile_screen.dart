@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:touristy_frontend/models/models.dart';
 import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
 import '../../utilities/utilities.dart';
@@ -21,12 +22,13 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  UserProfile? _user;
   File? _profileImage;
   File? _coverImage;
   CountryCode? _countrySelected;
   Map<String, dynamic>? _initialValues;
   Map<String, dynamic>? _updatedValues;
-  final bool _isLoading = false;
+  bool _isLoading = false;
   bool _isInit = true;
   final _formKey = GlobalKey<FormState>();
 
@@ -42,30 +44,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.didChangeDependencies();
 
     if (_isInit) {
-      final user = Provider.of<UserProfileProvider>(context).userProfile;
+      _user = Provider.of<UserProfileProvider>(context).userProfile;
 
       _initialValues = {
-        'fisrtName': user.firstName,
-        'lastName': user.lastName,
-        'gender': user.gender,
-        'birthDate': _dateOfBirthController.text,
-        'nationality': user.nationality,
-        'bio': user.bio,
-        'profileImageUrl': user.profilePictureUrl,
-        'coverImageUrl': user.coverPictureUrl,
-        'countryCode': user.countryCode,
-        'profileImage': _profileImage,
-        'coverImage': _coverImage,
+        'fisrt_name': _user!.firstName,
+        'last_name': _user!.lastName,
+        'gender': _user!.gender,
+        'date_of_birth': _user!.birthDate,
+        'nationality': _user!.nationality,
+        'bio': _user!.bio ?? '',
+        'profileImageUrl': _user!.profilePictureUrl,
+        'coverImageUrl': _user!.coverPictureUrl,
+        'country_code': _user!.countryCode,
+        'profile_picture': _profileImage,
+        'cover_picture': _coverImage,
       };
 
-      _updatedValues = _initialValues;
+      //assign the initial values to the updated values without aliasing
+      _updatedValues = Map.from(_initialValues!).cast<String, dynamic>();
 
       _genderController.text = Gender.values
-          .firstWhere((element) => element.name == user.gender)
+          .firstWhere((element) => element.name == _user!.gender)
           .name;
-      _dateOfBirthController.text = user.birthDate!;
+      _dateOfBirthController.text = _user!.birthDate!;
       _countrySelected =
-          CountryCode(name: user.nationality, code: user.countryCode);
+          CountryCode(name: _user!.nationality, code: _user!.countryCode);
 
       _isInit = false;
     }
@@ -74,7 +77,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future _pickImage(ImageSource source, {ImageType? imageType}) async {
     final ImagePicker picker = ImagePicker();
     try {
-      final pickedImage = await picker.pickImage(source: source);
+      final pickedImage = await picker.pickImage(
+        source: source,
+        maxHeight: 500,
+        maxWidth: 500,
+      );
 
       if (pickedImage == null) return;
       File? img = File(pickedImage.path);
@@ -83,13 +90,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         setState(() {
           _profileImage = img;
           _updatedValues!['profileImageUrl'] = null;
-          _updatedValues!['profileImage'] = _profileImage;
+          _updatedValues!['profile_picture'] = _profileImage;
         });
       } else {
         setState(() {
           _coverImage = img;
           _updatedValues!['coverImageUrl'] = null;
-          _updatedValues!['coverImage'] = _coverImage;
+          _updatedValues!['cover_picture'] = _coverImage;
         });
       }
       if (!mounted) return;
@@ -112,10 +119,66 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   CountryCode _selectedCountry(CountryCode country) {
     setState(() {
       _countrySelected = country;
-      _updatedValues!['countryCode'] = _countrySelected!.code;
+      _updatedValues!['country_code'] = _countrySelected!.code;
       _updatedValues!['nationality'] = _countrySelected!.name;
     });
     return _countrySelected!;
+  }
+
+  Future<void> _saveForm() async {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) return;
+
+    _formKey.currentState!.save();
+
+    // check if there is any change in every field
+    final isChanged = _initialValues!.entries
+        .any((element) => element.value != _updatedValues![element.key]);
+
+    if (!isChanged) {
+      ToastCommon.show('No changes made');
+      return;
+    }
+
+    //convert profile image to base64
+    if (_profileImage != null) {
+      final profileImageBase64 =
+          FileHandler.convertFileToBase64(_profileImage!);
+      _updatedValues!['profile_picture'] = profileImageBase64;
+    }
+
+    //convert cover image to base64
+    if (_coverImage != null) {
+      final coverImageBase64 = FileHandler.convertFileToBase64(_coverImage!);
+      _updatedValues!['cover_picture'] = coverImageBase64;
+    }
+
+    //get changed values
+    final changedValues = _updatedValues!.entries
+        .where((element) => element.value != _initialValues![element.key])
+        .toList();
+
+    //convert the list of map entries to a map
+    final changedValuesMap = Map.fromEntries(changedValues);
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await Provider.of<UserProfileProvider>(context, listen: false)
+          .updateUserProfile(changedValuesMap);
+      FocusScope.of(context).unfocus();
+      ToastCommon.show('Profile updated successfully');
+    } on HttpException catch (error) {
+      ToastCommon.show(error.toString());
+    } catch (error) {
+      debugPrint(error.toString());
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   @override
@@ -142,7 +205,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           child: Column(
             children: [
               _buildProfileImages(),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Form(
@@ -152,25 +215,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       label: 'First name',
                       focusNode: _firstNameFocusNode,
                       prefixIcon: const Icon(Icons.person),
-                      initialValue: _updatedValues!['fisrtName'],
+                      initialValue: _updatedValues!['fisrt_name'],
                       onFieldSubmitted: (_) => FormUtility.onSubmitField(
                           context: context, focusNode: _lastNameFocusNode),
                       textInputAction: TextInputAction.next,
                       validator: (value) =>
                           FormUtility.validateName(value!, 'first name'),
-                      onSaved: (value) => _updatedValues!['fisrtName'] = value,
+                      onSaved: (value) => _updatedValues!['fisrt_name'] = value,
                     ),
                     FormUtility.buildTextField(
                       label: 'Last name',
                       focusNode: _lastNameFocusNode,
                       prefixIcon: const Icon(Icons.person),
-                      initialValue: _updatedValues!['lastName'],
+                      initialValue: _updatedValues!['last_name'],
                       onFieldSubmitted: (_) => FormUtility.onSubmitField(
                           context: context, focusNode: _genderFocusNode),
                       textInputAction: TextInputAction.next,
                       validator: (value) =>
                           FormUtility.validateName(value!, 'last name'),
-                      onSaved: (value) => _updatedValues!['lastName'] = value,
+                      onSaved: (value) => _updatedValues!['last_name'] = value,
                     ),
                     FormUtility.buildTextField(
                       label: 'Gender',
@@ -213,8 +276,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               DateFormat.yMMMd().format(pickedDate);
                         });
                       }),
-                      onSaved: (value) => _updatedValues?['birthDate'] =
-                          _dateOfBirthController.text,
+                      onSaved: (value) => _updatedValues!['date_of_birth'] =
+                          DateFormat('MMM d, y')
+                              .parse(value!)
+                              .toIso8601String(),
                     ),
                     const SizedBox(height: 8.0),
                     CountryList(
@@ -224,7 +289,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     FormUtility.buildTextField(
                       label: 'Bio',
                       prefixIcon: const Icon(Icons.description),
-                      maxLines: 3,
+                      maxLines: 1,
                       initialValue: _updatedValues!['bio'],
                       validator: (value) {
                         if (value!.length > 150) {
@@ -232,13 +297,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         }
                         return null;
                       },
-                      onSaved: (value) => _updatedValues!['bio'] = value,
+                      onSaved: (value) => _updatedValues!['bio'] = value ?? '',
                     ),
                     PrimaryButton(
                       textLabel: 'SAVE CHANGES',
                       onTap: _saveForm,
                     )
-                    // _buildSubmitButton(),
                   ]),
                 ),
               )
