@@ -3,10 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import './utilities.dart';
 
 class LocationHandler {
-  static const GOOGLE_API_KEY = 'AIzaSyCTh9nt09BXB492g4fj3PfAdVwhlIdJcAM';
+  static String GOOGLE_API_KEY = dotenv.env['GOOGLE_API_KEY']!;
   static Future<Position> getCurrentPosition(BuildContext context) async {
     try {
       final hasPermission = await handleLocationPermission(context);
