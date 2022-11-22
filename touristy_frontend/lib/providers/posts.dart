@@ -93,9 +93,11 @@ class Posts with ChangeNotifier {
 
     if (postIndex >= 0) {
       _updateLikeStatus(postIndex, _posts);
+      notifyListeners();
 
       if (followingPostIndex >= 0) {
-        _updateLikeStatus(followingPostIndex, _followingPosts);
+        followingPosts[followingPostIndex].isLiked = _posts[postIndex].isLiked;
+        followingPosts[followingPostIndex].likes = _posts[postIndex].likes;
         notifyListeners();
       }
 
@@ -103,9 +105,11 @@ class Posts with ChangeNotifier {
         await PostsService().toggleLikePost(authToken as String, postId);
       } catch (error) {
         _updateLikeStatus(postIndex, _posts);
-
+        notifyListeners();
         if (followingPostIndex >= 0) {
-          _updateLikeStatus(followingPostIndex, _followingPosts);
+          followingPosts[followingPostIndex].isLiked =
+              _posts[postIndex].isLiked;
+          followingPosts[followingPostIndex].likes = _posts[postIndex].likes;
           notifyListeners();
         }
       }
