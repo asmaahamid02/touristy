@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum Gender { female, male, other }
+import '../utilities/utilities.dart';
 
 class GenderRadioButton extends StatelessWidget {
   const GenderRadioButton(
