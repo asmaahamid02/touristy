@@ -31,10 +31,14 @@
 > This design was planned before on paper, then moved to Figma app for the fine details.
 > Note that i didn't use any styling library or theme, all from scratch and using pure css modules and flutter widgets styling
 
+### Wireframes
+
 | Landing | Signup | Homepage | Profile | Profile | 
 | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |  ----------------------------------------- | ----------------------------------------- |
 | <img src='./readme/wireframes/landing.png' /> | <img src='./readme/wireframes/signup.png' /> | <img src='./readme/wireframes/homepage.png' /> | <img src='./readme/wireframes/profile.png' /> | <img src='./readme/wireframes/edit_profile.png' /> | 
 
+
+### Mockups
 
 | Landing | Signup | Homepage | Add Post | 
 | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |  ----------------------------------------- | 
@@ -43,6 +47,12 @@
 | Profile | Edit Profile | Chat | Explore | 
 | -----------------------------------------| -----------------------------------------| -----------------------------------------|  -----------------------------------------| 
 <img src='./readme/mockups/profile.png' /> | <img src='./readme/mockups/edit_profile.png' /> | <img src='./readme/mockups/chat.png' /> | <img src='./readme/mockups/explore.png' /> |
+
+### Prototypes
+
+| Stories | New Post | Chat | Explore | Profile |
+| -----------------------------------------| -----------------------------------------| -----------------------------------------|  -----------------------------------------|-----------------------------------------|
+<img src='./readme/prototypes/homepage.gif' /> | <img src='./readme/prototypes/post.gif' /> | <img src='./readme/prototypes/chat.gif' /> | <img src='./readme/prototypes/explore.gif' /> | <img src='./readme/prototypes/profile.gif' /> |
 
 <br><br>
 
