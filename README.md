@@ -31,13 +31,18 @@
 > This design was planned before on paper, then moved to Figma app for the fine details.
 > Note that i didn't use any styling library or theme, all from scratch and using pure css modules and flutter widgets styling
 
-| Landing | Signup | Home Page | Chat | Profile |
-| -----------------------------------------| -----------------------------------------| -----------------------------------------|  -----------------------------------------| -----------------------------------------| 
-| <img src='./readme/wireframes/Landing_Page.svg' /> | <img src='./readme/wireframes/signup_personal_info.svg' /> | <img src='./readme/wireframes/homepage.svg' /> | <img src='./readme/wireframes/chat.svg' /> | <img src='./readme/wireframes/profile.svg' /> |
+| Landing | Signup | Homepage | Profile | Profile | 
+| ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |  ----------------------------------------- | ----------------------------------------- |
+| <img src='./readme/wireframes/landing.png' /> | <img src='./readme/wireframes/signup.png' /> | <img src='./readme/wireframes/homepage.png' /> | <img src='./readme/wireframes/profile.png' /> | <img src='./readme/wireframes/edit_profile.png' /> | 
 
-| Landing | Signup | Home Page | Chat | Profile |
-| -----------------------------------------| -----------------------------------------| -----------------------------------------|  -----------------------------------------| -----------------------------------------| 
-| <img src='./readme/mockups/landing.svg' /> | <img src='./readme/mockups/signup.svg' /> | <img src='./readme/mockups/homepage.svg' /> | <img src='./readme/mockups/signup2.svg' /> | <img src='./readme/mockups/profile.svg' /> |
+
+| Landing | Signup | Homepage | Add Post | 
+| ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |  ----------------------------------------- | 
+| <img src='./readme/mockups/landing.png' /> | <img src='./readme/mockups/signup.png' /> | <img src='./readme/mockups/homepage.png' /> | <img src='./readme/mockups/add_post.png' /> | 
+
+| Profile | Edit Profile | Chat | Explore | 
+| -----------------------------------------| -----------------------------------------| -----------------------------------------|  -----------------------------------------| 
+<img src='./readme/mockups/profile.png' /> | <img src='./readme/mockups/edit_profile.png' /> | <img src='./readme/mockups/chat.png' /> | <img src='./readme/mockups/explore.png' /> |
 
 <br><br>
 
