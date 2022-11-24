@@ -21,34 +21,38 @@ class Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-        radius: radius,
-        backgroundColor: Theme.of(context).cardColor,
-        child: imageUrl != null
-            ? CachedNetworkImage(
-                imageUrl: imageUrl!,
-                imageBuilder: (context, imageProvider) => Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    image: DecorationImage(
-                      image: imageProvider,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                placeholder: (context, url) =>
-                    const CircularProgressIndicator(),
-                errorWidget: (context, url, error) => const Icon(Icons.error),
-              )
-            : Container(
+      radius: radius,
+      backgroundColor: Theme.of(context).cardColor,
+      child: imageUrl != null
+          ? CachedNetworkImage(
+              imageUrl: imageUrl!,
+              imageBuilder: (context, imageProvider) => Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   image: DecorationImage(
-                    image: defaultImageProvider != null
-                        ? defaultImageProvider!
-                        : const AssetImage('assets/images/profile_picture.png'),
+                    image: imageProvider,
                     fit: BoxFit.cover,
                   ),
                 ),
-              ));
+              ),
+              placeholder: (context, url) => const CircularProgressIndicator(),
+              errorWidget: (context, url, error) => _buildDefaultImage(),
+            )
+          : _buildDefaultImage(),
+    );
+  }
+
+  Container _buildDefaultImage() {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        image: DecorationImage(
+          image: defaultImageProvider != null
+              ? defaultImageProvider!
+              : const AssetImage('assets/images/profile_picture.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
   }
 }
