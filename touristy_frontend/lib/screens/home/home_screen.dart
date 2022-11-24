@@ -72,6 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         body: const TabBarView(
+          physics: NeverScrollableScrollPhysics(),
           children: [
             ForYouPage(),
             FollowingPage(),
