@@ -20,6 +20,8 @@ class ImageOtionsBottomSheet extends StatelessWidget {
 
               if (status.isGranted) {
                 onTap(ImageSource.camera);
+              } else if (status.isDenied) {
+                await Permission.camera.request();
               } else {
                 openAppSettings();
               }
@@ -34,6 +36,8 @@ class ImageOtionsBottomSheet extends StatelessWidget {
 
               if (status.isGranted) {
                 onTap(ImageSource.gallery);
+              } else if (status.isDenied) {
+                await Permission.storage.request();
               } else {
                 openAppSettings();
               }
