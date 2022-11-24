@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:touristy_frontend/utilities/theme.dart';
-import 'package:touristy_frontend/widgets/widgets.dart';
-
+import '../../utilities/utilities.dart';
+import '../../widgets/widgets.dart';
 import '../../providers/providers.dart';
 import '../../models/models.dart';
+import '../../screens/screens.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -66,8 +66,8 @@ class ProfileScreen extends StatelessWidget {
                           ? IconButton(
                               icon: const Icon(Icons.settings),
                               onPressed: () {
-                                // Navigator.of(context)
-                                //     .pushNamed(EditProfileScreen.routeName);
+                                Navigator.of(context)
+                                    .pushNamed(SettingsScreen.routeName);
                               },
                             )
                           : const SizedBox.shrink(),
