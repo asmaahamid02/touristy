@@ -30,8 +30,8 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'] as int,
-      firstName: json['first_name'] as String,
-      lastName: json['last_name'] as String,
+      firstName: json['first_name'] ?? '',
+      lastName: json['last_name'] ?? '',
       nationality: json['nationality'] != null
           ? json['nationality']['nationality']
           : null,
