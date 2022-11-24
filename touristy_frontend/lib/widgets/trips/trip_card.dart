@@ -136,7 +136,7 @@ class _TripCardItem extends StatelessWidget {
                             //date
                             Expanded(
                               child: Text(
-                                date,
+                                date.isNotEmpty ? date : 'Past trip',
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
