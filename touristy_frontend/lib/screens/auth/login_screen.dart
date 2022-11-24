@@ -106,9 +106,44 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            _buildEmailTextField(),
+                            FormUtility.buildTextField(
+                              label: 'Email',
+                              prefixIcon: const Icon(Icons.email_outlined),
+                              keyboardType: TextInputType.emailAddress,
+                              focusNode: _emailFocusNode,
+                              validator: (value) =>
+                                  FormUtility.validateEmail(value!),
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context)
+                                    .requestFocus(_passwordFocusNode);
+                              },
+                              onSaved: (((newValue) =>
+                                  _user['email'] = newValue as String)),
+                            ),
                             const SizedBox(height: 10),
-                            _buildPasswordTextField(),
+                            FormUtility.buildTextField(
+                              label: 'Password',
+                              obscureText: _passwordObscureText,
+                              focusNode: _passwordFocusNode,
+                              prefixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _passwordObscureText =
+                                        !_passwordObscureText;
+                                  });
+                                },
+                                icon: Icon(_passwordObscureText
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined),
+                              ),
+                              textInputAction: TextInputAction.done,
+                              validator: (value) {
+                                return FormUtility.validatePassword(value!);
+                              },
+                              onSaved: (value) =>
+                                  _user['password'] = value as String,
+                            ),
                           ],
                         ),
                       ),
@@ -129,72 +164,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildEmailTextField() {
-    return TextFormField(
-      decoration: const InputDecoration(
-        border: UnderlineInputBorder(),
-        labelText: 'Email',
-        prefixIcon: Icon(Icons.email_outlined),
-      ),
-      autofocus: true,
-      keyboardType: TextInputType.emailAddress,
-      focusNode: _emailFocusNode,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return 'Please enter your email';
-        }
-        const emailPattern =
-            r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$";
-        final result =
-            RegExp(emailPattern, caseSensitive: false).hasMatch(value);
-        //check if email is valid
-        if (!result) {
-          return 'Please enter a valid email';
-        }
-        return null;
-      },
-      textInputAction: TextInputAction.next,
-      onFieldSubmitted: (_) {
-        FocusScope.of(context).requestFocus(_passwordFocusNode);
-      },
-      onSaved: (((newValue) => _user['email'] = newValue as String)),
-    );
-  }
-
-  Widget _buildPasswordTextField() {
-    return TextFormField(
-      decoration: InputDecoration(
-        border: const UnderlineInputBorder(),
-        labelText: 'Password',
-        prefixIcon: const Icon(Icons.lock_outline),
-        suffixIcon: IconButton(
-            onPressed: () {
-              setState(() {
-                _passwordObscureText = !_passwordObscureText;
-              });
-            },
-            icon: Icon(_passwordObscureText
-                ? Icons.visibility_off_outlined
-                : Icons.visibility_outlined)),
-      ),
-      obscureText: _passwordObscureText,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return 'Please enter your password';
-        }
-        if (value.length < 6) {
-          return 'Password must be at least 6 characters';
-        }
-        return null;
-      },
-      focusNode: _passwordFocusNode,
-      onFieldSubmitted: (_) {
-        _saveForm();
-      },
-      onSaved: ((newValue) => _user['password'] = newValue as String),
     );
   }
 }
