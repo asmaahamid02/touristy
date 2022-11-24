@@ -28,7 +28,7 @@ class ProfileHeader extends StatelessWidget {
               coverImageUrl: profile.coverPictureUrl,
             ),
             //add overlay
-            _buildOverlay(),
+            // _buildOverlay(),
             //added user profile image
             ProfileAvatar(
               imaegUrl: profile.profilePictureUrl,
