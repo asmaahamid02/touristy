@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/widgets.dart';
 import '../../screens/screens.dart';
+import '../../utilities/utilities.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -34,6 +35,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   Future<void> _saveForm() async {
+    FocusScope.of(context).unfocus();
     final isValid = _form.currentState!.validate();
     if (!isValid) {
       return;
@@ -77,50 +79,100 @@ class _SignupScreenState extends State<SignupScreen> {
                         key: _form,
                         child: Column(
                           children: [
-                            _buildNameTextField(
-                              autoFocus: true,
-                              context: context,
+                            FormUtility.buildTextField(
                               label: 'First name',
+                              autoFocus: true,
+                              textInputAction: TextInputAction.next,
+                              prefixIcon: const Icon(Icons.person_outline),
+                              validator: (value) => FormUtility.validateName(
+                                  value!, 'first name'),
                               onFieldSubmitted: (_) {
                                 FocusScope.of(context)
                                     .requestFocus(_lastNameFocusNode);
                               },
-                              icon: Icons.person_outline,
                               onSaved: (value) =>
                                   _user['first_name'] = value as String,
                             ),
                             const SizedBox(height: 10),
-                            _buildNameTextField(
-                              context: context,
+                            FormUtility.buildTextField(
                               label: 'Last name',
                               focusNode: _lastNameFocusNode,
+                              textInputAction: TextInputAction.next,
+                              prefixIcon: const Icon(Icons.person_outline),
+                              validator: (value) =>
+                                  FormUtility.validateName(value!, 'last name'),
                               onFieldSubmitted: (_) {
                                 FocusScope.of(context)
                                     .requestFocus(_emailFocusNode);
                               },
-                              icon: Icons.person_outline,
                               onSaved: (value) =>
                                   _user['last_name'] = value as String,
                             ),
                             const SizedBox(height: 10),
-                            _buildEmailField(context),
+                            FormUtility.buildTextField(
+                              label: 'Email',
+                              prefixIcon: const Icon(Icons.email_outlined),
+                              keyboardType: TextInputType.emailAddress,
+                              focusNode: _emailFocusNode,
+                              validator: (value) =>
+                                  FormUtility.validateEmail(value!),
+                              textInputAction: TextInputAction.next,
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context)
+                                    .requestFocus(_passwordFocusNode);
+                              },
+                              onSaved: (((newValue) =>
+                                  _user['email'] = newValue as String)),
+                            ),
                             const SizedBox(height: 10),
-                            _buildPasswordField(
-                              context: context,
-                              isPassword: true,
+                            FormUtility.buildTextField(
                               label: 'Password',
                               obscureText: _passwordObscureText,
                               focusNode: _passwordFocusNode,
+                              prefixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _passwordObscureText =
+                                        !_passwordObscureText;
+                                  });
+                                },
+                                icon: Icon(_passwordObscureText
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined),
+                              ),
+                              textInputAction: TextInputAction.next,
+                              validator: (value) {
+                                _password = value!;
+
+                                return FormUtility.validatePassword(value);
+                              },
+                              onFieldSubmitted: (_) {
+                                FocusScope.of(context)
+                                    .requestFocus(_confirmPasswordFocusNode);
+                              },
                               onSaved: (value) =>
                                   _user['password'] = value as String,
                             ),
                             const SizedBox(height: 10),
-                            _buildPasswordField(
-                              context: context,
-                              isPassword: false,
+                            FormUtility.buildTextField(
                               label: 'Confirm password',
                               obscureText: _confirmPasswordObscureText,
                               focusNode: _confirmPasswordFocusNode,
+                              textInputAction: TextInputAction.done,
+                              prefixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    _confirmPasswordObscureText =
+                                        !_confirmPasswordObscureText;
+                                  });
+                                },
+                                icon: Icon(_confirmPasswordObscureText
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined),
+                              ),
+                              validator: (value) =>
+                                  FormUtility.validateConfirmPassword(
+                                      value!, _password),
                               onSaved: (value) =>
                                   _user['confirm_password'] = value as String,
                             ),
@@ -139,125 +191,6 @@ class _SignupScreenState extends State<SignupScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  TextFormField _buildPasswordField({
-    required BuildContext context,
-    required String label,
-    required bool obscureText,
-    required bool isPassword,
-    FocusNode? focusNode,
-    Function(String?)? onSaved,
-  }) {
-    return TextFormField(
-      decoration: InputDecoration(
-        border: const UnderlineInputBorder(),
-        labelText: label,
-        prefixIcon: const Icon(Icons.lock_outline),
-        suffixIcon: IconButton(
-            onPressed: () {
-              setState(() {
-                isPassword
-                    ? _passwordObscureText = !_passwordObscureText
-                    : _confirmPasswordObscureText =
-                        !_confirmPasswordObscureText;
-              });
-            },
-            icon: Icon(obscureText
-                ? Icons.visibility_off_outlined
-                : Icons.visibility_outlined)),
-      ),
-      obscureText: obscureText,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return 'Please enter your password';
-        }
-        if (value.length < 6) {
-          return 'Password must be at least 6 characters';
-        }
-
-        if (isPassword) {
-          _password = value;
-        }
-
-        if (!isPassword && value != _password) {
-          return 'Passwords do not match';
-        }
-
-        return null;
-      },
-      focusNode: focusNode,
-      textInputAction:
-          !isPassword ? TextInputAction.next : TextInputAction.done,
-      onFieldSubmitted: isPassword
-          ? (_) {
-              FocusScope.of(context).requestFocus(_confirmPasswordFocusNode);
-            }
-          : (_) {
-              _saveForm();
-            },
-      onSaved: onSaved,
-    );
-  }
-
-  TextFormField _buildEmailField(BuildContext context) {
-    return TextFormField(
-      decoration: const InputDecoration(
-        border: UnderlineInputBorder(),
-        labelText: 'Email',
-        prefixIcon: Icon(Icons.email_outlined),
-      ),
-      keyboardType: TextInputType.emailAddress,
-      focusNode: _emailFocusNode,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return 'Please enter your email';
-        }
-        const emailPattern =
-            r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$";
-        final result =
-            RegExp(emailPattern, caseSensitive: false).hasMatch(value);
-        //check if email is valid
-        if (!result) {
-          return 'Please enter a valid email';
-        }
-        return null;
-      },
-      textInputAction: TextInputAction.next,
-      onFieldSubmitted: (_) {
-        FocusScope.of(context).requestFocus(_passwordFocusNode);
-      },
-      onSaved: (((newValue) => _user['email'] = newValue as String)),
-    );
-  }
-
-  TextFormField _buildNameTextField({
-    required BuildContext context,
-    required String label,
-    required IconData icon,
-    FocusNode? focusNode,
-    required Function(String?) onFieldSubmitted,
-    required Function(String?) onSaved,
-    bool autoFocus = false,
-  }) {
-    return TextFormField(
-      decoration: InputDecoration(
-        border: const UnderlineInputBorder(),
-        labelText: label,
-        prefixIcon: Icon(icon),
-      ),
-      autofocus: autoFocus,
-      validator: (value) {
-        if (value!.isEmpty) {
-          return 'Please enter your ${label.toLowerCase()}';
-        }
-        return null;
-      },
-      focusNode: focusNode,
-      textInputAction: TextInputAction.next,
-      onFieldSubmitted: onFieldSubmitted,
-      onSaved: onSaved,
     );
   }
 }
