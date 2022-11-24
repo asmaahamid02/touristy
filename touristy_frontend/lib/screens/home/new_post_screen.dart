@@ -392,11 +392,13 @@ class _LocationChoicesListState extends State<_LocationChoicesList> {
       MaterialPageRoute(
         fullscreenDialog: true,
         builder: (ctx) => initialLocation != null
-            ? MapPage(
+            ? SelectLocation(
+                isViewing: false,
                 initialLocation: initialLocation,
                 isSelecting: true,
               )
-            : const MapPage(
+            : const SelectLocation(
+                isViewing: false,
                 isSelecting: true,
               ),
       ),
