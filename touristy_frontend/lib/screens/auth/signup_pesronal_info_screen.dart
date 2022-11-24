@@ -2,7 +2,7 @@ import 'package:country_list_pick/country_list_pick.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../widgets/widgets.dart';
-
+import '../../utilities/utilities.dart';
 import '../screens.dart';
 
 class SignupPersonalInfoScreen extends StatefulWidget {
@@ -19,13 +19,14 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
   CountryCode? countrySelected;
   Gender? _gender;
   TextEditingController dateInputController = TextEditingController();
+  final initialDate = DateTime.now().subtract(const Duration(days: 365 * 16));
 
   void _presentDatePicker() {
-    showDatePicker(
+    FormUtility.showDatePickerDialog(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime.now(),
+      initialDate: initialDate,
+      firstDate: DateTime.now().subtract(const Duration(days: 365 * 100)),
+      lastDate: initialDate,
     ).then((pickedDate) {
       if (pickedDate == null) {
         return;
@@ -40,7 +41,7 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
   void initState() {
     countrySelected = CountryCode(name: 'Egypt', code: 'EG');
     _gender = Gender.male;
-    dateInputController.text = DateFormat.yMMMd().format(DateTime.now());
+    dateInputController.text = DateFormat.yMMMd().format(initialDate);
     super.initState();
   }
 
@@ -124,6 +125,7 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
                               const SizedBox(height: 20),
                               Row(
                                 children: [
+                                  //loop over Gender values
                                   GenderRadioButton(
                                       value: Gender.male,
                                       gender: _gender as Gender,
@@ -146,11 +148,18 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
                               const SizedBox(height: 30),
                               _buildTextFieldLabel('Date of Birth'),
                               const SizedBox(height: 10),
-                              _buildDateTextField(
-                                'Date of Birth',
-                                dateInputController,
-                                _onSavedDateOfBirth,
-                              ),
+                              FormUtility.buildTextField(
+                                label: 'Date of Birth',
+                                prefixIcon: const Icon(Icons.cake_outlined),
+                                suffixIcon:
+                                    const Icon(Icons.calendar_month_outlined),
+                                validator: (value) =>
+                                    FormUtility.validateDateOfBirth(value!),
+                                onTap: _presentDatePicker,
+                                readOnly: true,
+                                controller: dateInputController,
+                                onSaved: _onSavedDateOfBirth,
+                              )
                             ],
                           ),
                         ],
@@ -167,34 +176,6 @@ class SignupPersonalInfoScreenState extends State<SignupPersonalInfoScreen> {
           )
         ],
       ),
-    );
-  }
-
-  Widget _buildDateTextField(
-      String labelText, TextEditingController controller, Function onSaved) {
-    return TextFormField(
-      decoration: InputDecoration(
-        border: const UnderlineInputBorder(),
-        labelText: labelText,
-        prefixIcon: const Icon(Icons.cake_outlined),
-        suffixIcon: IconButton(
-          icon: Icon(
-            Icons.calendar_month_outlined,
-            color: Theme.of(context).primaryColor,
-          ),
-          onPressed: _presentDatePicker,
-        ),
-      ),
-      validator: (value) {
-        if (value!.isEmpty) {
-          return 'Please select your date of birth';
-        }
-        return null;
-      },
-      onTap: _presentDatePicker,
-      readOnly: true,
-      controller: controller,
-      onSaved: (newValue) => onSaved(newValue),
     );
   }
 
