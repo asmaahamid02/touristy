@@ -81,6 +81,11 @@ class _MyAppState extends State<MyApp> {
           update: (_, auth, previousUserPosts) =>
               previousUserPosts!..update(auth),
         ),
+        ChangeNotifierProxyProvider<Auth, Locations>(
+          create: (_) => Locations(),
+          update: (_, auth, previousLocations) =>
+              previousLocations!..update(auth),
+        ),
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
