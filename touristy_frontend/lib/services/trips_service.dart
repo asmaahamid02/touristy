@@ -4,8 +4,8 @@ import 'package:touristy_frontend/exceptions/http_exception.dart';
 import '../utilities/utilities.dart';
 import '../models/models.dart';
 
-class TripService {
-  static Future<List<Trip>> getTrips(String token, int userId) async {
+class TripsService {
+  static Future<List<Trip>> getTripsByUser(String token, int userId) async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/trips/user/$userId'),
           headers: getHeaders(token));
@@ -66,6 +66,62 @@ class TripService {
       //check if response is has error, throw exception
       if (response.statusCode != 200) {
         throw HttpException(getResponseError(responseData));
+      }
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  //get trips locations
+  static Future<List<GroupedLocations>> getTripsLocations(String token) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/trips/locations'),
+          headers: getHeaders(token));
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      //check if response is has error, throw exception
+      if (response.statusCode != 200) {
+        throw HttpException(getResponseError(responseData));
+      } else {
+        if (responseData['data'] != null &&
+            responseData['data'] != '' &&
+            responseData['data'].length > 0) {
+          final List<dynamic> tripsList = responseData['data'];
+          return tripsList
+              .map((trip) => GroupedLocations.fromJson(trip))
+              .toList();
+        } else {
+          return [];
+        }
+      }
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  //get trips by ids
+  static Future<List<Trip>> getTripsByIds(String token, List<int> ids) async {
+    try {
+      final response = await http.post(Uri.parse('$baseUrl/trips/ids'),
+          headers: getHeaders(token),
+          body: json.encode({
+            'ids': ids,
+          }));
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      print('getTripsByIds: $responseData');
+      //check if response is has error, throw exception
+      if (response.statusCode != 200) {
+        throw HttpException(getResponseError(responseData));
+      } else {
+        if (responseData['data'] != null &&
+            responseData['data'] != '' &&
+            responseData['data'].length > 0) {
+          final List<dynamic> tripsList = responseData['data'];
+          return tripsList.map((trip) => Trip.fromJson(trip)).toList();
+        } else {
+          return [];
+        }
       }
     } catch (error) {
       rethrow;
