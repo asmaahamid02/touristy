@@ -32,7 +32,7 @@ class _ProfileTripsListState extends State<ProfileTripsList> {
       });
       try {
         await Provider.of<Trips>(context, listen: false)
-            .fetchTrips(userProfile!.id!);
+            .fetchTripsByUser(userProfile!.id!);
       } catch (error) {
         ToastCommon.show(error.toString());
       }
