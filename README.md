@@ -103,7 +103,7 @@ Here's a brief high-level overview of the tech stack the Well app uses:
 
 | Landing | Signup | Homepage | Profile | Edit Profile | 
 | ----------------------------------------- | ----------------------------------------- | ----------------------------------------- |  ----------------------------------------- | ----------------------------------------- |
-|<img src="./readme/implementation/signup.PNG"/>|<img src="./readme/implementation/signup.PNG"/>|<img src="./readme/implementation/homepage.PNG"/>|<img src="./readme/implementation/profile.PNG"/>|<img src="./readme/implementation/edit_profile.PNG"/>|
+|<img src="./readme/implementation/landing.gif"/>|<img src="./readme/implementation/signup.PNG"/>|<img src="./readme/implementation/homepage.PNG"/>|<img src="./readme/implementation/profile.PNG"/>|<img src="./readme/implementation/edit_profile.PNG"/>|
 
 |  |  |  |  |
 | ----------------------------------------- | ----------------------------------------- |----------------------------------------- | ----------------------------------------- |  
@@ -157,32 +157,43 @@ Here's a brief high-level overview of the tech stack the Well app uses:
    * DB_USERNAME=*Your_Username*
    * DB_PASSWORD=*Your_Password*
 
-7. Run migrations and seeders
+7. Run migrations
    ```sh
    php artisan migrate --seed 
    ```
-8. Run server
+8. Link storage
+   ```sh
+   php artisan storage:link
+   ```
+9. Create dummy data
+   - Copy the images from **dummy_images** to **touristy_backend/public/storage/uploads**
+   <br> <br>
+   - Run the following command
+     ```sh
+     php artisan db:seed
+     ```   
+10. Run server
    ```sh
    php artisan serve --host=YOUR_IP_ADDRESS
    ```
-9. Open touristy_frontend folder
-10. Rename **.env-example** to **.env** in assets folder
-11. Add your **Google Api Key** inside .env file
+11. Open touristy_frontend folder
+12. Rename **.env-example** to **.env** in assets folder
+13. Add your **Google Api Key** inside .env file
     - You can get the key from here: [Get Google API Key](https://developers.google.com/maps/documentation/javascript/get-api-key)
-12. Replace the *GOOGLE_API_KEY* inside **touristy_frontend/android/app/src/main/AndroidManifest.xml** file with your key 
+14. Replace the *GOOGLE_API_KEY* inside **touristy_frontend/android/app/src/main/AndroidManifest.xml** file with your key 
     - At this line: *android:value="GOOGLE_API_KEY"*
-13. Add your host_url and port number inside .env file
-14. Back to the cmd, navigate to app folder   
+15. Add your host_url and port number inside .env file
+16. Back to the cmd, navigate to app folder   
     ```sh
     cd touristy_frontend
     ```    
-15. Get packages
+17. Get packages
     ```sh
     flutter pub get
     ```
-16. Run the app
+18. Run the app
      ```sh
      flutter run
      ```
-17. Gongratulations 🎉 You are now using **TOURISTY** ✈️
+19. Gongratulations 🎉 You are now using **TOURISTY** ✈️
     - Start the journey by creating a new account ...
