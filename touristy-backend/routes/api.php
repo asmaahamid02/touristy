@@ -56,13 +56,15 @@ Route::group(['prefix' => 'v0.1'], function () {
         //trips
         Route::group(['prefix' => 'trips'], function () {
             Route::get('/', [TripController::class, 'index']);
-            Route::get('/{id}', [TripController::class, 'show']);
+            Route::get('/{id}', [TripController::class, 'show'])->where('id', '[0-9]+');
             Route::post('/', [TripController::class, 'create']);
-            Route::put('/{id}', [TripController::class, 'update']);
-            Route::delete('/{id}', [TripController::class, 'delete']);
-            Route::get('/user/{id}', [TripController::class, 'getTripsByUser']);
-            Route::get('/location/{id}', [TripController::class, 'getTripsByLocation']);
+            Route::put('/{id}', [TripController::class, 'update'])->where('id', '[0-9]+');
+            Route::delete('/{id}', [TripController::class, 'delete'])->where('id', '[0-9]+');
+            Route::get('/user/{id}', [TripController::class, 'getTripsByUser'])->where('id', '[0-9]+');
+            Route::get('/location/{id}', [TripController::class, 'getTripsByLocation'])->where('id', '[0-9]+');
             Route::get('/random', [TripController::class, 'getRandomTrips']);
+            Route::get('/locations', [TripController::class, 'getTripsGroupedByLocations']);
+            Route::post('/ids', [TripController::class, 'getTripsByIds']);
         });
 
         //comments
