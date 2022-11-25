@@ -48,11 +48,12 @@ class TripCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String date = trip.arrivalDate != null
-        ? DateFormat.yMMMd().format(trip.arrivalDate!)
+    String date = trip.departureDate != null
+        ? DateFormat.yMMMd().format(trip.departureDate!)
         : '';
-    if (trip.departureDate != null) {
-      date += ' - ${DateFormat.yMMMd().format(trip.departureDate!)}';
+    if (trip.arrivalDate != null) {
+      if (date.isNotEmpty) date += ' - ';
+      date += DateFormat.yMMMd().format(trip.arrivalDate!);
     }
 
     int currentUserId = Provider.of<Auth>(context, listen: false).userId!;
