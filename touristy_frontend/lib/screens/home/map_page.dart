@@ -47,6 +47,7 @@ class _MapPageState extends State<MapPage> {
           Provider.of<Users>(context, listen: false).currentUser;
 
       try {
+        //get user current location
         final position = await LocationHandler.getCurrentPosition(context);
 
         await Provider.of<Trips>(context, listen: false)
@@ -56,6 +57,8 @@ class _MapPageState extends State<MapPage> {
             Provider.of<Trips>(context, listen: false).trips;
         setState(() {
           _center = LatLng(position.latitude, position.longitude);
+
+          //add current user location marker
           _customMarkers.add(
             MarkerData(
               marker: Marker(
@@ -69,10 +72,12 @@ class _MapPageState extends State<MapPage> {
           );
         });
 
+        //fetch all trips
         final locations = Provider.of<Locations>(context, listen: false);
         await locations.fetchLocations();
         final locationList = locations.tripsLocations;
 
+        //add all trips markers
         if (locationList != null && locationList.isNotEmpty) {
           int id = 1;
 
