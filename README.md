@@ -159,7 +159,7 @@ Here's a brief high-level overview of the tech stack the Well app uses:
 
 7. Run migrations
    ```sh
-   php artisan migrate --seed 
+   php artisan migrate 
    ```
 8. Link storage
    ```sh
