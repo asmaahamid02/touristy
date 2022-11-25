@@ -129,7 +129,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               label: 'Password',
                               obscureText: _passwordObscureText,
                               focusNode: _passwordFocusNode,
-                              prefixIcon: IconButton(
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
                                     _passwordObscureText =
@@ -159,7 +160,8 @@ class _SignupScreenState extends State<SignupScreen> {
                               obscureText: _confirmPasswordObscureText,
                               focusNode: _confirmPasswordFocusNode,
                               textInputAction: TextInputAction.done,
-                              prefixIcon: IconButton(
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
                                     _confirmPasswordObscureText =

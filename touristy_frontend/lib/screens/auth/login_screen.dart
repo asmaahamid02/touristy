@@ -126,7 +126,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               label: 'Password',
                               obscureText: _passwordObscureText,
                               focusNode: _passwordFocusNode,
-                              prefixIcon: IconButton(
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
                                     _passwordObscureText =
