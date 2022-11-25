@@ -2,13 +2,21 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class Avatar extends StatelessWidget {
-  Avatar({super.key, this.imageUrl, required this.radius});
+  Avatar({
+    super.key,
+    this.imageUrl,
+    required this.radius,
+    this.defaultImageProvider =
+        const AssetImage('assets/images/profile_picture.png'),
+  });
+
   Avatar.small({super.key, this.imageUrl}) : radius = 16.0;
   Avatar.medium({super.key, this.imageUrl}) : radius = 27.0;
   Avatar.large({super.key, this.imageUrl}) : radius = 44.0;
 
   String? imageUrl;
   final double radius;
+  ImageProvider? defaultImageProvider;
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +36,23 @@ class Avatar extends StatelessWidget {
                 ),
               ),
               placeholder: (context, url) => const CircularProgressIndicator(),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
+              errorWidget: (context, url, error) => _buildDefaultImage(),
             )
-          : Image.asset('assets/images/profile_picture.png'),
+          : _buildDefaultImage(),
+    );
+  }
+
+  Container _buildDefaultImage() {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        image: DecorationImage(
+          image: defaultImageProvider != null
+              ? defaultImageProvider!
+              : const AssetImage('assets/images/profile_picture.png'),
+          fit: BoxFit.cover,
+        ),
+      ),
     );
   }
 }

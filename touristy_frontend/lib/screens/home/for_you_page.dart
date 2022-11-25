@@ -78,7 +78,7 @@ class _ForYouPageState extends State<ForYouPage> {
         _isLoading = false;
         _hasMore = false;
       });
-      SnakeBarCommon.show(context, error.toString());
+      debugPrint(error.toString());
     }
   }
 

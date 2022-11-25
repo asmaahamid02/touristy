@@ -8,13 +8,13 @@ class ProfileFollowers extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final profile =
-        Provider.of<UserProfileProvider>(context, listen: false).userProfile;
     final textColor = Theme.of(context).brightness == Brightness.light
         ? Theme.of(context).cardColor
         : null;
-    return SliverToBoxAdapter(
-      child: Card(
+    return Consumer<UserProfileProvider>(
+        builder: (context, userProfileProvider, child) {
+      final profile = userProfileProvider.userProfile;
+      return Card(
         color: Theme.of(context).brightness == Brightness.light
             ? AppColors.secondary
             : Theme.of(context).cardColor,
@@ -39,7 +39,7 @@ class ProfileFollowers extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _buildTextLabel(
-                        textColor, profile.followers.toString(), 20),
+                        textColor, profile.followings.toString(), 20),
                     _buildTextLabel(textColor, 'Following', 16),
                   ],
                 ),
@@ -47,8 +47,8 @@ class ProfileFollowers extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
+    });
   }
 
   Text _buildTextLabel(Color? textColor, String text, double fontSize) {

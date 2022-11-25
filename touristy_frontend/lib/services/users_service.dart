@@ -68,4 +68,36 @@ class UsersService {
       rethrow;
     }
   }
+
+  //update user profile
+  static Future<UserProfile> updateUserProfile(
+      String token, Map<String, dynamic> updatedData) async {
+    try {
+      var response = await http.put(
+        Uri.parse('$baseUrl/users'),
+        headers: getHeaders(token),
+        body: json.encode(
+          updatedData,
+        ),
+      );
+
+      final responseData = json.decode(response.body) as Map<String, dynamic>;
+
+      //check if response is has error, throw exception
+      if (response.statusCode != 200) {
+        throw HttpException(getResponseError(responseData));
+      } else {
+        if (responseData['data'] != null &&
+            responseData['data'] != '' &&
+            responseData['data'].length > 0) {
+          final Map<String, dynamic> userProfile = responseData['data'];
+          return UserProfile.fromJson(userProfile);
+        } else {
+          return UserProfile();
+        }
+      }
+    } catch (error) {
+      rethrow;
+    }
+  }
 }

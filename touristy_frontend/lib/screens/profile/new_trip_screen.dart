@@ -44,11 +44,11 @@ class _NewTripScreenState extends State<NewTripScreen> {
   void initState() {
     super.initState();
     firstArriDate = DateTime.now();
-    lastArriDate = DateTime.now().add(const Duration(days: 365));
+    lastArriDate = DateTime.now().add(const Duration(days: 365 * 20));
     _arrivalDateController.text = firstArriDate!.toString();
 
-    firstDepDate = DateTime.now().add(const Duration(days: 1));
-    lastDepDate = DateTime.now().add(const Duration(days: 366));
+    firstDepDate = DateTime.now();
+    lastDepDate = DateTime.now().add(const Duration(days: 365 * 20));
   }
 
   void changeDate(String value, TextEditingController controller) {
@@ -89,6 +89,14 @@ class _NewTripScreenState extends State<NewTripScreen> {
     }
     _formKey.currentState!.save();
 
+//check if arrival date is before departure date
+    if (_departureDateController.text.isNotEmpty) {
+      if (DateTime.parse(_departureDateController.text)
+          .isAfter(DateTime.parse(_arrivalDateController.text))) {
+        ToastCommon.show('Arrival date must be after departure date');
+        return;
+      }
+    }
     try {
       setState(() {
         _isLoading = true;

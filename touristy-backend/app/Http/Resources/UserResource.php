@@ -29,6 +29,7 @@ class UserResource extends JsonResource
             'cover_picture' => $this->cover_picture != null ? asset('storage/uploads/' . $this->cover_picture) : null,
             'bio' => $this->bio,
             'gender' => $this->gender,
+            'date_of_birth' => $this->date_of_birth,
             'followers' => $this->followers_count,
             'followings' => $this->followings_count,
             'location' => new LocationResource($this->whenLoaded('location')),

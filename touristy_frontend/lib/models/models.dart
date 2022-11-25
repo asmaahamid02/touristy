@@ -6,3 +6,4 @@ export './story_data.dart';
 export './user.dart';
 export './trip.dart';
 export './user_profile.dart';
+export './grouped_location.dart';

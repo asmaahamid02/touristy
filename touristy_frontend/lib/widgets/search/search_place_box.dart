@@ -4,7 +4,9 @@ import '../../../utilities/utilities.dart';
 import '../../widgets/widgets.dart';
 
 class SearchPlaceBox extends StatefulWidget {
-  const SearchPlaceBox({super.key});
+  final String? initialSearchText;
+  const SearchPlaceBox(
+      {super.key, this.initialSearchText = 'Search for a destination'});
 
   @override
   State<SearchPlaceBox> createState() => _SearchPlaceBoxState();
@@ -71,7 +73,7 @@ class _SearchPlaceBoxState extends State<SearchPlaceBox> {
         SearchTextField(
           focusNode: _destinationFocusNode,
           controller: _destinationController,
-          labelText: 'Search for a destination',
+          labelText: widget.initialSearchText!,
           onTap: null,
           readOnly: false,
           autoFocus: true,

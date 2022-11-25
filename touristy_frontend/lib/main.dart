@@ -2,14 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import './utilities/utilities.dart';
 import './screens/screens.dart';
 import './providers/providers.dart';
+import './config/config.dart';
 
-void main() async {
+Future<void> main() async {
   //portrait mode only
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  await dotenv.load(fileName: "assets/.env");
+  prefs = await SharedPreferences.getInstance();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
     runApp(MyApp(
@@ -18,10 +23,27 @@ void main() async {
   });
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key, required this.appTheme});
 
   final AppTheme appTheme;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+
+    //initialize the app theme
+    currentTheme.addListener(() {
+      print('Theme changed');
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -59,13 +81,18 @@ class MyApp extends StatelessWidget {
           update: (_, auth, previousUserPosts) =>
               previousUserPosts!..update(auth),
         ),
+        ChangeNotifierProxyProvider<Auth, Locations>(
+          create: (_) => Locations(),
+          update: (_, auth, previousLocations) =>
+              previousLocations!..update(auth),
+        ),
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
           title: 'Touristy',
-          theme: appTheme.dark,
-          darkTheme: appTheme.light,
-          themeMode: ThemeMode.light,
+          theme: widget.appTheme.light,
+          darkTheme: widget.appTheme.dark,
+          themeMode: currentTheme.currentTheme,
           home: auth.isAuth
               ? const Tabs()
               : FutureBuilder(
@@ -93,6 +120,8 @@ class MyApp extends StatelessWidget {
             CommentsScreen.routeName: (ctx) => const CommentsScreen(),
             ProfileScreen.routeName: (ctx) => const ProfileScreen(),
             NewTripScreen.routeName: (ctx) => const NewTripScreen(),
+            EditProfileScreen.routeName: (ctx) => const EditProfileScreen(),
+            SettingsScreen.routeName: (ctx) => const SettingsScreen(),
           },
         ),
       ),

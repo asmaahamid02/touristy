@@ -40,19 +40,17 @@ class _SignupProfileScreenState extends State<SignupProfileScreen> {
         Navigator.of(context).pop();
       });
     } on PlatformException catch (e) {
-      print(e);
+      debugPrint(e.toString());
       Navigator.of(context).pop();
     }
   }
 
   void _showBottomSheet() async {
-    if (_image == null) {
-      ModalBottomSheetCommon.show(
-        context,
-        ImageOtionsBottomSheet(onTap: _pickImage),
-        height: 215,
-      );
-    }
+    ModalBottomSheetCommon.show(
+      context,
+      ImageOtionsBottomSheet(onTap: _pickImage),
+      height: 215,
+    );
   }
 
   Future<void> _saveForm() async {

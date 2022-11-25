@@ -68,4 +68,17 @@ trait MediaTrait
 
         return $mime;
     }
+
+    //save base64String as image
+    public function saveBase64String($base64String, $folderName)
+    {
+        $file_name =  uniqid() . time() . '.png'; 
+
+        //save the file to the server
+        $path = $folderName . '/' . time() . '/' . $file_name;
+        Storage::disk('uploads')->put($path, base64_decode($base64String));
+
+        return $path;
+    }
+   
 }

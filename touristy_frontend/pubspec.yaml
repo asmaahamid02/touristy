@@ -47,26 +47,20 @@ dependencies:
   shared_preferences: ^2.0.15
   timeago: ^3.3.0
   images_picker: ^1.2.11
-  path_provider: ^2.0.11
   cloud_firestore: ^4.0.4
   firebase_core: ^2.1.1
   cached_network_image: ^3.2.2
   google_fonts: ^3.0.1
   fluttertoast: ^8.1.1
   collection: ^1.16.0
-  firebase_messaging: ^14.1.0
   geocoding: ^2.0.5
   geolocator: ^9.0.2
   google_maps_flutter: ^2.2.1
-  flutter_google_places: ^0.3.0
-  flutter_typeahead: ^4.1.1
-  google_maps_webservice: ^0.0.19
-  comment_tree: ^0.3.0
-  country_picker: ^2.0.17
-  csc_picker: ^0.2.6
   date_time_picker: ^2.1.0
-  flutter_datetime_picker: ^1.5.1
   uuid: ^3.0.7
+  flutter_dotenv: ^5.0.2
+  custom_map_markers: ^0.0.2+1
+
 
 dev_dependencies:
   flutter_test:
@@ -99,6 +93,7 @@ flutter:
     - assets/images/main_dark.png
     - assets/images/login_dark.png
     - assets/images/map.png
+    - assets/.env
     # - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
