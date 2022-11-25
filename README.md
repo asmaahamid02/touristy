@@ -108,8 +108,9 @@ Here's a brief high-level overview of the tech stack the Well app uses:
 |  |  | 
 | ----------------------------------------- | ----------------------------------------- | 
 |<img src="./readme/implementation/search_map.gif"/>|<img src="./readme/implementation/dark_mode.gif"/>|
-|<img src="./readme/implementation/chat.gif"/>|<img src="./readme/implementation/homepage.gif"/>|
+|<img src="./readme/implementation/chat.gif"/>|<img src="./readme/implementation/explore.gif"/>|
 |<img src="./readme/implementation/delete_trip.gif"/>|<img src="./readme/implementation/map.gif"/>|
+|<img src="./readme/implementation/autocomplete.gif"/>|<img src="./readme/implementation/homepage.gif"/>|
 
 <br><br>
 <img src="./readme/title6.svg"/>
